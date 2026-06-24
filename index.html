@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -12,19 +11,17 @@
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f0f; color: #e8e8e8; min-height: 100vh; }
 .container { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem; }
 
-/* HEADER */
 .header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 2rem; flex-wrap: wrap; gap: 12px; }
 .header-left h1 { font-size: 22px; font-weight: 500; color: #fff; margin-bottom: 4px; }
 .header-left p { font-size: 13px; color: #555; }
 .header-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 
-/* DROPDOWN */
 .dropdown-wrap { position: relative; }
-.dropdown-btn { background: #1a1a1a; border: 0.5px solid #2a2a2a; border-radius: 8px; padding: 8px 16px; font-size: 13px; color: #ccc; cursor: pointer; display: flex; align-items: center; gap: 8px; min-width: 155px; }
+.dropdown-btn { background: #1a1a1a; border: 0.5px solid #2a2a2a; border-radius: 8px; padding: 8px 16px; font-size: 13px; color: #ccc; cursor: pointer; display: flex; align-items: center; gap: 8px; min-width: 175px; }
 .dropdown-btn:hover { border-color: #444; background: #222; }
 .dropdown-chevron { margin-left: auto; color: #555; font-size: 11px; transition: transform 0.15s; }
 .dropdown-chevron.open { transform: rotate(180deg); }
-.dropdown-menu { position: absolute; top: calc(100% + 6px); right: 0; background: #1a1a1a; border: 0.5px solid #2a2a2a; border-radius: 10px; overflow: hidden; z-index: 100; min-width: 170px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); display: none; }
+.dropdown-menu { position: absolute; top: calc(100% + 6px); right: 0; background: #1a1a1a; border: 0.5px solid #2a2a2a; border-radius: 10px; overflow: hidden; z-index: 100; min-width: 190px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); display: none; }
 .dropdown-menu.open { display: block; }
 .dropdown-group-label { font-size: 10px; color: #444; text-transform: uppercase; letter-spacing: 0.08em; padding: 10px 14px 4px; }
 .dropdown-item { padding: 9px 14px; font-size: 13px; color: #888; cursor: pointer; transition: all 0.1s; display: flex; align-items: center; gap: 8px; }
@@ -33,49 +30,51 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .dropdown-item .dot { width: 6px; height: 6px; border-radius: 50%; background: #378ADD; flex-shrink: 0; opacity: 0; }
 .dropdown-item.active .dot { opacity: 1; }
 
-.btn-refresh { background: transparent; border: 0.5px solid #2a2a2a; border-radius: 8px; padding: 8px 14px; font-size: 13px; color: #666; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.15s; }
+.btn-refresh { background: transparent; border: 0.5px solid #2a2a2a; border-radius: 8px; padding: 8px 12px; font-size: 15px; color: #666; cursor: pointer; transition: all 0.15s; }
 .btn-refresh:hover { color: #ccc; border-color: #444; background: #1a1a1a; }
 
-/* TABS */
+/* Ciclo badge */
+.ciclo-badge { font-size: 11px; color: #555; background: #1a1a1a; border: 0.5px solid #222; border-radius: 6px; padding: 4px 10px; white-space: nowrap; }
+
 .tabs { display: flex; background: #1a1a1a; border: 0.5px solid #222; border-radius: 10px; padding: 3px; margin-bottom: 1.5rem; gap: 2px; }
 .tab { flex: 1; padding: 8px 12px; font-size: 12px; color: #555; background: transparent; border: none; cursor: pointer; border-radius: 8px; transition: all 0.15s; text-align: center; letter-spacing: 0.02em; }
 .tab:hover { color: #aaa; }
 .tab.active { color: #fff; background: #2a2a2a; }
 
-/* METRICS */
 .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
 .metric { background: #1a1a1a; border: 0.5px solid #222; border-radius: 8px; padding: 14px 16px; }
 .metric-label { font-size: 10px; color: #444; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
 .metric-value { font-size: 17px; font-weight: 500; color: #e8e8e8; }
 .metric-value.danger { color: #E24B4A; }
 .metric-value.success { color: #639922; }
-.metric-sub { font-size: 11px; color: #555; margin-top: 4px; }
 
-/* PROYECCIÓN banner */
-.proj-banner { background: #1a1a1a; border: 0.5px solid #2a2a2a; border-left: 2px solid #EF9F27; border-radius: 8px; padding: 12px 16px; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-.proj-banner-icon { font-size: 18px; }
-.proj-banner-text { flex: 1; }
-.proj-banner-title { font-size: 12px; color: #EF9F27; margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.05em; }
-.proj-banner-body { font-size: 13px; color: #aaa; }
+/* Banner proyección */
+.proj-banner { background: #1a1a1a; border: 0.5px solid #2a2a2a; border-left: 2px solid #EF9F27; border-radius: 8px; padding: 12px 16px; margin-bottom: 1.5rem; display: flex; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+.proj-banner-content { flex: 1; }
+.proj-banner-title { font-size: 10px; color: #EF9F27; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.06em; }
+.proj-banner-body { font-size: 13px; color: #888; line-height: 1.6; }
 .proj-banner-body strong { color: #e8e8e8; font-weight: 500; }
 
-/* CHARTS */
+/* Barra de progreso del ciclo */
+.ciclo-progress { background: #1a1a1a; border: 0.5px solid #222; border-radius: 8px; padding: 14px 16px; margin-bottom: 1.5rem; }
+.ciclo-progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.ciclo-progress-label { font-size: 10px; color: #444; text-transform: uppercase; letter-spacing: 0.06em; }
+.ciclo-progress-pct { font-size: 12px; color: #666; }
+.progress-track { background: #222; border-radius: 4px; height: 6px; position: relative; overflow: hidden; }
+.progress-fill-gastos { height: 6px; border-radius: 4px; background: #E24B4A; position: absolute; left: 0; top: 0; transition: width 0.4s; }
+.progress-fill-tiempo { height: 6px; border-radius: 4px; background: #378ADD22; position: absolute; left: 0; top: 0; border-right: 1.5px solid #378ADD; }
+.ciclo-progress-legend { display: flex; gap: 16px; margin-top: 8px; }
+.ciclo-legend-item { font-size: 11px; color: #555; display: flex; align-items: center; gap: 5px; }
+.ciclo-legend-dot { width: 8px; height: 4px; border-radius: 2px; }
+
 .charts { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 1.5rem; }
 .chart-card { background: #1a1a1a; border: 0.5px solid #222; border-radius: 12px; padding: 1.25rem; }
+.chart-card-full { background: #1a1a1a; border: 0.5px solid #222; border-radius: 12px; padding: 1.25rem; margin-bottom: 1.5rem; }
 .chart-title { font-size: 10px; font-weight: 500; color: #444; margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.07em; }
 .legend { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
 .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: #666; }
 .legend-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
 
-/* COMPARATIVA full width */
-.chart-card-full { background: #1a1a1a; border: 0.5px solid #222; border-radius: 12px; padding: 1.25rem; margin-bottom: 1.5rem; }
-
-/* RATIO chart */
-.ratio-points { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
-.ratio-pill { background: #222; border-radius: 20px; padding: 4px 10px; font-size: 11px; color: #666; }
-.ratio-pill.highlight { background: rgba(239,159,39,0.12); color: #EF9F27; }
-
-/* TABLE */
 .table-card { background: #1a1a1a; border: 0.5px solid #222; border-radius: 12px; padding: 1.25rem; margin-bottom: 1.5rem; }
 .ranking-table { width: 100%; border-collapse: collapse; font-size: 13px; }
 .ranking-table tr { border-bottom: 0.5px solid #1e1e1e; }
@@ -96,7 +95,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
 .loading { text-align: center; padding: 3rem 0; color: #444; font-size: 14px; }
 .error-msg { background: #2a1010; color: #E24B4A; border: 0.5px solid #3a1515; border-radius: 8px; padding: 12px 16px; font-size: 13px; margin-bottom: 1rem; }
-.section-hidden { display: none; }
 
 @media (max-width: 540px) { .charts { grid-template-columns: 1fr; } .metrics { grid-template-columns: repeat(2, 1fr); } }
 </style>
@@ -110,6 +108,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       <p id="dashSub">Cargando...</p>
     </div>
     <div class="header-right">
+      <span class="ciclo-badge" id="cicloBadge">Ciclo: —</span>
       <div class="dropdown-wrap" id="dropdownWrap">
         <button class="dropdown-btn" id="dropdownBtn" onclick="toggleDropdown()">
           <span id="dropdownLabel">Cargando...</span>
@@ -117,26 +116,38 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
         </button>
         <div class="dropdown-menu" id="dropdownMenu"></div>
       </div>
-      <button class="btn-refresh" onclick="loadData()">↻</button>
+      <button class="btn-refresh" onclick="loadData()" title="Actualizar">↻</button>
     </div>
   </div>
 
   <div id="errorBox" style="display:none;" class="error-msg"></div>
 
   <div class="tabs">
-    <button class="tab active" onclick="setTab('mes', this)">Este mes</button>
+    <button class="tab active" onclick="setTab('mes', this)">Este ciclo</button>
     <button class="tab" onclick="setTab('comparativa', this)">Comparativa</button>
     <button class="tab" onclick="setTab('detalle', this)">Detalle</button>
   </div>
 
   <div id="loadingBox" class="loading">Conectando con Google Sheets...</div>
 
-  <!-- TAB: ESTE MES -->
+  <!-- TAB: ESTE CICLO -->
   <div id="tabMes" style="display:none;">
+
+    <div id="cicloProgressWrap" class="ciclo-progress" style="display:none;">
+      <div class="ciclo-progress-header">
+        <span class="ciclo-progress-label">Avance del ciclo</span>
+        <span class="ciclo-progress-pct" id="cicloProgressPct"></span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill-tiempo" id="progressTiempo" style="width:0%"></div>
+        <div class="progress-fill-gastos" id="progressGastos" style="width:0%"></div>
+      </div>
+      <div class="ciclo-legend-item" style="margin-top:8px; font-size:11px; color:#555;" id="cicloLegendText"></div>
+    </div>
+
     <div id="projBanner" class="proj-banner" style="display:none;">
-      <div class="proj-banner-icon">📈</div>
-      <div class="proj-banner-text">
-        <p class="proj-banner-title">Proyección del mes</p>
+      <div class="proj-banner-content">
+        <p class="proj-banner-title">Proyección al cierre del ciclo</p>
         <p class="proj-banner-body" id="projText"></p>
       </div>
     </div>
@@ -151,7 +162,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       </div>
       <div class="chart-card">
         <p class="chart-title">Gastos por fecha</p>
-        <div style="position:relative; height:190px;"><canvas id="barChart" role="img" aria-label="Gastos por fecha del mes">Cargando...</canvas></div>
+        <div style="position:relative; height:190px;"><canvas id="barChart" role="img" aria-label="Gastos por fecha del ciclo">Cargando...</canvas></div>
       </div>
     </div>
 
@@ -164,21 +175,21 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
   <!-- TAB: COMPARATIVA -->
   <div id="tabComparativa" style="display:none;">
     <div class="chart-card-full">
-      <p class="chart-title">Total de gastos mes a mes</p>
-      <div style="position:relative; height:220px;"><canvas id="compareBarChart" role="img" aria-label="Comparativa de gastos totales por mes">Cargando...</canvas></div>
+      <p class="chart-title">Total de gastos por ciclo</p>
+      <div style="position:relative; height:220px;"><canvas id="compareBarChart" role="img" aria-label="Comparativa de gastos totales por ciclo">Cargando...</canvas></div>
     </div>
     <div class="charts">
       <div class="chart-card">
         <p class="chart-title">% gastado del ingreso</p>
-        <div style="position:relative; height:180px;"><canvas id="ratioLineChart" role="img" aria-label="Porcentaje del ingreso gastado por mes">Cargando...</canvas></div>
+        <div style="position:relative; height:180px;"><canvas id="ratioLineChart" role="img" aria-label="Porcentaje del ingreso gastado por ciclo">Cargando...</canvas></div>
       </div>
       <div class="chart-card">
-        <p class="chart-title">Categorías mes a mes</p>
-        <div style="position:relative; height:180px;"><canvas id="catCompareChart" role="img" aria-label="Comparativa de categorías entre meses">Cargando...</canvas></div>
+        <p class="chart-title">Top categorías por ciclo</p>
+        <div style="position:relative; height:180px;"><canvas id="catCompareChart" role="img" aria-label="Comparativa de categorías entre ciclos">Cargando...</canvas></div>
         <div class="legend" id="catCompareLegend"></div>
       </div>
     </div>
-    <div id="comparativaTable" class="table-card">
+    <div class="table-card">
       <p class="chart-title">Resumen comparativo</p>
       <table class="ranking-table" id="compareTable"></table>
     </div>
@@ -187,9 +198,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
   <!-- TAB: DETALLE -->
   <div id="tabDetalle" style="display:none;">
     <div class="table-card">
-      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 8px;">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
         <p class="chart-title" style="margin-bottom:0;">Registro de gastos</p>
-        <input type="text" id="searchInput" placeholder="Buscar..." onkeyup="filtrarLog()" style="background:#111; border:0.5px solid #2a2a2a; border-radius:6px; padding:6px 10px; font-size:12px; color:#ccc; outline:none; width:160px;">
+        <input type="text" id="searchInput" placeholder="Buscar..." onkeyup="filtrarLog()"
+          style="background:#111; border:0.5px solid #2a2a2a; border-radius:6px; padding:6px 10px; font-size:12px; color:#ccc; outline:none; width:160px;">
       </div>
       <div style="overflow-x:auto;">
         <table class="ranking-table" id="logTable" style="width:100%; min-width:560px;"></table>
@@ -200,79 +212,39 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 </div>
 
 <script>
-const MESES = [
-  { label: 'Mayo 2026', anio: 2026, mes: 5, url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTSR-jEHWGJNTU5Wk2HOm6U5_pQkHudAuzgL46QYnVg5WNv-2K9H8hDsNVGUtFifICuhdcCzBWich3V/pub?gid=768994311&single=true&output=csv' },
-  { label: 'Junio 2026', anio: 2026, mes: 6, url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTSR-jEHWGJNTU5Wk2HOm6U5_pQkHudAuzgL46QYnVg5WNv-2K9H8hDsNVGUtFifICuhdcCzBWich3V/pub?gid=1978138079&single=true&output=csv' }
+// ─── CONFIGURACIÓN ────────────────────────────────────────────────────────────
+// Cada entrada = un ciclo de cobro (del día 25 del mes anterior al 24 del mes actual).
+// "label" es el nombre que aparece en el dropdown.
+// "cicloDesde" y "cicloHasta" son las fechas exactas del ciclo (inclusive).
+// Ajustá estas fechas y URLs cuando sumes nuevos meses.
+const CICLOS = [
+  {
+    label: 'Ciclo Mayo 2026',
+    cicloDesde: new Date(2026, 3, 25),  // 25 abr 2026
+    cicloHasta: new Date(2026, 4, 24),  // 24 may 2026
+    url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTSR-jEHWGJNTU5Wk2HOm6U5_pQkHudAuzgL46QYnVg5WNv-2K9H8hDsNVGUtFifICuhdcCzBWich3V/pub?gid=768994311&single=true&output=csv'
+  },
+  {
+    label: 'Ciclo Junio 2026',
+    cicloDesde: new Date(2026, 4, 25),  // 25 may 2026
+    cicloHasta: new Date(2026, 5, 24),  // 24 jun 2026
+    url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTSR-jEHWGJNTU5Wk2HOm6U5_pQkHudAuzgL46QYnVg5WNv-2K9H8hDsNVGUtFifICuhdcCzBWich3V/pub?gid=1978138079&single=true&output=csv'
+  }
 ];
 
 const PALETTE = ['#378ADD','#1D9E75','#EF9F27','#7F77DD','#D4537E','#D85A30','#639922','#888780','#185FA5','#5DCAA5','#F09595','#B4B2A9'];
 const GRID = 'rgba(255,255,255,0.05)';
 const TICK = '#444';
 
-let mesActivo = MESES.length - 1;
+let cicloActivo = CICLOS.length - 1;
 let tabActivo = 'mes';
 let datosCache = {};
 let logDatos = [];
 let donutInst = null, barInst = null, compareBarInst = null, ratioLineInst = null, catCompareInst = null;
 
-// Agrupación por año para el dropdown
-function buildDropdown() {
-  const menu = document.getElementById('dropdownMenu');
-  const byAnio = {};
-  MESES.forEach((m, i) => {
-    if (!byAnio[m.anio]) byAnio[m.anio] = [];
-    byAnio[m.anio].push({ ...m, idx: i });
-  });
-  let html = '';
-  Object.keys(byAnio).sort((a,b) => b-a).forEach(anio => {
-    html += `<div class="dropdown-group-label">${anio}</div>`;
-    byAnio[anio].reverse().forEach(m => {
-      html += `<div class="dropdown-item ${m.idx === mesActivo ? 'active' : ''}" onclick="cambiarMes(${m.idx})">
-        <span class="dot"></span>${m.label.replace(' '+anio,'')}</div>`;
-    });
-  });
-  menu.innerHTML = html;
-  const active = MESES[mesActivo];
-  document.getElementById('dropdownLabel').textContent = active.label;
-}
-
-function toggleDropdown() {
-  const menu = document.getElementById('dropdownMenu');
-  const chev = document.getElementById('dropdownChevron');
-  const open = menu.classList.toggle('open');
-  chev.classList.toggle('open', open);
-}
-
-document.addEventListener('click', e => {
-  if (!document.getElementById('dropdownWrap').contains(e.target)) {
-    document.getElementById('dropdownMenu').classList.remove('open');
-    document.getElementById('dropdownChevron').classList.remove('open');
-  }
-});
-
-function cambiarMes(idx) {
-  mesActivo = idx;
-  buildDropdown();
-  document.getElementById('dropdownMenu').classList.remove('open');
-  document.getElementById('dropdownChevron').classList.remove('open');
-  loadData();
-}
-
-function setTab(tab, el) {
-  tabActivo = tab;
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  el.classList.add('active');
-  ['tabMes','tabComparativa','tabDetalle'].forEach(id => document.getElementById(id).style.display = 'none');
-  if (tab === 'mes') document.getElementById('tabMes').style.display = 'block';
-  if (tab === 'comparativa') { document.getElementById('tabComparativa').style.display = 'block'; renderComparativa(); }
-  if (tab === 'detalle') { document.getElementById('tabDetalle').style.display = 'block'; }
-}
-
+// ─── UTILIDADES ───────────────────────────────────────────────────────────────
 function fmt(n) {
-  return '$' + n.toLocaleString('es-AR', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
-}
-function fmtDec(n) {
-  return '$' + n.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return '$' + Math.round(n).toLocaleString('es-AR');
 }
 
 function parseMonto(s) {
@@ -291,92 +263,189 @@ function parseDate(s) {
   return null;
 }
 
-function showError(msg) {
-  document.getElementById('loadingBox').style.display = 'none';
-  document.getElementById('errorBox').textContent = msg;
-  document.getElementById('errorBox').style.display = 'block';
-  ['tabMes','tabComparativa','tabDetalle'].forEach(id => document.getElementById(id).style.display='none');
+function formatDateShort(d) {
+  if (!d) return '';
+  return d.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit' });
 }
 
+// Cantidad de días entre dos fechas (inclusive)
+function diasEntre(desde, hasta) {
+  return Math.round((hasta - desde) / (1000 * 60 * 60 * 24)) + 1;
+}
+
+// ─── DROPDOWN ─────────────────────────────────────────────────────────────────
+function buildDropdown() {
+  const menu = document.getElementById('dropdownMenu');
+  // Agrupar por año del cicloHasta
+  const byAnio = {};
+  CICLOS.forEach((c, i) => {
+    const anio = c.cicloHasta.getFullYear();
+    if (!byAnio[anio]) byAnio[anio] = [];
+    byAnio[anio].push({ ...c, idx: i });
+  });
+  let html = '';
+  Object.keys(byAnio).sort((a,b) => b - a).forEach(anio => {
+    html += `<div class="dropdown-group-label">${anio}</div>`;
+    [...byAnio[anio]].reverse().forEach(c => {
+      const shortLabel = c.label.replace(' ' + anio, '').replace('Ciclo ','');
+      html += `<div class="dropdown-item ${c.idx === cicloActivo ? 'active' : ''}" onclick="cambiarCiclo(${c.idx})">
+        <span class="dot"></span>${shortLabel}</div>`;
+    });
+  });
+  menu.innerHTML = html;
+  document.getElementById('dropdownLabel').textContent = CICLOS[cicloActivo].label;
+}
+
+function toggleDropdown() {
+  const menu = document.getElementById('dropdownMenu');
+  const chev = document.getElementById('dropdownChevron');
+  const open = menu.classList.toggle('open');
+  chev.classList.toggle('open', open);
+}
+
+document.addEventListener('click', e => {
+  if (!document.getElementById('dropdownWrap').contains(e.target)) {
+    document.getElementById('dropdownMenu').classList.remove('open');
+    document.getElementById('dropdownChevron').classList.remove('open');
+  }
+});
+
+function cambiarCiclo(idx) {
+  cicloActivo = idx;
+  buildDropdown();
+  document.getElementById('dropdownMenu').classList.remove('open');
+  document.getElementById('dropdownChevron').classList.remove('open');
+  loadData();
+}
+
+// ─── TABS ─────────────────────────────────────────────────────────────────────
+function setTab(tab, el) {
+  tabActivo = tab;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  ['tabMes','tabComparativa','tabDetalle'].forEach(id => document.getElementById(id).style.display = 'none');
+  if (tab === 'mes') document.getElementById('tabMes').style.display = 'block';
+  if (tab === 'comparativa') { document.getElementById('tabComparativa').style.display = 'block'; renderComparativa(); }
+  if (tab === 'detalle') document.getElementById('tabDetalle').style.display = 'block';
+}
+
+// ─── CARGA DE DATOS ───────────────────────────────────────────────────────────
 function loadData() {
   document.getElementById('loadingBox').style.display = 'block';
   document.getElementById('errorBox').style.display = 'none';
-  ['tabMes','tabComparativa','tabDetalle'].forEach(id => document.getElementById(id).style.display='none');
+  ['tabMes','tabComparativa','tabDetalle'].forEach(id => document.getElementById(id).style.display = 'none');
 
-  const mes = MESES[mesActivo];
-
-  // Carga el mes activo. Si ya está en caché, lo usa.
-  const fetchMes = (m) => new Promise((resolve, reject) => {
-    if (datosCache[m.idx]) { resolve(datosCache[m.idx]); return; }
-    Papa.parse(m.url, {
+  const fetchCiclo = (c, i) => new Promise((resolve, reject) => {
+    if (datosCache[i]) { resolve(datosCache[i]); return; }
+    Papa.parse(c.url, {
       download: true, header: true, skipEmptyLines: true,
-      complete: r => { datosCache[m.idx] = r.data; resolve(r.data); },
+      complete: r => { datosCache[i] = r.data; resolve(r.data); },
       error: reject
     });
   });
 
-  // Intentar cargar todos los meses para la comparativa
-  Promise.all(MESES.map((m, i) => fetchMes({...m, idx: i}).catch(() => null)))
+  Promise.all(CICLOS.map((c, i) => fetchCiclo(c, i).catch(() => null)))
     .then(results => {
       results.forEach((r, i) => { if (r) datosCache[i] = r; });
-      if (!datosCache[mesActivo]) { showError('No se pudo cargar el mes seleccionado.'); return; }
-      buildDashboard(datosCache[mesActivo]);
+      if (!datosCache[cicloActivo]) {
+        document.getElementById('loadingBox').style.display = 'none';
+        document.getElementById('errorBox').textContent = 'No se pudo cargar el ciclo seleccionado. Verificá que el sheet esté publicado.';
+        document.getElementById('errorBox').style.display = 'block';
+        return;
+      }
+      buildDashboard(datosCache[cicloActivo]);
     });
 }
 
-function parsearMes(rows) {
+// ─── PARSEO DE FILAS ──────────────────────────────────────────────────────────
+function parsearCiclo(rows) {
   if (!rows || rows.length === 0) return null;
   const cols = Object.keys(rows[0]);
   const colFecha = cols[0], colDetalle = cols[1], colCat = cols[2], colMonto = cols[3], colQuien = cols[4];
   let ingresosLucas = 0, ingresosMari = 0;
   const datos = [];
+
   rows.forEach(r => {
     const fecha = r[colFecha] ? r[colFecha].trim() : '';
-    const cat = r[colCat] ? r[colCat].trim() : '';
+    const cat   = r[colCat]   ? r[colCat].trim()   : '';
     const monto = parseMonto(r[colMonto]);
-    const det = r[colDetalle] ? r[colDetalle].trim() : '';
-    const quien = r[colQuien] ? r[colQuien].trim() : 'Desconocido';
+    const det   = r[colDetalle] ? r[colDetalle].trim() : '';
+    const quien = r[colQuien]   ? r[colQuien].trim()   : 'Desconocido';
     const dL = det.toLowerCase();
-    if (dL.includes('ingres. lucas')) { ingresosLucas = monto; return; }
-    if (dL.includes('ingres. mariana')) { ingresosMari = monto; return; }
+
+    if (dL.includes('ingres. lucas'))   { ingresosLucas = monto; return; }
+    if (dL.includes('ingres. mariana')) { ingresosMari  = monto; return; }
     if (!fecha || !cat || monto <= 0) return;
     datos.push({ fecha, detalle: det, categoria: cat, monto, quien });
   });
+
   if (ingresosLucas === 0) ingresosLucas = 3600000;
-  if (ingresosMari === 0) ingresosMari = 3600000;
+  if (ingresosMari  === 0) ingresosMari  = 3600000;
   return { datos, ingresosLucas, ingresosMari };
 }
 
+// ─── CONSTRUCCIÓN DEL DASHBOARD ───────────────────────────────────────────────
 function buildDashboard(rows) {
-  const parsed = parsearMes(rows);
+  const parsed = parsearCiclo(rows);
   const { datos, ingresosLucas, ingresosMari } = parsed;
-  logDatos = [...datos].sort((a,b) => { const da=parseDate(a.fecha),db=parseDate(b.fecha); return (!da||!db)?0:db-da; });
+  logDatos = [...datos].sort((a,b) => {
+    const da = parseDate(a.fecha), db = parseDate(b.fecha);
+    return (!da || !db) ? 0 : db - da;
+  });
 
-  const totalGastos = datos.reduce((s,r) => s+r.monto, 0);
+  const ciclo = CICLOS[cicloActivo];
+  const hoy   = new Date(); hoy.setHours(0,0,0,0);
+  const desde = ciclo.cicloDesde;
+  const hasta = ciclo.cicloHasta;
+
+  const totalDiasCiclo  = diasEntre(desde, hasta);
+  const esCicloActual   = hoy >= desde && hoy <= hasta;
+  const diasTranscurridos = esCicloActual ? diasEntre(desde, hoy) : (hoy > hasta ? totalDiasCiclo : 0);
+  const pctTiempo = Math.min(100, (diasTranscurridos / totalDiasCiclo) * 100);
+
+  const totalGastos   = datos.reduce((s, r) => s + r.monto, 0);
   const totalIngresos = ingresosLucas + ingresosMari;
-  const resto = totalIngresos - totalGastos;
-  const pctGastado = ((totalGastos / totalIngresos) * 100).toFixed(1);
+  const resto         = totalIngresos - totalGastos;
+  const pctGastado    = ((totalGastos / totalIngresos) * 100).toFixed(1);
 
-  // Proyección
-  const mes = MESES[mesActivo];
-  const diasEnMes = new Date(mes.anio, mes.mes, 0).getDate();
-  const hoy = new Date();
-  let diaActual = (hoy.getFullYear() === mes.anio && hoy.getMonth()+1 === mes.mes) ? hoy.getDate() : diasEnMes;
-  if (diaActual > diasEnMes) diaActual = diasEnMes;
-  const mesCompleto = diaActual >= diasEnMes;
+  // Badge del ciclo en el header
+  document.getElementById('cicloBadge').textContent =
+    `${formatDateShort(desde)} – ${formatDateShort(hasta)}`;
 
-  if (!mesCompleto && diaActual > 0 && totalGastos > 0) {
-    const promDiario = totalGastos / diaActual;
-    const proyectado = promDiario * diasEnMes;
-    const pctProy = ((proyectado / totalIngresos)*100).toFixed(1);
+  document.getElementById('dashSub').textContent =
+    `${datos.length} movimientos · ${ciclo.label}`;
+
+  // ── Barra de progreso del ciclo ──
+  const pctGastadoNum = (totalGastos / totalIngresos) * 100;
+  document.getElementById('progressTiempo').style.width = pctTiempo.toFixed(1) + '%';
+  document.getElementById('progressGastos').style.width = Math.min(100, pctGastadoNum).toFixed(1) + '%';
+  document.getElementById('cicloProgressPct').textContent =
+    `Día ${diasTranscurridos} de ${totalDiasCiclo}`;
+  document.getElementById('cicloLegendText').innerHTML =
+    `<span style="color:#E24B4A">■</span> Gastos: ${pctGastado}% del ingreso &nbsp;·&nbsp; `+
+    `<span style="color:#378ADD">▏</span> Tiempo transcurrido: ${pctTiempo.toFixed(0)}%`;
+  document.getElementById('cicloProgressWrap').style.display = esCicloActual || hoy > hasta ? 'block' : 'none';
+
+  // ── Proyección (solo si el ciclo está en curso) ──
+  if (esCicloActual && diasTranscurridos > 0 && totalGastos > 0) {
+    const promDiario  = totalGastos / diasTranscurridos;
+    const proyectado  = promDiario * totalDiasCiclo;
+    const pctProy     = ((proyectado / totalIngresos) * 100).toFixed(1);
+    const diasRestan  = totalDiasCiclo - diasTranscurridos;
+    const gastoRestan = proyectado - totalGastos;
+
     document.getElementById('projText').innerHTML =
-      `A día ${diaActual}, llevan <strong>${fmt(totalGastos)}</strong> gastados. Si el ritmo continúa, el mes cerraría en <strong>${fmt(Math.round(proyectado))}</strong> (${pctProy}% del ingreso). Promedio diario: <strong>${fmt(Math.round(promDiario))}</strong>.`;
+      `Llevan <strong>${fmt(totalGastos)}</strong> en ${diasTranscurridos} días ` +
+      `(promedio <strong>${fmt(Math.round(promDiario))}/día</strong>). ` +
+      `Si el ritmo continúa, el ciclo cerraría en <strong>${fmt(Math.round(proyectado))}</strong> ` +
+      `(<strong>${pctProy}%</strong> del ingreso). ` +
+      `Quedan ${diasRestan} días y ~<strong>${fmt(Math.round(gastoRestan))}</strong> por gastar.`;
     document.getElementById('projBanner').style.display = 'flex';
   } else {
     document.getElementById('projBanner').style.display = 'none';
   }
 
-  // Métricas
+  // ── Métricas ──
   document.getElementById('metricsBox').innerHTML = `
     <div class="metric"><p class="metric-label">Lucas</p><p class="metric-value">${fmt(ingresosLucas)}</p></div>
     <div class="metric"><p class="metric-label">Mariana</p><p class="metric-value">${fmt(ingresosMari)}</p></div>
@@ -386,46 +455,70 @@ function buildDashboard(rows) {
     <div class="metric"><p class="metric-label">% gastado</p><p class="metric-value">${pctGastado}%</p></div>
   `;
 
-  // Fechas y barras
-  const fechasSorted = [...new Set(datos.map(r=>r.fecha))].sort((a,b)=>{const da=parseDate(a),db=parseDate(b);return(!da||!db)?0:da-db;});
-  const montosPorFecha = fechasSorted.map(f=>datos.filter(r=>r.fecha===f).reduce((s,r)=>s+r.monto,0));
+  // ── Gráfico de fechas ──
+  const fechasSorted = [...new Set(datos.map(r => r.fecha))].sort((a,b) => {
+    const da = parseDate(a), db = parseDate(b);
+    return (!da || !db) ? 0 : da - db;
+  });
+  const montosPorFecha = fechasSorted.map(f =>
+    datos.filter(r => r.fecha === f).reduce((s, r) => s + r.monto, 0)
+  );
 
-  // Categorías
+  // ── Categorías ──
   const catMap = {};
-  datos.forEach(r=>{ catMap[r.categoria]=(catMap[r.categoria]||0)+r.monto; });
-  const categorias = Object.entries(catMap).sort((a,b)=>b[1]-a[1]).map(([nombre,monto],i)=>({nombre,monto,color:PALETTE[i%PALETTE.length]}));
+  datos.forEach(r => { catMap[r.categoria] = (catMap[r.categoria] || 0) + r.monto; });
+  const categorias = Object.entries(catMap)
+    .sort((a,b) => b[1] - a[1])
+    .map(([nombre, monto], i) => ({ nombre, monto, color: PALETTE[i % PALETTE.length] }));
 
-  document.getElementById('dashSub').textContent = `${datos.length} movimientos · ${MESES[mesActivo].label}`;
-
-  // Donut
+  // ── Donut ──
   if (donutInst) donutInst.destroy();
   donutInst = new Chart(document.getElementById('donutChart'), {
     type: 'doughnut',
-    data: { labels: categorias.map(c=>c.nombre), datasets: [{ data: categorias.map(c=>c.monto), backgroundColor: categorias.map(c=>c.color), borderWidth: 2, borderColor: '#111' }] },
-    options: { responsive:true, maintainAspectRatio:false, cutout:'65%', plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:ctx=>` ${fmt(ctx.raw)} (${((ctx.raw/totalGastos)*100).toFixed(1)}%)` } } } }
+    data: {
+      labels: categorias.map(c => c.nombre),
+      datasets: [{ data: categorias.map(c => c.monto), backgroundColor: categorias.map(c => c.color), borderWidth: 2, borderColor: '#111' }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, cutout: '65%',
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => ` ${fmt(ctx.raw)} (${((ctx.raw/totalGastos)*100).toFixed(1)}%)` } }
+      }
+    }
   });
-  document.getElementById('donutLegend').innerHTML = categorias.slice(0,6).map(c=>
+  document.getElementById('donutLegend').innerHTML = categorias.slice(0, 6).map(c =>
     `<span class="legend-item"><span class="legend-dot" style="background:${c.color}"></span>${c.nombre.split(' ')[0]} ${((c.monto/totalGastos)*100).toFixed(1)}%</span>`
   ).join('');
 
-  // Bar fechas
+  // ── Bar fechas ──
   if (barInst) barInst.destroy();
   barInst = new Chart(document.getElementById('barChart'), {
-    type:'bar',
-    data:{ labels:fechasSorted, datasets:[{ data:montosPorFecha, backgroundColor:'#378ADD33', borderColor:'#378ADD', borderWidth:1.5, borderRadius:4 }] },
-    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{
-      x:{ grid:{color:GRID}, ticks:{color:TICK, font:{size:10}, maxRotation:45, autoSkip:true, maxTicksLimit:8} },
-      y:{ grid:{color:GRID}, ticks:{color:TICK, font:{size:10}, callback:v=>'$'+(v>=1000?Math.round(v/1000)+'k':v)} }
-    }}
+    type: 'bar',
+    data: {
+      labels: fechasSorted,
+      datasets: [{ data: montosPorFecha, backgroundColor: '#378ADD33', borderColor: '#378ADD', borderWidth: 1.5, borderRadius: 4 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { color: GRID }, ticks: { color: TICK, font: { size: 10 }, maxRotation: 45, autoSkip: true, maxTicksLimit: 8 } },
+        y: { grid: { color: GRID }, ticks: { color: TICK, font: { size: 10 }, callback: v => '$' + (v >= 1000 ? Math.round(v/1000) + 'k' : v) } }
+      }
+    }
   });
 
-  // Ranking
-  document.getElementById('rankingTable').innerHTML = categorias.map((c,i)=>{
-    const pct=((c.monto/totalGastos)*100).toFixed(1);
-    return `<tr><td>${i+1}</td><td>${c.nombre}<div class="bar-bg"><div class="bar-fill" style="width:${pct}%;background:${c.color};"></div></div></td><td>${fmt(c.monto)}<br><span class="pct-label">${pct}%</span></td></tr>`;
+  // ── Ranking ──
+  document.getElementById('rankingTable').innerHTML = categorias.map((c, i) => {
+    const pct = ((c.monto / totalGastos) * 100).toFixed(1);
+    return `<tr>
+      <td>${i+1}</td>
+      <td>${c.nombre}<div class="bar-bg"><div class="bar-fill" style="width:${pct}%;background:${c.color};"></div></div></td>
+      <td>${fmt(c.monto)}<br><span class="pct-label">${pct}%</span></td>
+    </tr>`;
   }).join('');
 
-  // Log
   renderLog(logDatos);
 
   document.getElementById('loadingBox').style.display = 'none';
@@ -434,18 +527,21 @@ function buildDashboard(rows) {
   if (tabActivo === 'detalle') document.getElementById('tabDetalle').style.display = 'block';
 }
 
+// ─── LOG / DETALLE ────────────────────────────────────────────────────────────
 function renderLog(datos) {
   document.getElementById('logTable').innerHTML = `
     <thead><tr>
-      <th style="width:15%">Fecha</th><th style="width:35%">Detalle</th>
-      <th style="width:22%">Categoría</th><th style="width:15%;text-align:right">Monto</th>
+      <th style="width:15%">Fecha</th>
+      <th style="width:35%">Detalle</th>
+      <th style="width:22%">Categoría</th>
+      <th style="width:15%;text-align:right">Monto</th>
       <th style="width:13%;text-align:center">Quién</th>
     </tr></thead>
-    <tbody>${datos.map(r=>{
-      let bc='badge-desconocido';
-      const q=r.quien.toLowerCase();
-      if(q==='lucas') bc='badge-lucas';
-      if(q==='mariana'||q==='mari') bc='badge-mariana';
+    <tbody>${datos.map(r => {
+      let bc = 'badge-desconocido';
+      const q = r.quien.toLowerCase();
+      if (q === 'lucas') bc = 'badge-lucas';
+      if (q === 'mariana' || q === 'mari') bc = 'badge-mariana';
       return `<tr>
         <td style="color:#555;font-size:12px">${r.fecha}</td>
         <td style="font-weight:500">${r.detalle}</td>
@@ -459,73 +555,118 @@ function renderLog(datos) {
 function filtrarLog() {
   const q = document.getElementById('searchInput').value.toLowerCase();
   const filtrados = logDatos.filter(r =>
-    r.detalle.toLowerCase().includes(q) || r.categoria.toLowerCase().includes(q) || r.quien.toLowerCase().includes(q)
+    r.detalle.toLowerCase().includes(q) ||
+    r.categoria.toLowerCase().includes(q) ||
+    r.quien.toLowerCase().includes(q)
   );
   renderLog(filtrados);
 }
 
+// ─── COMPARATIVA ──────────────────────────────────────────────────────────────
 function renderComparativa() {
-  const parsed = MESES.map((m, i) => datosCache[i] ? { label: m.label, ...parsearMes(datosCache[i]) } : null).filter(Boolean);
+  const parsed = CICLOS.map((c, i) => datosCache[i] ? { label: c.label, ciclo: c, ...parsearCiclo(datosCache[i]) } : null).filter(Boolean);
   if (parsed.length < 1) return;
 
-  const labels = parsed.map(p => p.label.replace(' 2026',''));
-  const totales = parsed.map(p => Math.round(p.datos.reduce((s,r)=>s+r.monto,0)));
+  const labels   = parsed.map(p => p.label.replace('Ciclo ','').replace(' 2026',''));
+  const totales  = parsed.map(p => Math.round(p.datos.reduce((s,r) => s + r.monto, 0)));
   const ingresos = parsed.map(p => p.ingresosLucas + p.ingresosMari);
-  const ratios = parsed.map((p,i) => parseFloat(((totales[i]/ingresos[i])*100).toFixed(1)));
+  const ratios   = parsed.map((p,i) => parseFloat(((totales[i] / ingresos[i]) * 100).toFixed(1)));
 
-  // Comparativa total
+  // ── Bar comparativa ──
   if (compareBarInst) compareBarInst.destroy();
   compareBarInst = new Chart(document.getElementById('compareBarChart'), {
-    type:'bar',
-    data:{ labels, datasets:[
-      { label:'Gastos', data:totales, backgroundColor: labels.map((_,i)=>i===mesActivo?'#378ADD':'#378ADD44'), borderColor:'#378ADD', borderWidth:1.5, borderRadius:6 },
-      { label:'Ingresos', data:ingresos, backgroundColor:'transparent', borderColor:'#1D9E7566', borderWidth:1.5, borderRadius:6, borderDash:[4,4], type:'line', pointRadius:4, pointBackgroundColor:'#1D9E75' }
-    ]},
-    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{
-      x:{ grid:{color:GRID}, ticks:{color:TICK, font:{size:11}} },
-      y:{ grid:{color:GRID}, ticks:{color:TICK, font:{size:10}, callback:v=>'$'+(v>=1000000?Math.round(v/1000000)+'M':v>=1000?Math.round(v/1000)+'k':v)} }
-    }}
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Gastos', data: totales,
+          backgroundColor: labels.map((_, i) => parsed[i].label === CICLOS[cicloActivo].label ? '#378ADD' : '#378ADD44'),
+          borderColor: '#378ADD', borderWidth: 1.5, borderRadius: 6
+        },
+        {
+          label: 'Ingresos', data: ingresos, type: 'line',
+          borderColor: '#1D9E75', backgroundColor: 'transparent',
+          borderWidth: 1.5, borderDash: [4,4], pointRadius: 4, pointBackgroundColor: '#1D9E75', tension: 0.3
+        }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { color: GRID }, ticks: { color: TICK, font: { size: 11 } } },
+        y: { grid: { color: GRID }, ticks: { color: TICK, font: { size: 10 }, callback: v => '$' + (v >= 1000000 ? Math.round(v/1000000) + 'M' : v >= 1000 ? Math.round(v/1000) + 'k' : v) } }
+      }
+    }
   });
 
-  // Ratio %
+  // ── Ratio % ──
   if (ratioLineInst) ratioLineInst.destroy();
   ratioLineInst = new Chart(document.getElementById('ratioLineChart'), {
-    type:'line',
-    data:{ labels, datasets:[{ label:'% gastado', data:ratios, borderColor:'#EF9F27', backgroundColor:'#EF9F2715', borderWidth:2, pointRadius:5, pointBackgroundColor:'#EF9F27', tension:0.3, fill:true }]},
-    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}, tooltip:{callbacks:{label:ctx=>`${ctx.raw}% del ingreso`}}}, scales:{
-      x:{ grid:{color:GRID}, ticks:{color:TICK, font:{size:11}} },
-      y:{ grid:{color:GRID}, ticks:{color:TICK, font:{size:10}, callback:v=>v+'%'}, min:0, max:100 }
-    }}
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: '% gastado', data: ratios,
+        borderColor: '#EF9F27', backgroundColor: '#EF9F2715',
+        borderWidth: 2, pointRadius: 5, pointBackgroundColor: '#EF9F27', tension: 0.3, fill: true
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => `${ctx.raw}% del ingreso` } } },
+      scales: {
+        x: { grid: { color: GRID }, ticks: { color: TICK, font: { size: 11 } } },
+        y: { grid: { color: GRID }, ticks: { color: TICK, font: { size: 10 }, callback: v => v + '%' }, min: 0, max: 100 }
+      }
+    }
   });
 
-  // Categorías comparativa
-  const allCats = [...new Set(parsed.flatMap(p=>p.datos.map(d=>d.categoria)))];
-  const topCats = allCats.map(cat=>({ cat, total: parsed.reduce((s,p)=>s+p.datos.filter(d=>d.categoria===cat).reduce((ss,r)=>ss+r.monto,0),0) })).sort((a,b)=>b.total-a.total).slice(0,5).map(x=>x.cat);
+  // ── Categorías comparativa ──
+  const allCats = [...new Set(parsed.flatMap(p => p.datos.map(d => d.categoria)))];
+  const topCats = allCats
+    .map(cat => ({ cat, total: parsed.reduce((s,p) => s + p.datos.filter(d => d.categoria === cat).reduce((ss,r) => ss + r.monto, 0), 0) }))
+    .sort((a,b) => b.total - a.total).slice(0, 5).map(x => x.cat);
 
   if (catCompareInst) catCompareInst.destroy();
   catCompareInst = new Chart(document.getElementById('catCompareChart'), {
-    type:'bar',
-    data:{ labels, datasets: topCats.map((cat,i)=>({
-      label:cat, data: parsed.map(p=>Math.round(p.datos.filter(d=>d.categoria===cat).reduce((s,r)=>s+r.monto,0))),
-      backgroundColor: PALETTE[i]+'88', borderColor: PALETTE[i], borderWidth:1.5, borderRadius:4
-    }))},
-    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{
-      x:{ stacked:true, grid:{color:GRID}, ticks:{color:TICK, font:{size:11}} },
-      y:{ stacked:true, grid:{color:GRID}, ticks:{color:TICK, font:{size:10}, callback:v=>'$'+(v>=1000?Math.round(v/1000)+'k':v)} }
-    }}
+    type: 'bar',
+    data: {
+      labels,
+      datasets: topCats.map((cat, i) => ({
+        label: cat,
+        data: parsed.map(p => Math.round(p.datos.filter(d => d.categoria === cat).reduce((s,r) => s + r.monto, 0))),
+        backgroundColor: PALETTE[i] + '88', borderColor: PALETTE[i], borderWidth: 1.5, borderRadius: 4
+      }))
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { stacked: true, grid: { color: GRID }, ticks: { color: TICK, font: { size: 11 } } },
+        y: { stacked: true, grid: { color: GRID }, ticks: { color: TICK, font: { size: 10 }, callback: v => '$' + (v >= 1000 ? Math.round(v/1000) + 'k' : v) } }
+      }
+    }
   });
-  document.getElementById('catCompareLegend').innerHTML = topCats.slice(0,5).map((cat,i)=>
+  document.getElementById('catCompareLegend').innerHTML = topCats.slice(0, 5).map((cat, i) =>
     `<span class="legend-item"><span class="legend-dot" style="background:${PALETTE[i]}"></span>${cat.split(' ')[0]}</span>`
   ).join('');
 
-  // Tabla comparativa
+  // ── Tabla comparativa ──
   document.getElementById('compareTable').innerHTML = `
-    <thead><tr><th>Mes</th><th style="text-align:right">Ingresos</th><th style="text-align:right">Gastos</th><th style="text-align:right">Saldo</th><th style="text-align:right">%</th></tr></thead>
-    <tbody>${parsed.map((p,i)=>{
-      const t=totales[i], ing=ingresos[i], s=ing-t, r=ratios[i];
-      const isCurrent=p.label===MESES[mesActivo].label;
-      return `<tr style="${isCurrent?'color:#fff':''}">
-        <td style="color:${isCurrent?'#378ADD':'#666'};font-size:12px">${p.label.replace(' 2026','')}</td>
+    <thead><tr>
+      <th>Ciclo</th>
+      <th style="text-align:right">Ingresos</th>
+      <th style="text-align:right">Gastos</th>
+      <th style="text-align:right">Saldo</th>
+      <th style="text-align:right">%</th>
+    </tr></thead>
+    <tbody>${parsed.map((p, i) => {
+      const t = totales[i], ing = ingresos[i], s = ing - t, r = ratios[i];
+      const isCurrent = p.label === CICLOS[cicloActivo].label;
+      return `<tr style="${isCurrent ? 'color:#fff' : ''}">
+        <td style="color:${isCurrent ? '#378ADD' : '#666'};font-size:12px">${labels[i]}</td>
         <td style="text-align:right">${fmt(ing)}</td>
         <td style="text-align:right;color:#E24B4A">${fmt(t)}</td>
         <td style="text-align:right;color:#639922">${fmt(s)}</td>
@@ -534,6 +675,7 @@ function renderComparativa() {
     }).join('')}</tbody>`;
 }
 
+// ─── INICIO ───────────────────────────────────────────────────────────────────
 buildDropdown();
 loadData();
 </script>
