@@ -96,14 +96,25 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .loading { text-align: center; padding: 3rem 0; color: #444; font-size: 14px; }
 .error-msg { background: #2a1010; color: #E24B4A; border: 0.5px solid #3a1515; border-radius: 8px; padding: 12px 16px; font-size: 13px; margin-bottom: 1rem; }
 
-/* ── MULTISELECT FILTERS ── */
-.filter-wrap { display: flex; flex-wrap: wrap; gap: 6px; }
-.filter-pill { background: transparent; border: 0.5px solid #2a2a2a; border-radius: 6px; padding: 5px 10px; font-size: 11px; color: #555; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 6px; }
-.filter-pill:hover { border-color: #444; color: #ccc; background: #141414; }
-.filter-pill.active { background: #1a1a1a; color: #fff; border-color: #555; }
-.filter-pill .pill-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
-
 /* ── TARJETAS ── */
+.tc-hero { margin-bottom: 1.5rem; }
+.tc-venc-group { background: #1a1a1a; border: 0.5px solid #222; border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem; }
+.tc-venc-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; flex-wrap: wrap; gap: 8px; }
+.tc-venc-nombre { font-size: 15px; font-weight: 500; color: #e8e8e8; }
+.tc-venc-badge { display: flex; align-items: center; gap: 6px; }
+.tc-venc-label { font-size: 10px; color: #555; text-transform: uppercase; letter-spacing: 0.06em; }
+.tc-venc-fecha { font-size: 13px; font-weight: 500; }
+.tc-venc-fecha.urgente { color: #E24B4A; }
+.tc-venc-fecha.pronto  { color: #EF9F27; }
+.tc-venc-fecha.ok      { color: #888; }
+.tc-montos { display: flex; gap: 10px; flex-wrap: wrap; }
+.tc-monto-card { flex: 1; min-width: 120px; background: #111; border: 0.5px solid #1e1e1e; border-radius: 8px; padding: 14px 16px; }
+.tc-monto-label { font-size: 10px; color: #444; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+.tc-monto-value { font-size: 26px; font-weight: 600; letter-spacing: -0.5px; }
+.tc-monto-value.ars { color: #e8e8e8; }
+.tc-monto-value.usd { color: #1D9E75; }
+.tc-monto-value.zero { color: #333; font-size: 20px; }
+
 .tc-seccion-titulo { font-size: 10px; color: #444; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 10px; margin-top: 1.5rem; }
 
 .tc-cuotas-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; margin-bottom: 1.5rem; }
@@ -121,6 +132,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 @media (max-width: 540px) {
   .charts { grid-template-columns: 1fr; }
   .metrics { grid-template-columns: repeat(2, 1fr); }
+  .tc-montos { flex-direction: column; }
 }
 </style>
 </head>
@@ -232,16 +244,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
   </div>
 
   <div id="tabTarjetas" style="display:none;">
-    <div class="chart-card-full">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:12px;">
-        <p class="chart-title" style="margin-bottom:0;">Evolución de Gastos de Tarjetas</p>
-        <div id="tarjetasFilterWrap" class="filter-wrap"></div>
-      </div>
-      <div style="position:relative; height:260px;">
-        <canvas id="tarjetasLineChart"></canvas>
-      </div>
-    </div>
-    
+    <div id="tcHero" class="tc-hero"></div>
     <div id="tcCuotasPendientes"></div>
     <div id="tcDetalle"></div>
   </div>
@@ -252,12 +255,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 // ─── CONFIGURACIÓN ────────────────────────────────────────────────────────────
 const CICLOS = [
   {
-    label: 'Ciclo Junio 2026',
-    cicloDesde: new Date(2026, 4, 25),
-    cicloHasta: new Date(2026, 5, 24),
-    url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTSR-jEHWGJNTU5Wk2HOm6U5_pQkHudAuzgL46QYnVg5WNv-2K9H8hDsNVGUtFifICuhdcCzBWich3V/pub?gid=1978138079&single=true&output=csv'
-  },
-  {
     label: 'Ciclo Julio 2026',
     cicloDesde: new Date(2026, 5, 25),
     cicloHasta: new Date(2026, 6, 24),
@@ -267,6 +264,7 @@ const CICLOS = [
 
 const URL_TARJETAS = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTSR-jEHWGJNTU5Wk2HOm6U5_pQkHudAuzgL46QYnVg5WNv-2K9H8hDsNVGUtFifICuhdcCzBWich3V/pub?gid=1050964641&single=true&output=csv';
 
+// Paleta de colores por tarjeta (se asigna dinámicamente)
 const PALETTE = ['#378ADD','#1D9E75','#EF9F27','#7F77DD','#D4537E','#D85A30','#639922','#888780'];
 const GRID = 'rgba(255,255,255,0.05)';
 const TICK = '#444';
@@ -276,8 +274,7 @@ let tabActivo = 'mes';
 let datosCache = {};
 let tarjetasCache = null;
 let logDatos = [];
-let activeTarjetasMetrics = ['Total ARS', 'Total USD']; // Estado inicial multiselect
-let donutInst = null, barInst = null, compareBarInst = null, ratioLineInst = null, catCompareInst = null, tarjetasLineInst = null;
+let donutInst = null, barInst = null, compareBarInst = null, ratioLineInst = null, catCompareInst = null;
 
 // ─── UTILIDADES ───────────────────────────────────────────────────────────────
 function fmt(n) {
@@ -311,11 +308,13 @@ function formatDateMed(d) {
 function diasEntre(desde, hasta) {
   return Math.round((hasta - desde) / (1000 * 60 * 60 * 24)) + 1;
 }
+// Retorna "Jun/26", "Jul/26", etc.
 function mesLabel(d) {
   if (!d) return '';
   return d.toLocaleDateString('es-AR', { month: 'short', year: '2-digit' })
           .replace('. ', '/').replace('.', '/');
 }
+// Suma N meses a una fecha
 function addMonths(d, n) {
   const r = new Date(d);
   r.setMonth(r.getMonth() + n);
@@ -440,13 +439,7 @@ function parsearCiclo(rows) {
 function parsearTarjetas(rows) {
   if (!rows || rows.length === 0) return [];
   const cols = Object.keys(rows[0]);
-  // Columnas esperadas estándar
   const [cFecha, cTarjeta, cDetalle, cCuota, cARS, cUSD, cVenc] = cols;
-  
-  // Mapeo dinámico para columnas J (index 9) y K (index 10)
-  const cTotalARS = cols[9] || null;
-  const cTotalUSD = cols[10] || null;
-
   const datos = [];
   rows.forEach(r => {
     const fecha     = r[cFecha]   ? r[cFecha].trim()   : '';
@@ -456,25 +449,16 @@ function parsearTarjetas(rows) {
     const montoARS  = parseMonto(r[cARS]);
     const montoUSD  = parseMonto(r[cUSD]);
     const vencStr   = r[cVenc]    ? r[cVenc].trim()    : '';
-    
-    // Captura de valores de columnas J y K
-    const colJTotalARS = cTotalARS ? parseMonto(r[cTotalARS]) : 0;
-    const colKTotalUSD = cTotalUSD ? parseMonto(r[cTotalUSD]) : 0;
-
     if (!fecha || !tarjeta) return;
     const fechaDate = parseDate(fecha);
     const vencDate  = parseDate(vencStr);
-    
     let cuotaActual = 0, cuotaTotal = 0;
     if (cuota && cuota.includes('/')) {
       const parts = cuota.split('/');
       cuotaActual = parseInt(parts[0]) || 0;
       cuotaTotal  = parseInt(parts[1]) || 0;
     }
-    datos.push({ 
-      fecha, fechaDate, tarjeta, detalle, cuota, cuotaActual, cuotaTotal, 
-      montoARS, montoUSD, vencStr, vencDate, colJTotalARS, colKTotalUSD 
-    });
+    datos.push({ fecha, fechaDate, tarjeta, detalle, cuota, cuotaActual, cuotaTotal, montoARS, montoUSD, vencStr, vencDate });
   });
   return datos;
 }
@@ -506,6 +490,7 @@ function buildDashboard(rows) {
   document.getElementById('cicloBadge').textContent = `${formatDateShort(desde)} – ${formatDateShort(hasta)}`;
   document.getElementById('dashSub').textContent = `${datos.length} movimientos · ${ciclo.label}`;
 
+  // Barra progreso
   const pctGastadoNum = totalIngresos > 0 ? (totalGastos / totalIngresos) * 100 : 0;
   document.getElementById('progressTiempo').style.width = pctTiempo.toFixed(1) + '%';
   document.getElementById('progressGastos').style.width = Math.min(100, pctGastadoNum).toFixed(1) + '%';
@@ -515,6 +500,7 @@ function buildDashboard(rows) {
     `<span style="color:#378ADD">▏</span> Tiempo transcurrido: ${pctTiempo.toFixed(0)}%`;
   document.getElementById('cicloProgressWrap').style.display = esCicloActual || hoy > hasta ? 'block' : 'none';
 
+  // Proyección de ahorro
   const banner = document.getElementById('projBanner');
   if (esCicloActual && diasTranscurridos > 0 && totalGastos > 0 && totalIngresos > 0) {
     const promDiario    = totalGastos / diasTranscurridos;
@@ -542,6 +528,7 @@ function buildDashboard(rows) {
     banner.style.display = 'none';
   }
 
+  // Métricas
   document.getElementById('metricsBox').innerHTML = `
     <div class="metric"><p class="metric-label">Lucas</p><p class="metric-value">${fmt(ingresosLucas)}</p></div>
     <div class="metric"><p class="metric-label">Mariana</p><p class="metric-value">${fmt(ingresosMari)}</p></div>
@@ -551,6 +538,7 @@ function buildDashboard(rows) {
     <div class="metric"><p class="metric-label">% gastado</p><p class="metric-value">${pctGastado}%</p></div>
   `;
 
+  // Gráfico fechas
   const fechasSorted = [...new Set(datos.map(r => r.fecha))].sort((a,b) => {
     const da = parseDate(a), db = parseDate(b);
     return (!da || !db) ? 0 : da - db;
@@ -559,6 +547,7 @@ function buildDashboard(rows) {
     datos.filter(r => r.fecha === f).reduce((s, r) => s + r.monto, 0)
   );
 
+  // Categorías
   const catMap = {};
   datos.forEach(r => { catMap[r.categoria] = (catMap[r.categoria] || 0) + r.monto; });
   const categorias = Object.entries(catMap)
@@ -575,10 +564,23 @@ function buildDashboard(rows) {
     `<span class="legend-item"><span class="legend-dot" style="background:${c.color}"></span>${c.nombre.split(' ')[0]} ${totalGastos > 0 ? ((c.monto/totalGastos)*100).toFixed(1) : 0}%</span>`
   ).join('');
 
+  // ── MODIFICACIÓN: Gráfico de Barras a Líneas ──
   if (barInst) barInst.destroy();
   barInst = new Chart(document.getElementById('barChart'), {
-    type: 'bar',
-    data: { labels: fechasSorted, datasets: [{ data: montosPorFecha, backgroundColor: '#378ADD33', borderColor: '#378ADD', borderWidth: 1.5, borderRadius: 4 }] },
+    type: 'line',
+    data: { 
+      labels: fechasSorted, 
+      datasets: [{ 
+        data: montosPorFecha, 
+        backgroundColor: '#378ADD15', 
+        borderColor: '#378ADD', 
+        borderWidth: 2, 
+        pointRadius: 3,
+        pointBackgroundColor: '#378ADD',
+        tension: 0.3,
+        fill: true
+      }] 
+    },
     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: GRID }, ticks: { color: TICK, font: { size: 10 }, maxRotation: 45, autoSkip: true, maxTicksLimit: 8 } }, y: { grid: { color: GRID }, ticks: { color: TICK, font: { size: 10 }, callback: v => '$' + (v >= 1000 ? Math.round(v/1000) + 'k' : v) } } } }
   });
 
@@ -625,137 +627,82 @@ function filtrarLog() {
   ));
 }
 
-// ─── ACCIÓN INTERACTIVA MULTISELECT (TARJETAS) ──────────────────────────────
-function toggleTarjetaMetric(metricId) {
-  const idx = activeTarjetasMetrics.indexOf(metricId);
-  if (idx > -1) {
-    activeTarjetasMetrics.splice(idx, 1);
-  } else {
-    activeTarjetasMetrics.push(metricId);
-  }
-  renderTarjetas();
-}
-
 // ─── TARJETAS ────────────────────────────────────────────────────────────────
 function renderTarjetas() {
   const datos = parsearTarjetas(tarjetasCache || []);
   const hoy = new Date(); hoy.setHours(0,0,0,0);
 
   if (!datos.length) {
-    document.getElementById('tarjetasFilterWrap').innerHTML = '';
-    document.getElementById('tcCuotasPendientes').innerHTML = '<p style="color:#444;font-size:13px;padding:2rem 0;">No hay datos de tarjetas cargados todavía.</p>';
+    document.getElementById('tcHero').innerHTML = '<p style="color:#444;font-size:13px;padding:2rem 0;">No hay datos de tarjetas cargados todavía.</p>';
+    document.getElementById('tcCuotasPendientes').innerHTML = '';
     document.getElementById('tcDetalle').innerHTML = '';
     return;
   }
 
   const tarjetasUnicas = [...new Set(datos.map(d => d.tarjeta))];
   const colorMap = {};
-  tarjetasUnicas.forEach((t, i) => { colorMap[t] = PALETTE[(i + 2) % PALETTE.length]; });
+  tarjetasUnicas.forEach((t, i) => { colorMap[t] = PALETTE[i % PALETTE.length]; });
 
-  // ── 1. PROCESAR HISTORIAL HISTÓRICO POR MESES (Para el gráfico) ──
-  const mesesMap = {};
+  const grupos = {};
   datos.forEach(d => {
-    if (!d.fechaDate) return;
-    const key = `${d.fechaDate.getFullYear()}-${String(d.fechaDate.getMonth() + 1).padStart(2, '0')}`;
-    if (!mesesMap[key]) {
-      mesesMap[key] = {
-        label: mesLabel(d.fechaDate),
-        totalARS: 0,
-        totalUSD: 0,
-        cards: {}
-      };
+    const key = `${d.tarjeta}||${d.vencStr || 'sin-venc'}`;
+    if (!grupos[key]) {
+      grupos[key] = { tarjeta: d.tarjeta, vencDate: d.vencDate, vencStr: d.vencStr, totalARS: 0, totalUSD: 0 };
     }
-    // Suma las columnas J y K directas de la fila
-    mesesMap[key].totalARS += d.colJTotalARS;
-    mesesMap[key].totalUSD += d.colKTotalUSD;
-
-    if (!mesesMap[key].cards[d.tarjeta]) mesesMap[key].cards[d.tarjeta] = 0;
-    mesesMap[key].cards[d.tarjeta] += d.montoARS; 
+    grupos[key].totalARS += d.montoARS;
+    grupos[key].totalUSD += d.montoUSD;
   });
 
-  const mesesKeys = Object.keys(mesesMap).sort();
-
-  // ── 2. CONSTRUIR UI FILTROS (MULTISELECT) ──
-  let pillsHTML = '';
-  // Píldora Total ARS (Col J)
-  let activeARS = activeTarjetasMetrics.includes('Total ARS') ? 'active' : '';
-  pillsHTML += `<button class="filter-pill ${activeARS}" onclick="toggleTarjetaMetric('Total ARS')"><span class="pill-dot" style="background:#3b82f6"></span>Total ARS</button>`;
-  
-  // Píldora Total USD (Col K)
-  let activeUSD = activeTarjetasMetrics.includes('Total USD') ? 'active' : '';
-  pillsHTML += `<button class="filter-pill ${activeUSD}" onclick="toggleTarjetaMetric('Total USD')"><span class="pill-dot" style="background:#10b981"></span>Total USD</button>`;
-  
-  // Píldoras de Tarjetas Individuales
-  tarjetasUnicas.forEach(t => {
-    let activeCard = activeTarjetasMetrics.includes(t) ? 'active' : '';
-    pillsHTML += `<button class="filter-pill ${activeCard}" onclick="toggleTarjetaMetric('${t}')"><span class="pill-dot" style="background:${colorMap[t]}"></span>${t}</button>`;
+  const gruposArr = Object.values(grupos).sort((a, b) => {
+    if (!a.vencDate && !b.vencDate) return 0;
+    if (!a.vencDate) return 1;
+    if (!b.vencDate) return -1;
+    return a.vencDate - b.vencDate;
   });
-  document.getElementById('tarjetasFilterWrap').innerHTML = pillsHTML;
 
-  // ── 3. ARMAR JUEGO DE DATOS SELECCIONADOS ──
-  const datasets = [];
-  if (activeTarjetasMetrics.includes('Total ARS')) {
-    datasets.push({
-      label: 'Total Gastos ARS',
-      data: mesesKeys.map(k => mesesMap[k].totalARS),
-      borderColor: '#3b82f6',
-      backgroundColor: 'transparent',
-      borderWidth: 2,
-      tension: 0.2,
-      pointRadius: 4
-    });
+  function labelUrgencia(vencDate) {
+    if (!vencDate) return '—';
+    const diff = Math.round((vencDate - hoy) / (1000*60*60*24));
+    if (diff < 0)  return 'Venció';
+    if (diff === 0) return 'Vence hoy';
+    if (diff === 1) return 'Vence mañana';
+    if (diff <= 7)  return `Vence en ${diff} días`;
+    return `Vence el ${formatDateMed(vencDate)}`;
   }
-  if (activeTarjetasMetrics.includes('Total USD')) {
-    datasets.push({
-      label: 'Total Gastos USD',
-      data: mesesKeys.map(k => mesesMap[k].totalUSD),
-      borderColor: '#10b981',
-      backgroundColor: 'transparent',
-      borderWidth: 2,
-      tension: 0.2,
-      pointRadius: 4
-    });
-  }
-  tarjetasUnicas.forEach(t => {
-    if (activeTarjetasMetrics.includes(t)) {
-      datasets.push({
-        label: t,
-        data: mesesKeys.map(k => mesesMap[k].cards[t] || 0),
-        borderColor: colorMap[t],
-        backgroundColor: 'transparent',
-        borderWidth: 2,
-        tension: 0.2,
-        pointRadius: 4
-      });
-    }
-  });
 
-  // Render o Actualización del Gráfico de Líneas
-  const ctx = document.getElementById('tarjetasLineChart').getContext('2d');
-  if (tarjetasLineInst) tarjetasLineInst.destroy();
-  tarjetasLineInst = new Chart(ctx, {
-    type: 'line',
-    data: { labels: mesesKeys.map(k => mesesMap[k].label), datasets },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          callbacks: {
-            label: ctx => ` ${ctx.dataset.label}: ${ctx.dataset.label.includes('USD') ? 'U$S ' + ctx.raw.toFixed(2) : '$' + Math.round(ctx.raw).toLocaleString('es-AR')}`
-          }
-        }
-      },
-      scales: {
-        x: { grid: { color: GRID }, ticks: { color: TICK, font: { size: 11 } } },
-        y: { grid: { color: GRID }, ticks: { color: TICK, font: { size: 10 }, callback: v => '$' + (v >= 1000 ? Math.round(v/1000)+'k' : v) } }
-      }
-    }
+  let heroHTML = '';
+  gruposArr.forEach(g => {
+    const color = colorMap[g.tarjeta];
+    const urg   = localUrgenciaClass(g.vencDate);
+    const label = labelUrgencia(g.vencDate);
+    heroHTML += `
+      <div class="tc-venc-group">
+        <div class="tc-venc-header">
+          <span class="tc-venc-nombre">
+            <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${color};margin-right:7px;vertical-align:middle;"></span>
+            ${g.tarjeta}
+          </span>
+          <div class="tc-venc-badge">
+            <span class="tc-venc-label">Vencimiento &nbsp;</span>
+            <span class="tc-venc-fecha ${urg}">${label}</span>
+          </div>
+        </div>
+        <div class="tc-montos">
+          <div class="tc-monto-card">
+            <p class="tc-monto-label">Total en pesos</p>
+            <p class="tc-monto-value ars ${g.totalARS === 0 ? 'zero' : ''}">${g.totalARS > 0 ? fmt(g.totalARS) : '—'}</p>
+          </div>
+          <div class="tc-monto-card">
+            <p class="tc-monto-label">Total en dólares</p>
+            <p class="tc-monto-value usd ${g.totalUSD === 0 ? 'zero' : ''}">${g.totalUSD > 0 ? fmtUSD(g.totalUSD) : '—'}</p>
+          </div>
+        </div>
+      </div>`;
   });
+  document.getElementById('tcHero').innerHTML = heroHTML;
 
-  // ── 4. CUOTAS PENDIENTES FUTURAS ──
   const cuotasFuturas = {};
+
   datos.forEach(d => {
     if (d.cuotaTotal <= 1 || d.cuotaActual === 0 || !d.fechaDate) return;
     const cuotasPendientes = d.cuotaTotal - d.cuotaActual;
@@ -779,7 +726,7 @@ function renderTarjetas() {
         cuotaTotal: d.cuotaTotal,
         montoARS: montoCuotaARS,
         montoUSD: montoCuotaUSD,
-        color: colorMap[d.tarjeta] || '#fff'
+        color: colorMap[d.tarjeta]
       });
     }
   });
@@ -831,7 +778,6 @@ function renderTarjetas() {
   }
   document.getElementById('tcCuotasPendientes').innerHTML = cuotasHTML;
 
-  // ── 5. DETALLE COMPLETO DE CONSUMOS ──
   const detalleOrdenado = [...datos].sort((a,b) => {
     if (!a.vencDate && !b.vencDate) return 0;
     if (!a.vencDate) return 1;
@@ -853,7 +799,7 @@ function renderTarjetas() {
         </tr></thead>
         <tbody>`;
   detalleOrdenado.forEach(d => {
-    const color = colorMap[d.tarjeta] || '#fff';
+    const color = colorMap[d.tarjeta];
     const cuotaTag = d.cuota
       ? `<span class="cuota-tag en-curso">${d.cuota}</span>`
       : `<span style="color:#333;font-size:11px;">—</span>`;
@@ -874,9 +820,9 @@ function renderTarjetas() {
   function localUrgenciaClass(vencDate) {
     if (!vencDate) return '';
     const diff = Math.round((vencDate - hoy) / (1000*60*60*24));
-    if (diff <= 3)  return 'tc-venc-fecha urgente';
-    if (diff <= 7)  return 'tc-venc-fecha pronto';
-    return '';
+    if (diff <= 3)  return 'urgente';
+    if (diff <= 7)  return 'pronto';
+    return 'ok';
   }
 }
 
