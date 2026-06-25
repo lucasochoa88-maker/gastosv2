@@ -102,11 +102,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .tc-venc-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; flex-wrap: wrap; gap: 8px; }
 .tc-venc-nombre { font-size: 15px; font-weight: 500; color: #e8e8e8; }
 .tc-venc-badge { display: flex; align-items: center; gap: 6px; }
-.tc-venc-label { font-size: 10px; color: #555; text-transform: uppercase; letter-spacing: 0.06em; margin-right: 2px; }
+.tc-venc-label { font-size: 10px; color: #555; text-transform: uppercase; letter-spacing: 0.06em; }
 .tc-venc-fecha { font-size: 13px; font-weight: 500; }
-.tc-venc-fecha.urgente { color: #E24B4A; }
-.tc-venc-fecha.pronto  { color: #EF9F27; }
-.tc-venc-fecha.ok      { color: #888; }
 .tc-montos { display: flex; gap: 10px; flex-wrap: wrap; }
 .tc-monto-card { flex: 1; min-width: 120px; background: #111; border: 0.5px solid #1e1e1e; border-radius: 8px; padding: 14px 16px; }
 .tc-monto-label { font-size: 10px; color: #444; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
@@ -114,18 +111,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .tc-monto-value.ars { color: #e8e8e8; }
 .tc-monto-value.usd { color: #1D9E75; }
 .tc-monto-value.zero { color: #333; font-size: 20px; }
-
 .tc-seccion-titulo { font-size: 10px; color: #444; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 10px; margin-top: 1.5rem; }
 
-.tc-cuotas-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; margin-bottom: 1.5rem; }
-.tc-cuota-mes { background: #1a1a1a; border: 0.5px solid #222; border-radius: 8px; padding: 12px 14px; }
-.tc-cuota-mes-label { font-size: 10px; color: #555; margin-bottom: 6px; }
-.tc-cuota-mes-ars { font-size: 16px; font-weight: 500; color: #e8e8e8; }
-.tc-cuota-mes-usd { font-size: 11px; color: #1D9E75; margin-top: 2px; }
-.tc-cuota-mes.actual { border-color: #378ADD44; background: #1a2030; }
-.tc-cuota-mes.actual .tc-cuota-mes-label { color: #378ADD; }
-
-.tc-tarjeta-tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; }
 .cuota-tag { background: #252525; color: #888; padding: 2px 7px; border-radius: 4px; font-size: 11px; white-space: nowrap; }
 .cuota-tag.en-curso { background: #1a2535; color: #378ADD; }
 
@@ -244,10 +231,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
   </div>
 
   <div id="tabTarjetas" style="display:none;">
-    <div id="tcHero" class="tc-hero"></div>
-    <div id="tcCuotasPendientes"></div>
-    <div id="tcDetalle"></div>
-  </div>
+    </div>
 
 </div>
 
@@ -270,7 +254,6 @@ const CICLOS = [
 
 const URL_TARJETAS = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTSR-jEHWGJNTU5Wk2HOm6U5_pQkHudAuzgL46QYnVg5WNv-2K9H8hDsNVGUtFifICuhdcCzBWich3V/pub?gid=1050964641&single=true&output=csv';
 
-// Paleta de colores por tarjeta (se asigna dinámicamente)
 const PALETTE = ['#378ADD','#1D9E75','#EF9F27','#7F77DD','#D4537E','#D85A30','#639922','#888780'];
 const GRID = 'rgba(255,255,255,0.05)';
 const TICK = '#444';
@@ -281,6 +264,7 @@ let datosCache = {};
 let tarjetasCache = null;
 let logDatos = [];
 let donutInst = null, barInst = null, compareBarInst = null, ratioLineInst = null, catCompareInst = null;
+let mesTarjetaActivo = null; // Guardará el mes seleccionado en la pestaña tarjetas
 
 // ─── UTILIDADES ───────────────────────────────────────────────────────────────
 function fmt(n) {
@@ -307,34 +291,11 @@ function formatDateShort(d) {
   if (!d) return '';
   return d.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit' });
 }
-function formatDateMed(d) {
-  if (!d) return '';
-  return d.toLocaleDateString('es-AR', { day: '2-digit', month: 'short', year: 'numeric' });
-}
 function diasEntre(desde, hasta) {
   return Math.round((hasta - desde) / (1000 * 60 * 60 * 24)) + 1;
 }
-function mesLabel(d) {
-  if (!d) return '';
-  return d.toLocaleDateString('es-AR', { month: 'short', year: '2-digit' })
-          .replace('. ', '/').replace('.', '/');
-}
-function addMonths(d, n) {
-  const r = new Date(d);
-  r.setMonth(r.getMonth() + n);
-  return r;
-}
 
-// Clasificación de urgencia global de vencimientos
-function calcularUrgenciaClass(vencDate, hoy) {
-  if (!vencDate) return 'ok';
-  const diff = Math.round((vencDate - hoy) / (1000*60*60*24));
-  if (diff <= 3)  return 'urgente';
-  if (diff <= 7)  return 'pronto';
-  return 'ok';
-}
-
-// ─── DROPDOWN ─────────────────────────────────────────────────────────────────
+// ─── DROPDOWN DASHBOARD ──────────────────────────────────────────────────────
 function buildDropdown() {
   const menu = document.getElementById('dropdownMenu');
   const byAnio = {};
@@ -448,55 +409,32 @@ function parsearCiclo(rows) {
   return { datos, ingresosLucas, ingresosMari };
 }
 
-// ─── PARSEO DE TARJETAS (ESTRUCTURA CORREGIDA) ───────────────────────────────
+// ─── PARSEO DE TARJETAS ──────────────────────────────────────────────────────
 function parsearTarjetas(rows) {
   if (!rows || rows.length === 0) return [];
-  const cols = Object.keys(rows[0]);
-  
-  // Identificación dinámica basada en tu estructura real
-  const cBanco    = cols.find(c => c.toLowerCase().includes('banco')) || cols[0];
-  const cMes      = cols.find(c => c.toLowerCase() === 'mes') || cols[1];
-  const cFecha    = cols.find(c => c.toLowerCase() === 'fecha') || cols[2];
-  const cTarjeta  = cols.find(c => c.toLowerCase() === 'tarjeta') || cols[3];
-  const cDetalle  = cols.find(c => c.toLowerCase() === 'detalle') || cols[4];
-  const cCuota    = cols.find(c => c.toLowerCase() === 'cuota') || cols[5];
-  const cDetARS   = cols.find(c => c.toLowerCase().includes('monto') && c.toLowerCase().includes('ars')) || cols[6];
-  const cDetUSD   = cols.find(c => c.toLowerCase().includes('monto') && c.toLowerCase().includes('usd')) || cols[7];
-  const cVenc     = cols.find(c => c.toLowerCase().includes('vencimiento')) || cols[8];
-  const cTotalARS = cols.find(c => c.toLowerCase().includes('total') && c.toLowerCase().includes('ars')) || cols[9];
-  const cTotalUSD = cols.find(c => c.toLowerCase().includes('total') && c.toLowerCase().includes('usd')) || cols[10];
-
   const datos = [];
-  rows.forEach((r, idx) => {
-    const fecha     = r[cFecha]    ? r[cFecha].trim()   : '';
-    const tarjeta   = r[cTarjeta]  ? r[cTarjeta].trim() : '';
-    const detalle   = r[cDetalle]  ? r[cDetalle].trim() : '';
-    const cuota     = r[cCuota]    ? r[cCuota].trim()   : '';
-    const montoARS  = parseMonto(r[cDetARS]);
-    const montoUSD  = parseMonto(r[cDetUSD]);
-    const vencStr   = r[cVenc]     ? r[cVenc].trim()    : '';
-    const bancoTipo = r[cBanco]    ? r[cBanco].trim()   : '';
-    const mesStr    = r[cMes]      ? r[cMes].trim()     : '';
+  rows.forEach(r => {
+    // Búsqueda flexible de columnas por si tienen espacios extra
+    const getVal = (colName) => {
+      const key = Object.keys(r).find(k => k.trim().toLowerCase() === colName.toLowerCase());
+      return key ? r[key].trim() : '';
+    };
 
-    // Los totales consolidados vienen solo en la cabecera por bloque.
-    // Usamos el monto de la fila para los items individuales y dejamos los totales en bruto para el agrupador posterior.
-    if (!fecha || !tarjeta) return;
-    
-    const fechaDate = parseDate(fecha);
-    const vencDate  = parseDate(vencStr);
+    const bancoTipo = getVal('Banco y tipo') || getVal('Banco');
+    const mes = getVal('Mes');
+    const fecha = getVal('Fecha');
+    const tarjeta = getVal('Tarjeta');
+    const detalle = getVal('Detalle');
+    const cuota = getVal('Cuota');
+    const montoARS = parseMonto(getVal('Detalle monto ARS'));
+    const montoUSD = parseMonto(getVal('Detalle monto USD'));
+    const vencStr = getVal('Vencimiento');
+    const totalARS = parseMonto(getVal('Total a pagar ARS') || getVal('Total ARS'));
+    const totalUSD = parseMonto(getVal('Total a pagar USD') || getVal('Total USD'));
 
-    let cuotaActual = 0, cuotaTotal = 0;
-    if (cuota && cuota.includes('/')) {
-      const parts = cuota.split('/');
-      cuotaActual = parseInt(parts[0]) || 0;
-      cuotaTotal  = parseInt(parts[1]) || 0;
-    }
+    if (!mes && !bancoTipo) return; // Fila vacía
 
-    datos.push({ 
-      mesStr, fecha, fechaDate, tarjeta, detalle, cuota, 
-      cuotaActual, cuotaTotal, montoARS, montoUSD, vencStr, 
-      vencDate, bancoTipo 
-    });
+    datos.push({ bancoTipo, mes, fecha, tarjeta, detalle, cuota, montoARS, montoUSD, vencStr, totalARS, totalUSD });
   });
   return datos;
 }
@@ -528,7 +466,6 @@ function buildDashboard(rows) {
   document.getElementById('cicloBadge').textContent = `${formatDateShort(desde)} – ${formatDateShort(hasta)}`;
   document.getElementById('dashSub').textContent = `${datos.length} movimientos · ${ciclo.label}`;
 
-  // Barra progreso
   const pctGastadoNum = totalIngresos > 0 ? (totalGastos / totalIngresos) * 100 : 0;
   document.getElementById('progressTiempo').style.width = pctTiempo.toFixed(1) + '%';
   document.getElementById('progressGastos').style.width = Math.min(100, pctGastadoNum).toFixed(1) + '%';
@@ -538,7 +475,6 @@ function buildDashboard(rows) {
     `<span style="color:#378ADD">▏</span> Tiempo transcurrido: ${pctTiempo.toFixed(0)}%`;
   document.getElementById('cicloProgressWrap').style.display = esCicloActual || hoy > hasta ? 'block' : 'none';
 
-  // Proyección de ahorro
   const banner = document.getElementById('projBanner');
   if (esCicloActual && diasTranscurridos > 0 && totalGastos > 0 && totalIngresos > 0) {
     const promDiario    = totalGastos / diasTranscurridos;
@@ -549,14 +485,14 @@ function buildDashboard(rows) {
     let tono, titulo, texto;
     if (ahorroProy >= totalIngresos * 0.20) {
       tono = 'saving'; titulo = 'Van muy bien 🎯';
-      texto = `Al ritmo actual (<strong>${fmt(Math.round(promDiario))}/día</strong>), cerrarían el ciclo ahorrando <strong>${fmt(Math.round(ahorroProy))}</strong> — el <strong>${pctAhorroProy}%</strong> del ingreso. Quedan ${diasRestan} días: si mantienen el ritmo, ese ahorro está asegurado.`;
+      texto = `Al ritmo actual (<strong>${fmt(Math.round(promDiario))}/día</strong>), cerrarían el ciclo ahorrando <strong>${fmt(Math.round(ahorroProy))}</strong> — el <strong>${pctAhorroProy}%</strong> del ingreso. Quedan ${diasRestan} días.`;
     } else if (ahorroProy > 0) {
       tono = 'warning'; titulo = 'Ahorro proyectado ajustado';
-      texto = `Al ritmo actual (<strong>${fmt(Math.round(promDiario))}/día</strong>), cerrarían ahorrando <strong>${fmt(Math.round(ahorroProy))}</strong> (<strong>${pctAhorroProy}%</strong> del ingreso). Quedan ${diasRestan} días para ampliar ese margen.`;
+      texto = `Al ritmo actual (<strong>${fmt(Math.round(promDiario))}/día</strong>), cerrarían ahorrando <strong>${fmt(Math.round(ahorroProy))}</strong> (<strong>${pctAhorroProy}%</strong> del ingreso). Quedan ${diasRestan} días.`;
     } else {
       const deficit = Math.abs(ahorroProy);
       tono = 'danger'; titulo = 'Ritmo por encima del ingreso';
-      texto = `Al ritmo actual (<strong>${fmt(Math.round(promDiario))}/día</strong>), el ciclo cerraría con un déficit de <strong>${fmt(Math.round(deficit))}</strong>. Quedan ${diasRestan} días para revertirlo.`;
+      texto = `Al ritmo actual (<strong>${fmt(Math.round(promDiario))}/día</strong>), el ciclo cerraría con un déficit de <strong>${fmt(Math.round(deficit))}</strong>. Quedan ${diasRestan} días.`;
     }
     banner.className = `proj-banner ${tono}`;
     document.getElementById('projBannerTitle').textContent = titulo;
@@ -566,7 +502,6 @@ function buildDashboard(rows) {
     banner.style.display = 'none';
   }
 
-  // Métricas
   document.getElementById('metricsBox').innerHTML = `
     <div class="metric"><p class="metric-label">Lucas</p><p class="metric-value">${fmt(ingresosLucas)}</p></div>
     <div class="metric"><p class="metric-label">Mariana</p><p class="metric-value">${fmt(ingresosMari)}</p></div>
@@ -576,7 +511,6 @@ function buildDashboard(rows) {
     <div class="metric"><p class="metric-label">% gastado</p><p class="metric-value">${pctGastado}%</p></div>
   `;
 
-  // Gráfico fechas
   const fechasSorted = [...new Set(datos.map(r => r.fecha))].sort((a,b) => {
     const da = parseDate(a), db = parseDate(b);
     return (!da || !db) ? 0 : da - db;
@@ -585,7 +519,6 @@ function buildDashboard(rows) {
     datos.filter(r => r.fecha === f).reduce((s, r) => s + r.monto, 0)
   );
 
-  // Categorías
   const catMap = {};
   datos.forEach(r => { catMap[r.categoria] = (catMap[r.categoria] || 0) + r.monto; });
   const categorias = Object.entries(catMap)
@@ -652,200 +585,136 @@ function filtrarLog() {
   ));
 }
 
-// ─── TARJETAS ────────────────────────────────────────────────────────────────
+// ─── TARJETAS REVISADO ───────────────────────────────────────────────────────
 function renderTarjetas() {
   const datos = parsearTarjetas(tarjetasCache || []);
-  const hoy = new Date(); hoy.setHours(0,0,0,0);
 
   if (!datos.length) {
-    document.getElementById('tcHero').innerHTML = '<p style="color:#444;font-size:13px;padding:2rem 0;">No hay datos de tarjetas cargados todavía.</p>';
-    document.getElementById('tcCuotasPendientes').innerHTML = '';
-    document.getElementById('tcDetalle').innerHTML = '';
+    document.getElementById('tabTarjetas').innerHTML = '<p style="color:#444;font-size:13px;padding:2rem 0;">No hay datos de tarjetas cargados todavía o las columnas no coinciden.</p>';
     return;
   }
 
-  // Asignar color por tarjeta
-  const tarjetasUnicas = [...new Set(datos.map(d => d.tarjeta))];
-  const colorMap = {};
-  tarjetasUnicas.forEach((t, i) => { colorMap[t] = PALETTE[i % PALETTE.length]; });
+  // 1. Obtener los meses únicos disponibles en la planilla
+  const meses = [...new Set(datos.map(d => d.mes).filter(Boolean))];
+  if (!meses.length) return;
 
-  // Agrupar consumos para calcular totales exactos por Tarjeta y Vencimiento
-  const grupos = {};
-  datos.forEach(d => {
-    const key = `${d.tarjeta}||${d.vencStr || 'sin-venc'}`;
-    if (!grupos[key]) {
-      grupos[key] = { tarjeta: d.tarjeta, vencDate: d.vencDate, vencStr: d.vencStr, totalARS: 0, totalUSD: 0 };
-    }
-    grupos[key].totalARS += d.montoARS;
-    grupos[key].totalUSD += d.montoUSD;
-  });
-
-  const gruposArr = Object.values(grupos).sort((a, b) => {
-    if (!a.vencDate && !b.vencDate) return 0;
-    if (!a.vencDate) return 1;
-    if (!b.vencDate) return -1;
-    return a.vencDate - b.vencDate;
-  });
-
-  function obtenerUrgenciaLabel(vencDate) {
-    if (!vencDate) return '—';
-    const diff = Math.round((vencDate - hoy) / (1000*60*60*24));
-    if (diff < 0)  return 'Venció';
-    if (diff === 0) return 'Vence hoy';
-    if (diff === 1) return 'Vence mañana';
-    if (diff <= 7)  return `Vence en ${diff} días`;
-    return `Vence el ${formatDateMed(vencDate)}`;
+  // 2. Definir el mes activo (por defecto el último de la lista)
+  if (!mesTarjetaActivo || !meses.includes(mesTarjetaActivo)) {
+    mesTarjetaActivo = meses[meses.length - 1];
   }
 
-  // Render de tarjetas superiores
+  // 3. Filtrar los datos por el mes seleccionado
+  const datosMes = datos.filter(d => d.mes === mesTarjetaActivo);
+
+  // 4. Agrupar la información por Banco/Tipo para generar los Headers
+  const grupos = {};
+  datosMes.forEach(d => {
+    const key = d.bancoTipo || d.tarjeta || 'Desconocido';
+    if (!grupos[key]) {
+      grupos[key] = {
+        bancoTipo: d.bancoTipo,
+        tarjeta: d.tarjeta,
+        vencStr: d.vencStr,
+        totalARS: d.totalARS,
+        totalUSD: d.totalUSD
+      };
+    }
+    // Si la fila actual tiene el total o el vencimiento, actualizamos.
+    // Esto es por si lo pusiste en todas las filas o solo en la primera.
+    if (d.totalARS > 0) grupos[key].totalARS = d.totalARS;
+    if (d.totalUSD > 0) grupos[key].totalUSD = d.totalUSD;
+    if (d.vencStr) grupos[key].vencStr = d.vencStr;
+  });
+
+  const gruposArr = Object.values(grupos);
+
+  // 5. Construir la UI: Dropdown de Mes + Headers
+  let html = `
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; gap:10px;">
+      <p class="tc-seccion-titulo" style="margin:0;">Resumen de Tarjetas</p>
+      <select onchange="cambiarMesTarjeta(this.value)" style="background:#1a1a1a; border:0.5px solid #2a2a2a; border-radius:8px; padding:8px 12px; color:#e8e8e8; font-size:13px; outline:none; cursor:pointer;">
+        ${meses.map(m => `<option value="${m}" ${m === mesTarjetaActivo ? 'selected' : ''}>Mes: ${m}</option>`).join('')}
+      </select>
+    </div>
+  `;
+
   let heroHTML = '';
-  gruposArr.forEach(g => {
-    const color = colorMap[g.tarjeta];
-    const urg   = calcularUrgenciaClass(g.vencDate, hoy);
-    const label = obtenerUrgenciaLabel(g.vencDate);
+  gruposArr.forEach((g, idx) => {
+    const color = PALETTE[idx % PALETTE.length];
     heroHTML += `
       <div class="tc-venc-group">
         <div class="tc-venc-header">
           <span class="tc-venc-nombre">
             <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${color};margin-right:7px;vertical-align:middle;"></span>
-            ${g.tarjeta}
+            ${g.bancoTipo || g.tarjeta}
           </span>
           <div class="tc-venc-badge">
             <span class="tc-venc-label">Vencimiento &nbsp;</span>
-            <span class="tc-venc-fecha ${urg}">${label}</span>
+            <span class="tc-venc-fecha" style="color:#ccc;">${g.vencStr || '—'}</span>
           </div>
         </div>
         <div class="tc-montos">
           <div class="tc-monto-card">
-            <p class="tc-monto-label">Total en pesos</p>
+            <p class="tc-monto-label">Total a pagar ARS</p>
             <p class="tc-monto-value ars ${g.totalARS === 0 ? 'zero' : ''}">${g.totalARS > 0 ? fmt(g.totalARS) : '—'}</p>
           </div>
           <div class="tc-monto-card">
-            <p class="tc-monto-label">Total en dólares</p>
+            <p class="tc-monto-label">Total a pagar USD</p>
             <p class="tc-monto-value usd ${g.totalUSD === 0 ? 'zero' : ''}">${g.totalUSD > 0 ? fmtUSD(g.totalUSD) : '—'}</p>
           </div>
         </div>
-      </div>`;
+      </div>
+    `;
   });
-  document.getElementById('tcHero').innerHTML = heroHTML;
+  html += `<div id="tcHero">${heroHTML}</div>`;
 
-  // ── CUOTAS PENDIENTES FUTURAS ──
-  const cuotasFuturas = {};
-  datos.forEach(d => {
-    if (d.cuotaTotal <= 1 || d.cuotaActual === 0 || !d.fechaDate) return;
-    const cuotasPendientes = d.cuotaTotal - d.cuotaActual;
-    if (cuotasPendientes <= 0) return;
-
-    const montoCuotaARS = d.montoARS;
-    const montoCuotaUSD = d.montoUSD;
-
-    for (let i = 1; i <= cuotasPendientes; i++) {
-      const mesFuturo = addMonths(d.fechaDate, i);
-      const key = `${mesFuturo.getFullYear()}-${String(mesFuturo.getMonth()+1).padStart(2,'0')}`;
-      if (!cuotasFuturas[key]) {
-        cuotasFuturas[key] = { label: mesLabel(mesFuturo), date: mesFuturo, totalARS: 0, totalUSD: 0, items: [] };
-      }
-      cuotasFuturas[key].totalARS += montoCuotaARS;
-      cuotasFuturas[key].totalUSD += montoCuotaUSD;
-      cuotasFuturas[key].items.push({
-        tarjeta: d.tarjeta,
-        detalle: d.detalle,
-        cuotaNum: d.cuotaActual + i,
-        cuotaTotal: d.cuotaTotal,
-        montoARS: montoCuotaARS,
-        montoUSD: montoCuotaUSD,
-        color: colorMap[d.tarjeta]
-      });
-    }
-  });
-
-  const cuotasKeys = Object.keys(cuotasFuturas).sort();
-  let cuotasHTML = '';
-  if (cuotasKeys.length > 0) {
-    const mesActualKey = `${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}`;
-    cuotasHTML += `<p class="tc-seccion-titulo">Cuotas pendientes futuras</p><div class="tc-cuotas-grid">`;
-    cuotasKeys.forEach(key => {
-      const m = cuotasFuturas[key];
-      const esActual = key === mesActualKey;
-      cuotasHTML += `
-        <div class="tc-cuota-mes ${esActual ? 'actual' : ''}">
-          <p class="tc-cuota-mes-label">${m.label}${esActual ? ' · este mes' : ''}</p>
-          <p class="tc-cuota-mes-ars">${m.totalARS > 0 ? fmt(m.totalARS) : '—'}</p>
-          ${m.totalUSD > 0 ? `<p class="tc-cuota-mes-usd">${fmtUSD(m.totalUSD)}</p>` : ''}
-        </div>`;
-    });
-    cuotasHTML += `</div>`;
-
-    cuotasHTML += `
-      <div class="table-card" style="margin-top:0;">
-        <p class="chart-title">Detalle de cuotas pendientes</p>
-        <div style="overflow-x:auto;">
-        <table class="ranking-table" style="min-width:500px;">
-          <thead><tr>
-            <th>Mes</th><th>Tarjeta</th><th>Concepto</th>
-            <th style="text-align:center">Cuota</th>
-            <th style="text-align:right">ARS</th>
-            <th style="text-align:right">USD</th>
-          </tr></thead>
-          <tbody>`;
-    cuotasKeys.forEach(key => {
-      const m = cuotasFuturas[key];
-      const esActual = key === `${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}`;
-      m.items.forEach(it => {
-        cuotasHTML += `<tr style="${esActual ? 'background:#111;' : ''}">
-          <td style="color:#555;font-size:12px;white-space:nowrap">${m.label}${esActual ? ' ←' : ''}</td>
-          <td><span style="color:${it.color};font-size:12px;font-weight:500;">${it.tarjeta}</span></td>
-          <td style="font-size:12px">${it.detalle}</td>
-          <td style="text-align:center"><span class="cuota-tag ${esActual ? 'en-curso' : ''}">${it.cuotaNum}/${it.cuotaTotal}</span></td>
-          <td style="text-align:right;font-size:12px">${it.montoARS > 0 ? fmt(it.montoARS) : '—'}</td>
-          <td style="text-align:right;font-size:12px;color:#1D9E75">${it.montoUSD > 0 ? fmtUSD(it.montoUSD) : '—'}</td>
-        </tr>`;
-      });
-    });
-    cuotasHTML += `</tbody></table></div></div>`;
-  }
-  document.getElementById('tcCuotasPendientes').innerHTML = cuotasHTML;
-
-  // ── DETALLE DE CONSUMOS ──
-  const detalleOrdenado = [...datos].sort((a,b) => {
-    if (!a.vencDate && !b.vencDate) return 0;
-    if (!a.vencDate) return 1;
-    if (!b.vencDate) return -1;
-    return a.vencDate - b.vencDate || a.tarjeta.localeCompare(b.tarjeta);
-  });
-
-  let detalleHTML = `
-    <p class="tc-seccion-titulo">Todos los consumos</p>
-    <div class="table-card" style="margin-top:0;">
+  // 6. Construir la tabla con el detalle de ese mes únicamente
+  html += `
+    <div class="table-card" style="margin-top:2rem;">
+      <p class="chart-title" style="margin-bottom:14px;">Detalle de consumos - ${mesTarjetaActivo}</p>
       <div style="overflow-x:auto;">
-      <table class="ranking-table" style="min-width:540px;">
-        <thead><tr>
-          <th>Fecha</th><th>Tarjeta</th><th>Concepto</th>
-          <th style="text-align:center">Cuota</th>
-          <th style="text-align:right">ARS</th>
-          <th style="text-align:right">USD</th>
-          <th style="text-align:right">Vencimiento</th>
-        </tr></thead>
-        <tbody>`;
-  detalleOrdenado.forEach(d => {
-    const color = colorMap[d.tarjeta];
-    const cuotaTag = d.cuota
-      ? `<span class="cuota-tag en-curso">${d.cuota}</span>`
-      : `<span style="color:#333;font-size:11px;">—</span>`;
-    const urg = calcularUrgenciaClass(d.vencDate, hoy);
-    const cls = urg !== 'ok' ? `tc-venc-fecha ${urg}` : '';
-    detalleHTML += `<tr>
-      <td style="color:#555;font-size:12px;white-space:nowrap">${d.fecha}</td>
-      <td><span style="color:${color};font-size:12px;font-weight:500;">${d.tarjeta}</span></td>
-      <td style="font-size:12px">${d.detalle}</td>
-      <td style="text-align:center">${cuotaTag}</td>
-      <td style="text-align:right;font-size:12px">${d.montoARS > 0 ? fmt(d.montoARS) : '—'}</td>
-      <td style="text-align:right;font-size:12px;color:#1D9E75">${d.montoUSD > 0 ? fmtUSD(d.montoUSD) : '—'}</td>
-      <td style="text-align:right;font-size:12px" class="${cls}">${d.vencStr || '—'}</td>
-    </tr>`;
+        <table class="ranking-table" style="min-width:600px;">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Tarjeta</th>
+              <th>Detalle</th>
+              <th style="text-align:center">Cuota</th>
+              <th style="text-align:right">Monto ARS</th>
+              <th style="text-align:right">Monto USD</th>
+            </tr>
+          </thead>
+          <tbody>
+  `;
+
+  datosMes.forEach(d => {
+    const cuotaTag = d.cuota ? `<span class="cuota-tag en-curso">${d.cuota}</span>` : '<span style="color:#333;font-size:11px;">—</span>';
+    html += `
+      <tr>
+        <td style="color:#555;font-size:12px;white-space:nowrap">${d.fecha}</td>
+        <td><span style="font-size:12px;font-weight:500;color:#ccc;">${d.tarjeta}</span></td>
+        <td style="font-size:12px">${d.detalle}</td>
+        <td style="text-align:center">${cuotaTag}</td>
+        <td style="text-align:right;font-size:12px">${d.montoARS > 0 ? fmt(d.montoARS) : '—'}</td>
+        <td style="text-align:right;font-size:12px;color:#1D9E75">${d.montoUSD > 0 ? fmtUSD(d.montoUSD) : '—'}</td>
+      </tr>
+    `;
   });
-  detalleHTML += `</tbody></table></div></div>`;
-  document.getElementById('tcDetalle').innerHTML = detalleHTML;
+
+  html += `
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('tabTarjetas').innerHTML = html;
+}
+
+// Función global conectada al evento "onchange" del selector de mes
+window.cambiarMesTarjeta = function(mes) {
+  mesTarjetaActivo = mes;
+  renderTarjetas();
 }
 
 // ─── COMPARATIVA ──────────────────────────────────────────────────────────────
