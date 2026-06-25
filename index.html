@@ -252,30 +252,23 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 </div>
 
 <script>
-// ─── CONFIGURACIÓN ────────────────────────────────────────────────────────────
+// ─── CONFIGURACIÓN (Solo Julio 2026) ───────────────────────────────────────────
 const CICLOS = [
   {
-    label: 'Ciclo Junio 2026',
-    cicloDesde: new Date(2026, 4, 25),
-    cicloHasta: new Date(2026, 5, 24),
-    url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTSR-jEHWGJNTU5Wk2HOm6U5_pQkHudAuzgL46QYnVg5WNv-2K9H8hDsNVGUtFifICuhdcCzBWich3V/pub?gid=1978138079&single=true&output=csv'
-  },
-  {
     label: 'Ciclo Julio 2026',
-    cicloDesde: new Date(2026, 5, 25),
-    cicloHasta: new Date(2026, 6, 24),
+    cicloDesde: new Date(2026, 5, 25), // 25 de Junio
+    cicloHasta: new Date(2026, 6, 24), // 24 de Julio
     url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTSR-jEHWGJNTU5Wk2HOm6U5_pQkHudAuzgL46QYnVg5WNv-2K9H8hDsNVGUtFifICuhdcCzBWich3V/pub?gid=815384903&single=true&output=csv'
   }
 ];
 
 const URL_TARJETAS = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTSR-jEHWGJNTU5Wk2HOm6U5_pQkHudAuzgL46QYnVg5WNv-2K9H8hDsNVGUtFifICuhdcCzBWich3V/pub?gid=1050964641&single=true&output=csv';
 
-// Paleta de colores por tarjeta (se asigna dinámicamente)
 const PALETTE = ['#378ADD','#1D9E75','#EF9F27','#7F77DD','#D4537E','#D85A30','#639922','#888780'];
 const GRID = 'rgba(255,255,255,0.05)';
 const TICK = '#444';
 
-let cicloActivo = CICLOS.length - 1;
+let cicloActivo = 0;
 let tabActivo = 'mes';
 let datosCache = {};
 let tarjetasCache = null;
@@ -314,13 +307,11 @@ function formatDateMed(d) {
 function diasEntre(desde, hasta) {
   return Math.round((hasta - desde) / (1000 * 60 * 60 * 24)) + 1;
 }
-// Retorna "Jun/26", "Jul/26", etc.
 function mesLabel(d) {
   if (!d) return '';
   return d.toLocaleDateString('es-AR', { month: 'short', year: '2-digit' })
           .replace('. ', '/').replace('.', '/');
 }
-// Suma N meses a una fecha
 function addMonths(d, n) {
   const r = new Date(d);
   r.setMonth(r.getMonth() + n);
@@ -330,20 +321,10 @@ function addMonths(d, n) {
 // ─── DROPDOWN ─────────────────────────────────────────────────────────────────
 function buildDropdown() {
   const menu = document.getElementById('dropdownMenu');
-  const byAnio = {};
-  CICLOS.forEach((c, i) => {
-    const anio = c.cicloHasta.getFullYear();
-    if (!byAnio[anio]) byAnio[anio] = [];
-    byAnio[anio].push({ ...c, idx: i });
-  });
   let html = '';
-  Object.keys(byAnio).sort((a,b) => b - a).forEach(anio => {
-    html += `<div class="dropdown-group-label">${anio}</div>`;
-    [...byAnio[anio]].reverse().forEach(c => {
-      const shortLabel = c.label.replace(' ' + anio, '').replace('Ciclo ','');
-      html += `<div class="dropdown-item ${c.idx === cicloActivo ? 'active' : ''}" onclick="cambiarCiclo(${c.idx})">
-        <span class="dot"></span>${shortLabel}</div>`;
-    });
+  CICLOS.forEach((c, i) => {
+    html += `<div class="dropdown-item ${i === cicloActivo ? 'active' : ''}" onclick="cambiarCiclo(${i})">
+      <span class="dot"></span>${c.label}</div>`;
   });
   menu.innerHTML = html;
   document.getElementById('dropdownLabel').textContent = CICLOS[cicloActivo].label;
@@ -363,8 +344,6 @@ document.addEventListener('click', e => {
 function cambiarCiclo(idx) {
   cicloActivo = idx;
   buildDropdown();
-  document.getElementById('dropdownMenu').classList.remove('open');
-  document.getElementById('dropdownChevron').classList.remove('open');
   loadData();
 }
 
@@ -441,11 +420,20 @@ function parsearCiclo(rows) {
   return { datos, ingresosLucas, ingresosMari };
 }
 
-// ─── PARSEO DE TARJETAS ──────────────────────────────────────────────────────
+// ─── CORRECCIÓN: PARSEO SEGURO DE COLUMNAS EN TARJETAS ──────────────────────
 function parsearTarjetas(rows) {
   if (!rows || rows.length === 0) return [];
   const cols = Object.keys(rows[0]);
-  const [cFecha, cTarjeta, cDetalle, cCuota, cARS, cUSD, cVenc] = cols;
+
+  // Buscamos los índices de forma semántica para evitar desajustes estructurales
+  const cFecha   = cols.find(c => c.toLowerCase().includes('fecha')) || cols[0];
+  const cTarjeta = cols.find(c => c.toLowerCase().includes('tarjeta')) || cols[1];
+  const cDetalle = cols.find(c => c.toLowerCase().includes('detalle') || c.toLowerCase().includes('concepto')) || cols[2];
+  const cCuota   = cols.find(c => c.toLowerCase().includes('cuota')) || cols[3];
+  const cARS     = cols.find(c => c.toLowerCase().includes('ars') || c.toLowerCase().includes('pesos')) || cols[4];
+  const cUSD     = cols.find(c => c.toLowerCase().includes('usd') || c.toLowerCase().includes('dólar') || c.toLowerCase().includes('dolar')) || cols[5];
+  const cVenc    = cols.find(c => c.toLowerCase().includes('venc')) || cols[6];
+
   const datos = [];
   rows.forEach(r => {
     const fecha     = r[cFecha]   ? r[cFecha].trim()   : '';
@@ -456,6 +444,7 @@ function parsearTarjetas(rows) {
     const montoUSD  = parseMonto(r[cUSD]);
     const vencStr   = r[cVenc]    ? r[cVenc].trim()    : '';
     if (!fecha || !tarjeta) return;
+    
     const fechaDate = parseDate(fecha);
     const vencDate  = parseDate(vencStr);
     let cuotaActual = 0, cuotaTotal = 0;
@@ -517,14 +506,14 @@ function buildDashboard(rows) {
     let tono, titulo, texto;
     if (ahorroProy >= totalIngresos * 0.20) {
       tono = 'saving'; titulo = 'Van muy bien 🎯';
-      texto = `Al ritmo actual (<strong>${fmt(Math.round(promDiario))}/día</strong>), cerrarían el ciclo ahorrando <strong>${fmt(Math.round(ahorroProy))}</strong> — el <strong>${pctAhorroProy}%</strong> del ingreso. Quedan ${diasRestan} días: si mantienen el ritmo, ese ahorro está asegurado.`;
+      texto = `Al ritmo actual (<strong>${fmt(Math.round(promDiario))}/día</strong>), cerrarían el ciclo ahorrando <strong>${fmt(Math.round(ahorroProy))}</strong> — el <strong>${pctAhorroProy}%</strong> del ingreso. Quedan ${diasRestan} días para mantenerlo.`;
     } else if (ahorroProy > 0) {
       tono = 'warning'; titulo = 'Ahorro proyectado ajustado';
-      texto = `Al ritmo actual (<strong>${fmt(Math.round(promDiario))}/día</strong>), cerrarían ahorrando <strong>${fmt(Math.round(ahorroProy))}</strong> (<strong>${pctAhorroProy}%</strong> del ingreso). Quedan ${diasRestan} días para ampliar ese margen.`;
+      texto = `Al ritmo actual (<strong>${fmt(Math.round(promDiario))}/día</strong>), cerrarían ahorrando <strong>${fmt(Math.round(ahorroProy))}</strong> (<strong>${pctAhorroProy}%</strong> del ingreso).`;
     } else {
       const deficit = Math.abs(ahorroProy);
       tono = 'danger'; titulo = 'Ritmo por encima del ingreso';
-      texto = `Al ritmo actual (<strong>${fmt(Math.round(promDiario))}/día</strong>), el ciclo cerraría con un déficit de <strong>${fmt(Math.round(deficit))}</strong>. Quedan ${diasRestan} días para revertirlo.`;
+      texto = `Al ritmo actual (<strong>${fmt(Math.round(promDiario))}/día</strong>), el ciclo cerraría con un déficit de <strong>${fmt(Math.round(deficit))}</strong>.`;
     }
     banner.className = `proj-banner ${tono}`;
     document.getElementById('projBannerTitle').textContent = titulo;
@@ -544,7 +533,7 @@ function buildDashboard(rows) {
     <div class="metric"><p class="metric-label">% gastado</p><p class="metric-value">${pctGastado}%</p></div>
   `;
 
-  // Gráfico fechas
+  // Gráfico fechas (Línea uniforme)
   const fechasSorted = [...new Set(datos.map(r => r.fecha))].sort((a,b) => {
     const da = parseDate(a), db = parseDate(b);
     return (!da || !db) ? 0 : da - db;
@@ -570,7 +559,7 @@ function buildDashboard(rows) {
     `<span class="legend-item"><span class="legend-dot" style="background:${c.color}"></span>${c.nombre.split(' ')[0]} ${totalGastos > 0 ? ((c.monto/totalGastos)*100).toFixed(1) : 0}%</span>`
   ).join('');
 
-  // ── MODIFICACIÓN: Gráfico de Barras a Líneas ──
+  // ── MODIFICACIÓN REALIZADA: Gráfico de líneas sin acumulación confusa ──
   if (barInst) barInst.destroy();
   barInst = new Chart(document.getElementById('barChart'), {
     type: 'line',
@@ -633,7 +622,7 @@ function filtrarLog() {
   ));
 }
 
-// ─── TARJETAS ────────────────────────────────────────────────────────────────
+// ─── TARJETAS (Renderizado Correcto y Dinámico) ────────────────────────────────
 function renderTarjetas() {
   const datos = parsearTarjetas(tarjetasCache || []);
   const hoy = new Date(); hoy.setHours(0,0,0,0);
@@ -696,19 +685,19 @@ function renderTarjetas() {
         <div class="tc-montos">
           <div class="tc-monto-card">
             <p class="tc-monto-label">Total en pesos</p>
-            <p class="tc-monto-value ars ${g.totalARS === 0 ? 'zero' : ''}">${g.totalARS > 0 ? fmt(g.totalARS) : '—'}</p>
+            <p class="tc-monto-value rows-value ars ${g.totalARS === 0 ? 'zero' : ''}">${g.totalARS > 0 ? fmt(g.totalARS) : '—'}</p>
           </div>
           <div class="tc-monto-card">
             <p class="tc-monto-label">Total en dólares</p>
-            <p class="tc-monto-value usd ${g.totalUSD === 0 ? 'zero' : ''}">${g.totalUSD > 0 ? fmtUSD(g.totalUSD) : '—'}</p>
+            <p class="tc-monto-value rows-value usd ${g.totalUSD === 0 ? 'zero' : ''}">${g.totalUSD > 0 ? fmtUSD(g.totalUSD) : '—'}</p>
           </div>
         </div>
       </div>`;
   });
   document.getElementById('tcHero').innerHTML = heroHTML;
 
+  // Cuotas futuras alternas
   const cuotasFuturas = {};
-
   datos.forEach(d => {
     if (d.cuotaTotal <= 1 || d.cuotaActual === 0 || !d.fechaDate) return;
     const cuotasPendientes = d.cuotaTotal - d.cuotaActual;
