@@ -287,19 +287,19 @@ const CICLOS = [
     label: 'Ciclo Julio 2026',
     cicloDesde: new Date(2026, 5, 25),  // 25 jun 2026
     cicloHasta: new Date(2026, 6, 24),  // 24 jul 2026
-    url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTSR-jEHWGJNTU5Wk2HOm6U5_pQkHudAuzgL46QYnVg5WNv-2K9H8hDsNVGUtFifICuhdcCzBWich3V/pub?gid=768994311&single=true&output=csv'
+    url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTSR-jEHWGJNTU5Wk2HOm6U5_pQkHudAuzgL46QYnVg5WNv-2K9H8hDsNVGUtFifICuhdcCzBWich3V/pub?gid=815384903&single=true&output=csv'
   }
   // Para agregar el próximo mes:
   // { label: 'Ciclo Agosto 2026', cicloDesde: new Date(2026,6,25), cicloHasta: new Date(2026,7,24), url: '...' }
 ];
 
 // ─── CICLOS TARJETAS ──────────────────────────────────────────────────────────
-// Cada entrada tiene "label" (con año, ej. "Julio 2026") y url del sheet de tarjetas.
-// Si url es null, se usan datos de ejemplo (mock).
+// Columnas del sheet: Banco y tipo | Mes | Fecha | Tarjeta | Detalle | Cuota |
+//                    Detalle monto ARS | Detalle monto USD | Vencimiento | Total ARS | Total USD
 const TARJETAS_CICLOS = [
   {
     label: 'Julio 2026',
-    url: null  // <- poner la URL del CSV de tarjetas cuando esté listo
+    url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTSR-jEHWGJNTU5Wk2HOm6U5_pQkHudAuzgL46QYnVg5WNv-2K9H8hDsNVGUtFifICuhdcCzBWich3V/pub?gid=1050964641&single=true&output=csv'
   }
 ];
 
@@ -441,6 +441,7 @@ function loadData() {
 function parsearCiclo(rows) {
   if (!rows || !rows.length) return null;
   const cols = Object.keys(rows[0]);
+  // Solo miramos columnas A-E (primeras 5) para datos principales
   const [cFecha,cDet,cCat,cMonto,cQuien] = cols;
   let ingresosLucas=0, ingresosMari=0;
   const datos=[];
@@ -454,8 +455,8 @@ function parsearCiclo(rows) {
     if (!fecha||!cat||monto<=0) return;
     datos.push({fecha,detalle:det,categoria:cat,monto,quien});
   });
+  // Fallback solo para Lucas si no aparece; Mariana queda en 0 si no está en cols A-E
   if (!ingresosLucas) ingresosLucas=3600000;
-  if (!ingresosMari)  ingresosMari=3600000;
   return {datos,ingresosLucas,ingresosMari};
 }
 
@@ -640,27 +641,49 @@ function initTarjetas() {
 function loadTarjetasData() {
   const idx = parseInt(document.getElementById('tarjetasCicloSelect').value);
   const conf = TARJETAS_CICLOS[idx];
-  tarjetasLineSelected = []; // reset selección al cambiar ciclo
+  tarjetasLineSelected = [];
 
   if (!conf.url) {
     tarjetasDatos = TARJETAS_MOCK;
     renderTarjetas();
     return;
   }
+
   Papa.parse(conf.url, {
     download:true, header:true, skipEmptyLines:true,
     complete: r => {
+      // Columnas reales del sheet:
+      // [0] Banco y tipo  [1] Mes  [2] Fecha  [3] Tarjeta  [4] Detalle
+      // [5] Cuota  [6] Detalle monto ARS  [7] Detalle monto USD
+      // [8] Vencimiento  [9] Total ARS  [10] Total USD
       const cols = Object.keys(r.data[0]||{});
-      tarjetasDatos = r.data.map(row => ({
-        fecha:      (row[cols[0]]||'').trim(),
-        detalle:    (row[cols[1]]||'').trim(),
-        banco:      (row[cols[2]]||'').trim(),
-        tarjeta:    (row[cols[3]]||'').trim(),
-        tipo:       (row[cols[4]]||'').trim(),
-        montoARS:   parseMonto(row[cols[5]]),
-        cotizacion: parseMonto(row[cols[6]])||1,
-        quien:      (row[cols[7]]||'Desconocido').trim()
-      })).filter(r=>r.montoARS>0);
+      tarjetasDatos = r.data.map(row => {
+        const bancoTipo = (row[cols[0]]||'').trim();
+        const montoARS  = parseMonto(row[cols[6]]);   // "Detalle monto ARS"
+        const montoUSD  = parseMonto(row[cols[7]]);   // "Detalle monto USD"
+        const cuota     = (row[cols[5]]||'').trim();
+
+        // Derivar banco y tipo del campo "Banco y tipo" (ej. "Visa Galicia", "Master Cencopay")
+        const partes = bancoTipo.split(' ');
+        const tipo   = partes[0] || '';           // "Visa" / "Master"
+        const banco  = partes.slice(1).join(' ') || bancoTipo; // "Galicia" / "Cencopay"
+
+        return {
+          fecha:    (row[cols[2]]||'').trim(),
+          detalle:  (row[cols[4]]||'').trim(),
+          banco:    banco,
+          tarjeta:  (row[cols[3]]||'').trim(),
+          tipo:     tipo,          // "Visa" o "Master"
+          bancoTipo: bancoTipo,    // "Visa Galicia" completo para agrupar por tarjeta
+          mes:      (row[cols[1]]||'').trim(),
+          cuota:    cuota,
+          montoARS: montoARS,
+          montoUSD: montoUSD,
+          // cotizacion implícita: si hay ambos montos y ARS>0 y USD>0
+          cotizacion: (montoARS>0 && montoUSD>0) ? montoARS/montoUSD : 0,
+          vencimiento:(row[cols[8]]||'').trim(),
+        };
+      }).filter(r => r.montoARS > 0 || r.montoUSD > 0);
       renderTarjetas();
     },
     error: () => { tarjetasDatos=TARJETAS_MOCK; renderTarjetas(); }
@@ -683,8 +706,21 @@ function setAgrupacion(a) {
   renderTarjetas();
 }
 
-const getMontoConv = r => tarjetasMoneda==='USD' ? (r.cotizacion>1?r.montoARS/r.cotizacion:0) : r.montoARS;
-const getGroupKey  = r => tarjetasAgrupacion==='banco'?r.banco : tarjetasAgrupacion==='tarjeta'?r.tarjeta : r.tipo;
+const getMontoConv = r => {
+  if (tarjetasMoneda === 'USD') {
+    // Si la fila tiene monto en USD directo, usarlo; si no, convertir desde ARS con cotizacion
+    if (r.montoUSD > 0) return r.montoUSD;
+    if (r.cotizacion > 0) return r.montoARS / r.cotizacion;
+    return 0;
+  }
+  return r.montoARS;
+};
+const getGroupKey  = r => {
+  if (tarjetasAgrupacion === 'banco')   return r.banco;
+  if (tarjetasAgrupacion === 'tarjeta') return r.bancoTipo || r.tarjeta; // "Visa Galicia"
+  if (tarjetasAgrupacion === 'tipo')    return r.tipo;                   // "Visa" / "Master"
+  return 'Otro';
+};
 
 function renderTarjetas() {
   if (!tarjetasDatos||!tarjetasDatos.length) return;
@@ -785,24 +821,26 @@ function toggleTarjetaLine(key) {
 function renderTarjetasLog(datos) {
   document.getElementById('tarjetasLogTable').innerHTML=`
     <thead><tr>
-      <th style="width:11%">Fecha</th>
-      <th style="width:27%">Detalle</th>
-      <th style="width:14%">Banco</th>
-      <th style="width:16%">Tarjeta</th>
-      <th style="width:11%">Tipo</th>
-      <th style="width:13%;text-align:right">ARS</th>
-      <th style="width:8%;text-align:right">USD</th>
+      <th style="width:10%">Fecha</th>
+      <th style="width:25%">Detalle</th>
+      <th style="width:14%">Banco/Tipo</th>
+      <th style="width:15%">Tarjeta</th>
+      <th style="width:9%">Cuota</th>
+      <th style="width:14%;text-align:right">ARS</th>
+      <th style="width:13%;text-align:right">USD</th>
     </tr></thead>
     <tbody>${datos.map(r=>{
-      const usd=r.cotizacion>1?fmtUSD(r.montoARS/r.cotizacion):'—';
+      const arsStr = r.montoARS > 0 ? fmt(r.montoARS) : '—';
+      const usdStr = r.montoUSD > 0 ? fmtUSD(r.montoUSD) : (r.cotizacion>0 && r.montoARS>0 ? fmtUSD(r.montoARS/r.cotizacion) : '—');
+      const tipoColor = r.tipo==='Visa'?'#378ADD':r.tipo==='Master'?'#EF9F27':'#888';
       return `<tr>
         <td style="color:#555;font-size:12px">${r.fecha}</td>
-        <td style="font-weight:500">${r.detalle}</td>
-        <td><span class="cat-tag">${r.banco}</span></td>
+        <td style="font-weight:500;font-size:12px">${r.detalle}</td>
+        <td><span class="cat-tag">${r.bancoTipo||r.banco}</span></td>
         <td style="color:#888;font-size:12px">${r.tarjeta}</td>
-        <td><span style="font-size:11px;color:${r.tipo==='Crédito'?'#EF9F27':'#1D9E75'}">${r.tipo}</span></td>
-        <td style="text-align:right;font-weight:500">${fmt(r.montoARS)}</td>
-        <td style="text-align:right;color:#555;font-size:12px">${usd}</td>
+        <td style="font-size:11px;color:#555">${r.cuota||'—'}</td>
+        <td style="text-align:right;font-weight:500">${arsStr}</td>
+        <td style="text-align:right;color:#555;font-size:12px">${usdStr}</td>
       </tr>`;
     }).join('')}</tbody>`;
 }
@@ -810,8 +848,12 @@ function renderTarjetasLog(datos) {
 function filtrarTarjetasLog() {
   const q=document.getElementById('tarjetasSearch').value.toLowerCase();
   renderTarjetasLog(tarjetasDatos.filter(r=>
-    r.detalle.toLowerCase().includes(q)||r.banco.toLowerCase().includes(q)||
-    r.tarjeta.toLowerCase().includes(q)||r.tipo.toLowerCase().includes(q)
+    r.detalle.toLowerCase().includes(q)||
+    (r.bancoTipo||'').toLowerCase().includes(q)||
+    r.banco.toLowerCase().includes(q)||
+    r.tarjeta.toLowerCase().includes(q)||
+    r.tipo.toLowerCase().includes(q)||
+    (r.cuota||'').toLowerCase().includes(q)
   ));
 }
 
