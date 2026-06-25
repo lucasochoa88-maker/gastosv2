@@ -264,7 +264,7 @@ let datosCache = {};
 let tarjetasCache = null;
 let logDatos = [];
 let donutInst = null, barInst = null, compareBarInst = null, ratioLineInst = null, catCompareInst = null;
-let mesTarjetaActivo = null; // Guardará el mes seleccionado en la pestaña tarjetas
+let mesTarjetaActivo = null;
 
 // ─── UTILIDADES ───────────────────────────────────────────────────────────────
 function fmt(n) {
@@ -414,7 +414,6 @@ function parsearTarjetas(rows) {
   if (!rows || rows.length === 0) return [];
   const datos = [];
   rows.forEach(r => {
-    // Búsqueda flexible de columnas por si tienen espacios extra
     const getVal = (colName) => {
       const key = Object.keys(r).find(k => k.trim().toLowerCase() === colName.toLowerCase());
       return key ? r[key].trim() : '';
@@ -432,7 +431,7 @@ function parsearTarjetas(rows) {
     const totalARS = parseMonto(getVal('Total a pagar ARS') || getVal('Total ARS'));
     const totalUSD = parseMonto(getVal('Total a pagar USD') || getVal('Total USD'));
 
-    if (!mes && !bancoTipo) return; // Fila vacía
+    if (!mes && !bancoTipo) return;
 
     datos.push({ bancoTipo, mes, fecha, tarjeta, detalle, cuota, montoARS, montoUSD, vencStr, totalARS, totalUSD });
   });
@@ -594,19 +593,19 @@ function renderTarjetas() {
     return;
   }
 
-  // 1. Obtener los meses únicos disponibles en la planilla
+  // 1. Obtener los meses únicos disponibles
   const meses = [...new Set(datos.map(d => d.mes).filter(Boolean))];
   if (!meses.length) return;
 
-  // 2. Definir el mes activo (por defecto el último de la lista)
+  // 2. Definir el mes activo
   if (!mesTarjetaActivo || !meses.includes(mesTarjetaActivo)) {
     mesTarjetaActivo = meses[meses.length - 1];
   }
 
-  // 3. Filtrar los datos por el mes seleccionado
+  // 3. Filtrar los datos por el mes
   const datosMes = datos.filter(d => d.mes === mesTarjetaActivo);
 
-  // 4. Agrupar la información por Banco/Tipo para generar los Headers
+  // 4. Agrupar la información por Banco/Tipo
   const grupos = {};
   datosMes.forEach(d => {
     const key = d.bancoTipo || d.tarjeta || 'Desconocido';
@@ -619,8 +618,6 @@ function renderTarjetas() {
         totalUSD: d.totalUSD
       };
     }
-    // Si la fila actual tiene el total o el vencimiento, actualizamos.
-    // Esto es por si lo pusiste en todas las filas o solo en la primera.
     if (d.totalARS > 0) grupos[key].totalARS = d.totalARS;
     if (d.totalUSD > 0) grupos[key].totalUSD = d.totalUSD;
     if (d.vencStr) grupos[key].vencStr = d.vencStr;
@@ -628,7 +625,11 @@ function renderTarjetas() {
 
   const gruposArr = Object.values(grupos);
 
-  // 5. Construir la UI: Dropdown de Mes + Headers
+  // --- CÁLCULO DE TOTALES GENERALES DEL MES ---
+  const granTotalARS = gruposArr.reduce((acc, g) => acc + (g.totalARS || 0), 0);
+  const granTotalUSD = gruposArr.reduce((acc, g) => acc + (g.totalUSD || 0), 0);
+
+  // 5. Construir la UI
   let html = `
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; gap:10px;">
       <p class="tc-seccion-titulo" style="margin:0;">Resumen de Tarjetas</p>
@@ -638,7 +639,20 @@ function renderTarjetas() {
     </div>
   `;
 
-  let heroHTML = '';
+  // --- BLOQUE DE RESUMEN CONSOLIDADO ---
+  let heroHTML = `
+    <div style="background: rgba(55,138,221,0.05); border: 0.5px solid #2a2a2a; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; display: flex; gap: 20px; flex-wrap: wrap;">
+      <div style="flex: 1; min-width: 150px;">
+        <p style="font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px;">Total general a pagar ARS</p>
+        <p style="font-size: 32px; font-weight: 600; color: #e8e8e8; letter-spacing: -1px;">${granTotalARS > 0 ? fmt(granTotalARS) : '$0'}</p>
+      </div>
+      <div style="flex: 1; min-width: 150px;">
+        <p style="font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px;">Total general a pagar USD</p>
+        <p style="font-size: 32px; font-weight: 600; color: #1D9E75; letter-spacing: -1px;">${granTotalUSD > 0 ? fmtUSD(granTotalUSD) : 'U$S 0,00'}</p>
+      </div>
+    </div>
+  `;
+
   gruposArr.forEach((g, idx) => {
     const color = PALETTE[idx % PALETTE.length];
     heroHTML += `
@@ -668,7 +682,7 @@ function renderTarjetas() {
   });
   html += `<div id="tcHero">${heroHTML}</div>`;
 
-  // 6. Construir la tabla con el detalle de ese mes únicamente
+  // 6. Construir la tabla
   html += `
     <div class="table-card" style="margin-top:2rem;">
       <p class="chart-title" style="margin-bottom:14px;">Detalle de consumos - ${mesTarjetaActivo}</p>
@@ -711,7 +725,6 @@ function renderTarjetas() {
   document.getElementById('tabTarjetas').innerHTML = html;
 }
 
-// Función global conectada al evento "onchange" del selector de mes
 window.cambiarMesTarjeta = function(mes) {
   mesTarjetaActivo = mes;
   renderTarjetas();
