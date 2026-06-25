@@ -97,12 +97,16 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .error-msg { background: #2a1010; color: #E24B4A; border: 0.5px solid #3a1515; border-radius: 8px; padding: 12px 16px; font-size: 13px; margin-bottom: 1rem; }
 
 /* ── TARJETAS ── */
+.tc-hero { margin-bottom: 1.5rem; }
 .tc-venc-group { background: #1a1a1a; border: 0.5px solid #222; border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem; }
 .tc-venc-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; flex-wrap: wrap; gap: 8px; }
 .tc-venc-nombre { font-size: 15px; font-weight: 500; color: #e8e8e8; }
 .tc-venc-badge { display: flex; align-items: center; gap: 6px; }
 .tc-venc-label { font-size: 10px; color: #555; text-transform: uppercase; letter-spacing: 0.06em; }
 .tc-venc-fecha { font-size: 13px; font-weight: 500; }
+.tc-venc-fecha.urgente { color: #E24B4A; }
+.tc-venc-fecha.pronto  { color: #EF9F27; }
+.tc-venc-fecha.ok      { color: #888; }
 .tc-montos { display: flex; gap: 10px; flex-wrap: wrap; }
 .tc-monto-card { flex: 1; min-width: 120px; background: #111; border: 0.5px solid #1e1e1e; border-radius: 8px; padding: 14px 16px; }
 .tc-monto-label { font-size: 10px; color: #444; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
@@ -110,15 +114,20 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .tc-monto-value.ars { color: #e8e8e8; }
 .tc-monto-value.usd { color: #1D9E75; }
 .tc-monto-value.zero { color: #333; font-size: 20px; }
+
 .tc-seccion-titulo { font-size: 10px; color: #444; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 10px; margin-top: 1.5rem; }
 
+.tc-cuotas-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; margin-bottom: 1.5rem; }
+.tc-cuota-mes { background: #1a1a1a; border: 0.5px solid #222; border-radius: 8px; padding: 12px 14px; }
+.tc-cuota-mes-label { font-size: 10px; color: #555; margin-bottom: 6px; }
+.tc-cuota-mes-ars { font-size: 16px; font-weight: 500; color: #e8e8e8; }
+.tc-cuota-mes-usd { font-size: 11px; color: #1D9E75; margin-top: 2px; }
+.tc-cuota-mes.actual { border-color: #378ADD44; background: #1a2030; }
+.tc-cuota-mes.actual .tc-cuota-mes-label { color: #378ADD; }
+
+.tc-tarjeta-tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; }
 .cuota-tag { background: #252525; color: #888; padding: 2px 7px; border-radius: 4px; font-size: 11px; white-space: nowrap; }
 .cuota-tag.en-curso { background: #1a2535; color: #378ADD; }
-
-/* ── FILTROS MULTISELECT HISTÓRICO ── */
-.filter-tag { display: inline-flex; align-items: center; padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 500; cursor: pointer; border: 0.5px solid #2a2a2a; background: #111; color: #555; transition: all 0.15s; user-select: none; }
-.filter-tag:hover { border-color: #444; color: #888; }
-.filter-tag.active { color: #fff; background: #1a1a1a; }
 
 @media (max-width: 540px) {
   .charts { grid-template-columns: 1fr; }
@@ -234,7 +243,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     </div>
   </div>
 
-  <div id="tabTarjetas" style="display:none;"></div>
+  <div id="tabTarjetas" style="display:none;">
+    <div id="tcHero" class="tc-hero"></div>
+    <div id="tcCuotasPendientes"></div>
+    <div id="tcDetalle"></div>
+  </div>
 
 </div>
 
@@ -257,6 +270,7 @@ const CICLOS = [
 
 const URL_TARJETAS = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTSR-jEHWGJNTU5Wk2HOm6U5_pQkHudAuzgL46QYnVg5WNv-2K9H8hDsNVGUtFifICuhdcCzBWich3V/pub?gid=1050964641&single=true&output=csv';
 
+// Paleta de colores por tarjeta (se asigna dinámicamente)
 const PALETTE = ['#378ADD','#1D9E75','#EF9F27','#7F77DD','#D4537E','#D85A30','#639922','#888780'];
 const GRID = 'rgba(255,255,255,0.05)';
 const TICK = '#444';
@@ -266,9 +280,7 @@ let tabActivo = 'mes';
 let datosCache = {};
 let tarjetasCache = null;
 let logDatos = [];
-let donutInst = null, barInst = null, compareBarInst = null, ratioLineInst = null, catCompareInst = null, cardsHistoryInst = null;
-let mesTarjetaActivo = null;
-let tarjetasSeleccionadasFiltro = [];
+let donutInst = null, barInst = null, compareBarInst = null, ratioLineInst = null, catCompareInst = null;
 
 // ─── UTILIDADES ───────────────────────────────────────────────────────────────
 function fmt(n) {
@@ -295,11 +307,27 @@ function formatDateShort(d) {
   if (!d) return '';
   return d.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit' });
 }
+function formatDateMed(d) {
+  if (!d) return '';
+  return d.toLocaleDateString('es-AR', { day: '2-digit', month: 'short', year: 'numeric' });
+}
 function diasEntre(desde, hasta) {
   return Math.round((hasta - desde) / (1000 * 60 * 60 * 24)) + 1;
 }
+// Retorna "Jun/26", "Jul/26", etc.
+function mesLabel(d) {
+  if (!d) return '';
+  return d.toLocaleDateString('es-AR', { month: 'short', year: '2-digit' })
+          .replace('. ', '/').replace('.', '/');
+}
+// Suma N meses a una fecha
+function addMonths(d, n) {
+  const r = new Date(d);
+  r.setMonth(r.getMonth() + n);
+  return r;
+}
 
-// ─── DROPDOWN DASHBOARD ──────────────────────────────────────────────────────
+// ─── DROPDOWN ─────────────────────────────────────────────────────────────────
 function buildDropdown() {
   const menu = document.getElementById('dropdownMenu');
   const byAnio = {};
@@ -357,6 +385,7 @@ function loadData() {
   document.getElementById('loadingBox').style.display = 'block';
   document.getElementById('errorBox').style.display = 'none';
   ['tabMes','tabComparativa','tabDetalle','tabTarjetas'].forEach(id => document.getElementById(id).style.display = 'none');
+  tarjetasCache = null;
 
   const fetchCiclo = (c, i) => new Promise((resolve, reject) => {
     if (datosCache[i]) { resolve(datosCache[i]); return; }
@@ -390,7 +419,7 @@ function loadData() {
   });
 }
 
-// ─── PARSEO DE GASTOS REVISADO (REMOVER INGRESOS AUTOMÁTICAMENTE) ─────────────
+// ─── PARSEO DE GASTOS ────────────────────────────────────────────────────────
 function parsearCiclo(rows) {
   if (!rows || rows.length === 0) return null;
   const cols = Object.keys(rows[0]);
@@ -403,68 +432,39 @@ function parsearCiclo(rows) {
     const monto  = parseMonto(r[colMonto]);
     const det    = r[colDetalle] ? r[colDetalle].trim() : '';
     const quien  = r[colQuien]   ? r[colQuien].trim()   : 'Desconocido';
-    
     const dL = det.toLowerCase();
-    const cL = cat.toLowerCase();
-    const q  = quien.toLowerCase();
-
-    // Filtro flexible y cruzado para detectar ingresos
-    if (cL === 'ingresos' || dL.includes('ingres') || dL.includes('sueldo')) {
-      if (dL.includes('lucas') || q === 'lucas') {
-        ingresosLucas = monto;
-        return; // Excluye la fila de los gastos y detiene su inserción al array 'datos' (y por ende al log)
-      }
-      if (dL.includes('mariana') || dL.includes('mari') || q === 'mariana' || q === 'mari') {
-        ingresosMari = monto;
-        return; // Excluye la fila
-      }
-    }
-
+    if (dL.includes('ingres. lucas'))   { ingresosLucas = monto; return; }
+    if (dL.includes('ingres. mariana')) { ingresosMari  = monto; return; }
     if (!fecha || !cat || monto <= 0) return;
     datos.push({ fecha, detalle: det, categoria: cat, monto, quien });
   });
   return { datos, ingresosLucas, ingresosMari };
 }
 
-// ─── PARSEO DE TARJETAS (ESTRATEGIA AÑO DINÁMICO) ─────────────────────────────
+// ─── PARSEO DE TARJETAS ──────────────────────────────────────────────────────
 function parsearTarjetas(rows) {
   if (!rows || rows.length === 0) return [];
+  const cols = Object.keys(rows[0]);
+  const [cFecha, cTarjeta, cDetalle, cCuota, cARS, cUSD, cVenc] = cols;
   const datos = [];
   rows.forEach(r => {
-    const getVal = (colName) => {
-      const key = Object.keys(r).find(k => k.trim().toLowerCase() === colName.toLowerCase());
-      return key ? r[key].trim() : '';
-    };
-
-    const bancoTipo = getVal('Banco y tipo') || getVal('Banco');
-    const mes = getVal('Mes');
-    const fecha = getVal('Fecha');
-    const tarjeta = getVal('Tarjeta');
-    const detalle = getVal('Detalle');
-    const cuota = getVal('Cuota');
-    const montoARS = parseMonto(getVal('Detalle monto ARS'));
-    const montoUSD = parseMonto(getVal('Detalle monto USD'));
-    const vencStr = getVal('Vencimiento');
-    const totalARS = parseMonto(getVal('Total a pagar ARS') || getVal('Total ARS'));
-    const totalUSD = parseMonto(getVal('Total a pagar USD') || getVal('Total USD'));
-
-    if (!mes && !bancoTipo) return;
-
-    // Detectar año dinámicamente desde alguna de las celdas de fecha
-    let anio = 2026;
-    if (fecha && fecha.includes('/')) {
-      const p = fecha.split('/'); if (p.length === 3) anio = parseInt(p[2]) || 2026;
-    } else if (vencStr && vencStr.includes('/')) {
-      const p = vencStr.split('/'); if (p.length === 3) anio = parseInt(p[2]) || 2026;
+    const fecha     = r[cFecha]   ? r[cFecha].trim()   : '';
+    const tarjeta   = r[cTarjeta] ? r[cTarjeta].trim() : '';
+    const detalle   = r[cDetalle] ? r[cDetalle].trim() : '';
+    const cuota     = r[cCuota]   ? r[cCuota].trim()   : '';
+    const montoARS  = parseMonto(r[cARS]);
+    const montoUSD  = parseMonto(r[cUSD]);
+    const vencStr   = r[cVenc]    ? r[cVenc].trim()    : '';
+    if (!fecha || !tarjeta) return;
+    const fechaDate = parseDate(fecha);
+    const vencDate  = parseDate(vencStr);
+    let cuotaActual = 0, cuotaTotal = 0;
+    if (cuota && cuota.includes('/')) {
+      const parts = cuota.split('/');
+      cuotaActual = parseInt(parts[0]) || 0;
+      cuotaTotal  = parseInt(parts[1]) || 0;
     }
-
-    // Asegurar formato "Mes Año" unificado (ej: "Julio 2026")
-    let mesUnico = mes;
-    if (mes && !mes.includes(String(anio))) {
-      mesUnico = `${mes} ${anio}`;
-    }
-
-    datos.push({ bancoTipo, mes: mesUnico, fecha, tarjeta, detalle, cuota, montoARS, montoUSD, vencStr, totalARS, totalUSD });
+    datos.push({ fecha, fechaDate, tarjeta, detalle, cuota, cuotaActual, cuotaTotal, montoARS, montoUSD, vencStr, vencDate });
   });
   return datos;
 }
@@ -496,6 +496,7 @@ function buildDashboard(rows) {
   document.getElementById('cicloBadge').textContent = `${formatDateShort(desde)} – ${formatDateShort(hasta)}`;
   document.getElementById('dashSub').textContent = `${datos.length} movimientos · ${ciclo.label}`;
 
+  // Barra progreso
   const pctGastadoNum = totalIngresos > 0 ? (totalGastos / totalIngresos) * 100 : 0;
   document.getElementById('progressTiempo').style.width = pctTiempo.toFixed(1) + '%';
   document.getElementById('progressGastos').style.width = Math.min(100, pctGastadoNum).toFixed(1) + '%';
@@ -505,6 +506,7 @@ function buildDashboard(rows) {
     `<span style="color:#378ADD">▏</span> Tiempo transcurrido: ${pctTiempo.toFixed(0)}%`;
   document.getElementById('cicloProgressWrap').style.display = esCicloActual || hoy > hasta ? 'block' : 'none';
 
+  // Proyección de ahorro
   const banner = document.getElementById('projBanner');
   if (esCicloActual && diasTranscurridos > 0 && totalGastos > 0 && totalIngresos > 0) {
     const promDiario    = totalGastos / diasTranscurridos;
@@ -515,14 +517,14 @@ function buildDashboard(rows) {
     let tono, titulo, texto;
     if (ahorroProy >= totalIngresos * 0.20) {
       tono = 'saving'; titulo = 'Van muy bien 🎯';
-      texto = `Al ritmo actual (<strong>${fmt(Math.round(promDiario))}/día</strong>), cerrarían el ciclo ahorrando <strong>${fmt(Math.round(ahorroProy))}</strong> — el <strong>${pctAhorroProy}%</strong> del ingreso. Quedan ${diasRestan} días.`;
+      texto = `Al ritmo actual (<strong>${fmt(Math.round(promDiario))}/día</strong>), cerrarían el ciclo ahorrando <strong>${fmt(Math.round(ahorroProy))}</strong> — el <strong>${pctAhorroProy}%</strong> del ingreso. Quedan ${diasRestan} días: si mantienen el ritmo, ese ahorro está asegurado.`;
     } else if (ahorroProy > 0) {
       tono = 'warning'; titulo = 'Ahorro proyectado ajustado';
-      texto = `Al ritmo actual (<strong>${fmt(Math.round(promDiario))}/día</strong>), cerrarían ahorrando <strong>${fmt(Math.round(ahorroProy))}</strong> (<strong>${pctAhorroProy}%</strong> del ingreso). Quedan ${diasRestan} días.`;
+      texto = `Al ritmo actual (<strong>${fmt(Math.round(promDiario))}/día</strong>), cerrarían ahorrando <strong>${fmt(Math.round(ahorroProy))}</strong> (<strong>${pctAhorroProy}%</strong> del ingreso). Quedan ${diasRestan} días para ampliar ese margen.`;
     } else {
       const deficit = Math.abs(ahorroProy);
       tono = 'danger'; titulo = 'Ritmo por encima del ingreso';
-      texto = `Al ritmo actual (<strong>${fmt(Math.round(promDiario))}/día</strong>), el ciclo cerraría con un déficit de <strong>${fmt(Math.round(deficit))}</strong>. Quedan ${diasRestan} días.`;
+      texto = `Al ritmo actual (<strong>${fmt(Math.round(promDiario))}/día</strong>), el ciclo cerraría con un déficit de <strong>${fmt(Math.round(deficit))}</strong>. Quedan ${diasRestan} días para revertirlo.`;
     }
     banner.className = `proj-banner ${tono}`;
     document.getElementById('projBannerTitle').textContent = titulo;
@@ -532,6 +534,7 @@ function buildDashboard(rows) {
     banner.style.display = 'none';
   }
 
+  // Métricas
   document.getElementById('metricsBox').innerHTML = `
     <div class="metric"><p class="metric-label">Lucas</p><p class="metric-value">${fmt(ingresosLucas)}</p></div>
     <div class="metric"><p class="metric-label">Mariana</p><p class="metric-value">${fmt(ingresosMari)}</p></div>
@@ -541,6 +544,7 @@ function buildDashboard(rows) {
     <div class="metric"><p class="metric-label">% gastado</p><p class="metric-value">${pctGastado}%</p></div>
   `;
 
+  // Gráfico fechas
   const fechasSorted = [...new Set(datos.map(r => r.fecha))].sort((a,b) => {
     const da = parseDate(a), db = parseDate(b);
     return (!da || !db) ? 0 : da - db;
@@ -549,6 +553,7 @@ function buildDashboard(rows) {
     datos.filter(r => r.fecha === f).reduce((s, r) => s + r.monto, 0)
   );
 
+  // Categorías
   const catMap = {};
   datos.forEach(r => { catMap[r.categoria] = (catMap[r.categoria] || 0) + r.monto; });
   const categorias = Object.entries(catMap)
@@ -565,10 +570,23 @@ function buildDashboard(rows) {
     `<span class="legend-item"><span class="legend-dot" style="background:${c.color}"></span>${c.nombre.split(' ')[0]} ${totalGastos > 0 ? ((c.monto/totalGastos)*100).toFixed(1) : 0}%</span>`
   ).join('');
 
+  // ── MODIFICACIÓN: Gráfico de Barras a Líneas ──
   if (barInst) barInst.destroy();
   barInst = new Chart(document.getElementById('barChart'), {
-    type: 'bar',
-    data: { labels: fechasSorted, datasets: [{ data: montosPorFecha, backgroundColor: '#378ADD33', borderColor: '#378ADD', borderWidth: 1.5, borderRadius: 4 }] },
+    type: 'line',
+    data: { 
+      labels: fechasSorted, 
+      datasets: [{ 
+        data: montosPorFecha, 
+        backgroundColor: '#378ADD15', 
+        borderColor: '#378ADD', 
+        borderWidth: 2, 
+        pointRadius: 3,
+        pointBackgroundColor: '#378ADD',
+        tension: 0.3,
+        fill: true
+      }] 
+    },
     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: GRID }, ticks: { color: TICK, font: { size: 10 }, maxRotation: 45, autoSkip: true, maxTicksLimit: 8 } }, y: { grid: { color: GRID }, ticks: { color: TICK, font: { size: 10 }, callback: v => '$' + (v >= 1000 ? Math.round(v/1000) + 'k' : v) } } } }
   });
 
@@ -615,278 +633,203 @@ function filtrarLog() {
   ));
 }
 
-// ─── MÓDULO NUEVO: TARJETAS (HISTÓRICO MULTI-SELECT + EVOLUCIÓN) ──────────────
+// ─── TARJETAS ────────────────────────────────────────────────────────────────
 function renderTarjetas() {
   const datos = parsearTarjetas(tarjetasCache || []);
+  const hoy = new Date(); hoy.setHours(0,0,0,0);
 
   if (!datos.length) {
-    document.getElementById('tabTarjetas').innerHTML = '<p style="color:#444;font-size:13px;padding:2rem 0;">No hay datos de tarjetas cargados todavía.</p>';
+    document.getElementById('tcHero').innerHTML = '<p style="color:#444;font-size:13px;padding:2rem 0;">No hay datos de tarjetas cargados todavía.</p>';
+    document.getElementById('tcCuotasPendientes').innerHTML = '';
+    document.getElementById('tcDetalle').innerHTML = '';
     return;
   }
 
-  // 1. Clasificación cronológica de meses unificados ("Mes Año")
-  const mOrder = { 'enero':1, 'febrero':2, 'marzo':3, 'abril':4, 'mayo':5, 'junio':6, 'julio':7, 'agosto':8, 'septiembre':9, 'octubre':10, 'noviembre':11, 'diciembre':12 };
-  const parseMesAnio = (str) => {
-    if (!str) return 0;
-    const p = str.toLowerCase().split(' ');
-    const m = mOrder[p[0]] || 1;
-    const a = parseInt(p[1]) || 2026;
-    return a * 12 + m;
-  };
-  const mesesDisponibles = [...new Set(datos.map(d => d.mes).filter(Boolean))].sort((a,b) => parseMesAnio(a) - parseMesAnio(b));
-
-  // 2. Extracción de universo completo de tarjetas para asignación de colores fija
-  const todasLasTarjetas = [...new Set(datos.map(d => d.bancoTipo || d.tarjeta || 'Desconocido').filter(Boolean))];
-
-  // Inicializar estado del multi-select
-  if (tarjetasSeleccionadasFiltro.length === 0) {
-    tarjetasSeleccionadasFiltro = [...todasLasTarjetas];
-  }
-
-  // Definición de mes activo para el desglose
-  if (!mesTarjetaActivo || !mesesDisponibles.includes(mesTarjetaActivo)) {
-    mesTarjetaActivo = mesesDisponibles[mesesDisponibles.length - 1];
-  }
-
-  // 3. Estructurar cascarón HTML de la vista
-  document.getElementById('tabTarjetas').innerHTML = `
-    <div class="chart-card-full" style="margin-bottom: 2rem;">
-      <p class="chart-title">Evolución Histórica de Tarjetas (ARS)</p>
-      <div id="cardTagsContainer" style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px;"></div>
-      <div style="position:relative; height:220px;"><canvas id="cardsHistoryChart"></canvas></div>
-    </div>
-
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; gap:10px;">
-      <p class="tc-seccion-titulo" style="margin:0;">Resumen mensual de Tarjetas</p>
-      <select onchange="cambiarMesTarjeta(this.value)" style="background:#1a1a1a; border:0.5px solid #2a2a2a; border-radius:8px; padding:8px 12px; color:#e8e8e8; font-size:13px; outline:none; cursor:pointer;">
-        ${mesesDisponibles.map(m => `<option value="${m}" ${m === mesTarjetaActivo ? 'selected' : ''}>Mes: ${m}</option>`).join('')}
-      </select>
-    </div>
-    <div id="tarjetaMensualUI"></div>
-  `;
-
-  // Renderizar componentes secundarios
-  renderCardFilterTags(todasLasTarjetas);
-  updateCardsHistoryChart(mesesDisponibles, todasLasTarjetas, datos);
-  renderTarjetaMensualUI(datos, todasLasTarjetas);
-}
-
-// Renderizador de Tags Multi-select
-function renderCardFilterTags(todasLasTarjetas) {
-  const container = document.getElementById('cardTagsContainer');
-  if (!container) return;
-
-  container.innerHTML = todasLasTarjetas.map((card, idx) => {
-    const isActive = tarjetasSeleccionadasFiltro.includes(card);
-    const color = PALETTE[idx % PALETTE.length];
-    const borderStyle = isActive ? `border-color: ${color}; background: ${color}12; color: #fff;` : '';
-    return `
-      <div class="filter-tag ${isActive ? 'active' : ''}" style="${borderStyle}" onclick="toggleCardFilter('${card}')">
-        <span style="display:inline-block; width:6px; height:6px; border-radius:50%; background:${color}; margin-right:7px;"></span>
-        ${card}
-      </div>
-    `;
-  }).join('');
-}
-
-// Toggle interactivo de filtros
-window.toggleCardFilter = function(card) {
-  const idx = tarjetasSeleccionadasFiltro.indexOf(card);
-  if (idx > -1) {
-    tarjetasSeleccionadasFiltro.splice(idx, 1);
-  } else {
-    tarjetasSeleccionadasFiltro.push(card);
-  }
-  // Actualización fluida sin refrescar cascarón completo
-  const datos = parsearTarjetas(tarjetasCache || []);
-  const mOrder = { 'enero':1, 'febrero':2, 'marzo':3, 'abril':4, 'mayo':5, 'junio':6, 'julio':7, 'agosto':8, 'septiembre':9, 'octubre':10, 'noviembre':11, 'diciembre':12 };
-  const parseMesAnio = (str) => {
-    if (!str) return 0;
-    const p = str.toLowerCase().split(' ');
-    const m = mOrder[p[0]] || 1;
-    const a = parseInt(p[1]) || 2026;
-    return a * 12 + m;
-  };
-  const mesesDisponibles = [...new Set(datos.map(d => d.mes).filter(Boolean))].sort((a,b) => parseMesAnio(a) - parseMesAnio(b));
-  const todasLasTarjetas = [...new Set(datos.map(d => d.bancoTipo || d.tarjeta || 'Desconocido').filter(Boolean))];
-
-  renderCardFilterTags(todasLasTarjetas);
-  updateCardsHistoryChart(mesesDisponibles, todasLasTarjetas, datos);
-}
-
-// Renderizador del Gráfico de Barras Apiladas Histórico
-function updateCardsHistoryChart(mesesDisponibles, todasLasTarjetas, datos) {
-  const ctx = document.getElementById('cardsHistoryChart');
-  if (!ctx) return;
-
-  const datasets = todasLasTarjetas.map((card, idx) => {
-    const color = PALETTE[idx % PALETTE.length];
-    const isSelected = tarjetasSeleccionadasFiltro.includes(card);
-
-    const dataPorMes = mesesDisponibles.map(mes => {
-      if (!isSelected) return 0;
-      const filtro = datos.filter(d => (d.bancoTipo || d.tarjeta || 'Desconocido') === card && d.mes === mes);
-      
-      let maxTotal = 0;
-      filtro.forEach(d => { if (d.totalARS > maxTotal) maxTotal = d.totalARS; });
-      if (maxTotal === 0) {
-        maxTotal = filtro.reduce((s, d) => s + (d.montoARS || 0), 0);
-      }
-      return Math.round(maxTotal);
-    });
-
-    return {
-      label: card,
-      data: dataPorMes,
-      backgroundColor: color,
-      borderColor: '#0f0f0f',
-      borderWidth: 1.5,
-      stack: 'tarjetasStack'
-    };
-  });
-
-  if (cardsHistoryInst) cardsHistoryInst.destroy();
-  cardsHistoryInst = new Chart(ctx, {
-    type: 'bar',
-    data: { labels: mesesDisponibles, datasets: datasets },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: { callbacks: { label: c => ` ${c.dataset.label}: ${fmt(c.raw)}` } }
-      },
-      scales: {
-        x: { stacked: true, grid: { color: GRID }, ticks: { color: TICK, font: { size: 11 } } },
-        y: { stacked: true, grid: { color: GRID }, ticks: { color: TICK, font: { size: 10 }, callback: v => '$' + (v >= 1000 ? Math.round(v/1000)+'k' : v) } }
-      }
-    }
-  });
-}
-
-// Renderizador de la Información Específica del Mes Seleccionado
-function renderTarjetaMensualUI(datos, todasLasTarjetas) {
-  const container = document.getElementById('tarjetaMensualUI');
-  if (!container) return;
-
-  const datosMes = datos.filter(d => d.mes === mesTarjetaActivo);
+  const tarjetasUnicas = [...new Set(datos.map(d => d.tarjeta))];
+  const colorMap = {};
+  tarjetasUnicas.forEach((t, i) => { colorMap[t] = PALETTE[i % PALETTE.length]; });
 
   const grupos = {};
-  datosMes.forEach(d => {
-    const key = d.bancoTipo || d.tarjeta || 'Desconocido';
+  datos.forEach(d => {
+    const key = `${d.tarjeta}||${d.vencStr || 'sin-venc'}`;
     if (!grupos[key]) {
-      grupos[key] = { bancoTipo: d.bancoTipo, tarjeta: d.tarjeta, vencStr: d.vencStr, totalARS: 0, totalUSD: 0 };
+      grupos[key] = { tarjeta: d.tarjeta, vencDate: d.vencDate, vencStr: d.vencStr, totalARS: 0, totalUSD: 0 };
     }
-    if (d.totalARS > 0) grupos[key].totalARS = d.totalARS;
-    if (d.totalUSD > 0) grupos[key].totalUSD = d.totalUSD;
-    if (d.vencStr) grupos[key].vencStr = d.vencStr;
+    grupos[key].totalARS += d.montoARS;
+    grupos[key].totalUSD += d.montoUSD;
   });
 
-  // Fallback inteligente en caso de que falten los totales consolidados en la fila
-  Object.keys(grupos).forEach(key => {
-    if (grupos[key].totalARS === 0) {
-      grupos[key].totalARS = datosMes.filter(d => (d.bancoTipo || d.tarjeta || 'Desconocido') === key).reduce((s,d)=>s+(d.montoARS||0), 0);
-    }
-    if (grupos[key].totalUSD === 0) {
-      grupos[key].totalUSD = datosMes.filter(d => (d.bancoTipo || d.tarjeta || 'Desconocido') === key).reduce((s,d)=>s+(d.montoUSD||0), 0);
-    }
+  const gruposArr = Object.values(grupos).sort((a, b) => {
+    if (!a.vencDate && !b.vencDate) return 0;
+    if (!a.vencDate) return 1;
+    if (!b.vencDate) return -1;
+    return a.vencDate - b.vencDate;
   });
 
-  const gruposArr = Object.values(grupos);
-  const granTotalARS = gruposArr.reduce((acc, g) => acc + (g.totalARS || 0), 0);
-  const granTotalUSD = gruposArr.reduce((acc, g) => acc + (g.totalUSD || 0), 0);
+  function labelUrgencia(vencDate) {
+    if (!vencDate) return '—';
+    const diff = Math.round((vencDate - hoy) / (1000*60*60*24));
+    if (diff < 0)  return 'Venció';
+    if (diff === 0) return 'Vence hoy';
+    if (diff === 1) return 'Vence mañana';
+    if (diff <= 7)  return `Vence en ${diff} días`;
+    return `Vence el ${formatDateMed(vencDate)}`;
+  }
 
-  let html = `
-    <div style="background: rgba(55,138,221,0.05); border: 0.5px solid #2a2a2a; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; display: flex; gap: 20px; flex-wrap: wrap;">
-      <div style="flex: 1; min-width: 150px;">
-        <p style="font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px;">Total general a pagar ARS</p>
-        <p style="font-size: 32px; font-weight: 600; color: #e8e8e8; letter-spacing: -1px;">${granTotalARS > 0 ? fmt(granTotalARS) : '$0'}</p>
-      </div>
-      <div style="flex: 1; min-width: 150px;">
-        <p style="font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px;">Total general a pagar USD</p>
-        <p style="font-size: 32px; font-weight: 600; color: #1D9E75; letter-spacing: -1px;">${granTotalUSD > 0 ? fmtUSD(granTotalUSD) : 'U$S 0,00'}</p>
-      </div>
-    </div>
-  `;
-
-  // Bloques individuales por Tarjeta
-  gruposArr.forEach((g) => {
-    const cardName = g.bancoTipo || g.tarjeta || 'Desconocido';
-    const origIdx = todasLasTarjetas.indexOf(cardName);
-    const color = PALETTE[origIdx > -1 ? origIdx % PALETTE.length : 0];
-
-    html += `
+  let heroHTML = '';
+  gruposArr.forEach(g => {
+    const color = colorMap[g.tarjeta];
+    const urg   = localUrgenciaClass(g.vencDate);
+    const label = labelUrgencia(g.vencDate);
+    heroHTML += `
       <div class="tc-venc-group">
         <div class="tc-venc-header">
           <span class="tc-venc-nombre">
             <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${color};margin-right:7px;vertical-align:middle;"></span>
-            ${cardName}
+            ${g.tarjeta}
           </span>
           <div class="tc-venc-badge">
             <span class="tc-venc-label">Vencimiento &nbsp;</span>
-            <span class="tc-venc-fecha" style="color:#ccc;">${g.vencStr || '—'}</span>
+            <span class="tc-venc-fecha ${urg}">${label}</span>
           </div>
         </div>
         <div class="tc-montos">
           <div class="tc-monto-card">
-            <p class="tc-monto-label">Total a pagar ARS</p>
+            <p class="tc-monto-label">Total en pesos</p>
             <p class="tc-monto-value ars ${g.totalARS === 0 ? 'zero' : ''}">${g.totalARS > 0 ? fmt(g.totalARS) : '—'}</p>
           </div>
           <div class="tc-monto-card">
-            <p class="tc-monto-label">Total a pagar USD</p>
+            <p class="tc-monto-label">Total en dólares</p>
             <p class="tc-monto-value usd ${g.totalUSD === 0 ? 'zero' : ''}">${g.totalUSD > 0 ? fmtUSD(g.totalUSD) : '—'}</p>
           </div>
         </div>
-      </div>
-    `;
+      </div>`;
+  });
+  document.getElementById('tcHero').innerHTML = heroHTML;
+
+  const cuotasFuturas = {};
+
+  datos.forEach(d => {
+    if (d.cuotaTotal <= 1 || d.cuotaActual === 0 || !d.fechaDate) return;
+    const cuotasPendientes = d.cuotaTotal - d.cuotaActual;
+    if (cuotasPendientes <= 0) return;
+
+    const montoCuotaARS = d.montoARS;
+    const montoCuotaUSD = d.montoUSD;
+
+    for (let i = 1; i <= cuotasPendientes; i++) {
+      const mesFuturo = addMonths(d.fechaDate, i);
+      const key = `${mesFuturo.getFullYear()}-${String(mesFuturo.getMonth()+1).padStart(2,'0')}`;
+      if (!cuotasFuturas[key]) {
+        cuotasFuturas[key] = { label: mesLabel(mesFuturo), date: mesFuturo, totalARS: 0, totalUSD: 0, items: [] };
+      }
+      cuotasFuturas[key].totalARS += montoCuotaARS;
+      cuotasFuturas[key].totalUSD += montoCuotaUSD;
+      cuotasFuturas[key].items.push({
+        tarjeta: d.tarjeta,
+        detalle: d.detalle,
+        cuotaNum: d.cuotaActual + i,
+        cuotaTotal: d.cuotaTotal,
+        montoARS: montoCuotaARS,
+        montoUSD: montoCuotaUSD,
+        color: colorMap[d.tarjeta]
+      });
+    }
   });
 
-  // Tabla detallada de transacciones del mes
-  html += `
-    <div class="table-card" style="margin-top:2rem;">
-      <p class="chart-title" style="margin-bottom:14px;">Detalle de consumos - ${mesTarjetaActivo}</p>
+  const cuotasKeys = Object.keys(cuotasFuturas).sort();
+  let cuotasHTML = '';
+  if (cuotasKeys.length > 0) {
+    const mesActualKey = `${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}`;
+    cuotasHTML += `<p class="tc-seccion-titulo">Cuotas pendientes futuras</p><div class="tc-cuotas-grid">`;
+    cuotasKeys.forEach(key => {
+      const m = cuotasFuturas[key];
+      const esActual = key === mesActualKey;
+      cuotasHTML += `
+        <div class="tc-cuota-mes ${esActual ? 'actual' : ''}">
+          <p class="tc-cuota-mes-label">${m.label}${esActual ? ' · este mes' : ''}</p>
+          <p class="tc-cuota-mes-ars">${m.totalARS > 0 ? fmt(m.totalARS) : '—'}</p>
+          ${m.totalUSD > 0 ? `<p class="tc-cuota-mes-usd">${fmtUSD(m.totalUSD)}</p>` : ''}
+        </div>`;
+    });
+    cuotasHTML += `</div>`;
+
+    cuotasHTML += `
+      <div class="table-card" style="margin-top:0;">
+        <p class="chart-title">Detalle de cuotas pendientes</p>
+        <div style="overflow-x:auto;">
+        <table class="ranking-table" style="min-width:500px;">
+          <thead><tr>
+            <th>Mes</th><th>Tarjeta</th><th>Concepto</th>
+            <th style="text-align:center">Cuota</th>
+            <th style="text-align:right">ARS</th>
+            <th style="text-align:right">USD</th>
+          </tr></thead>
+          <tbody>`;
+    cuotasKeys.forEach(key => {
+      const m = cuotasFuturas[key];
+      const esActual = key === `${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}`;
+      m.items.forEach(it => {
+        cuotasHTML += `<tr style="${esActual ? 'background:#111;' : ''}">
+          <td style="color:#555;font-size:12px;white-space:nowrap">${m.label}${esActual ? ' ←' : ''}</td>
+          <td><span style="color:${it.color};font-size:12px;font-weight:500;">${it.tarjeta}</span></td>
+          <td style="font-size:12px">${it.detalle}</td>
+          <td style="text-align:center"><span class="cuota-tag ${esActual ? 'en-curso' : ''}">${it.cuotaNum}/${it.cuotaTotal}</span></td>
+          <td style="text-align:right;font-size:12px">${it.montoARS > 0 ? fmt(it.montoARS) : '—'}</td>
+          <td style="text-align:right;font-size:12px;color:#1D9E75">${it.montoUSD > 0 ? fmtUSD(it.montoUSD) : '—'}</td>
+        </tr>`;
+      });
+    });
+    cuotasHTML += `</tbody></table></div></div>`;
+  }
+  document.getElementById('tcCuotasPendientes').innerHTML = cuotasHTML;
+
+  const detalleOrdenado = [...datos].sort((a,b) => {
+    if (!a.vencDate && !b.vencDate) return 0;
+    if (!a.vencDate) return 1;
+    if (!b.vencDate) return -1;
+    return a.vencDate - b.vencDate || a.tarjeta.localeCompare(b.tarjeta);
+  });
+
+  let detalleHTML = `
+    <p class="tc-seccion-titulo">Todos los consumos</p>
+    <div class="table-card" style="margin-top:0;">
       <div style="overflow-x:auto;">
-        <table class="ranking-table" style="min-width:600px;">
-          <thead>
-            <tr>
-              <th>Fecha</th>
-              <th>Tarjeta</th>
-              <th>Detalle</th>
-              <th style="text-align:center">Cuota</th>
-              <th style="text-align:right">Monto ARS</th>
-              <th style="text-align:right">Monto USD</th>
-            </tr>
-          </thead>
-          <tbody>
-  `;
-
-  datosMes.forEach(d => {
-    const cuotaTag = d.cuota ? `<span class="cuota-tag en-curso">${d.cuota}</span>` : '<span style="color:#333;font-size:11px;">—</span>';
-    html += `
-      <tr>
-        <td style="color:#555;font-size:12px;white-space:nowrap">${d.fecha}</td>
-        <td><span style="font-size:12px;font-weight:500;color:#ccc;">${d.tarjeta}</span></td>
-        <td style="font-size:12px">${d.detalle}</td>
-        <td style="text-align:center">${cuotaTag}</td>
-        <td style="text-align:right;font-size:12px">${d.montoARS > 0 ? fmt(d.montoARS) : '—'}</td>
-        <td style="text-align:right;font-size:12px;color:#1D9E75">${d.montoUSD > 0 ? fmtUSD(d.montoUSD) : '—'}</td>
-      </tr>
-    `;
+      <table class="ranking-table" style="min-width:540px;">
+        <thead><tr>
+          <th>Fecha</th><th>Tarjeta</th><th>Concepto</th>
+          <th style="text-align:center">Cuota</th>
+          <th style="text-align:right">ARS</th>
+          <th style="text-align:right">USD</th>
+          <th style="text-align:right">Vencimiento</th>
+        </tr></thead>
+        <tbody>`;
+  detalleOrdenado.forEach(d => {
+    const color = colorMap[d.tarjeta];
+    const cuotaTag = d.cuota
+      ? `<span class="cuota-tag en-curso">${d.cuota}</span>`
+      : `<span style="color:#333;font-size:11px;">—</span>`;
+    const urg = localUrgenciaClass(d.vencDate);
+    detalleHTML += `<tr>
+      <td style="color:#555;font-size:12px;white-space:nowrap">${d.fecha}</td>
+      <td><span style="color:${color};font-size:12px;font-weight:500;">${d.tarjeta}</span></td>
+      <td style="font-size:12px">${d.detalle}</td>
+      <td style="text-align:center">${cuotaTag}</td>
+      <td style="text-align:right;font-size:12px">${d.montoARS > 0 ? fmt(d.montoARS) : '—'}</td>
+      <td style="text-align:right;font-size:12px;color:#1D9E75">${d.montoUSD > 0 ? fmtUSD(d.montoUSD) : '—'}</td>
+      <td style="text-align:right;font-size:12px" class="${urg}">${d.vencStr || '—'}</td>
+    </tr>`;
   });
+  detalleHTML += `</tbody></table></div></div>`;
+  document.getElementById('tcDetalle').innerHTML = detalleHTML;
 
-  html += `
-          </tbody>
-        </table>
-      </div>
-    </div>
-  `;
-
-  container.innerHTML = html;
-}
-
-window.cambiarMesTarjeta = function(mes) {
-  mesTarjetaActivo = mes;
-  renderTarjetas();
+  function localUrgenciaClass(vencDate) {
+    if (!vencDate) return '';
+    const diff = Math.round((vencDate - hoy) / (1000*60*60*24));
+    if (diff <= 3)  return 'urgente';
+    if (diff <= 7)  return 'pronto';
+    return 'ok';
+  }
 }
 
 // ─── COMPARATIVA ──────────────────────────────────────────────────────────────
