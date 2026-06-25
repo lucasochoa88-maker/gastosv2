@@ -21,7 +21,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .dropdown-btn:hover { border-color: #444; background: #222; }
 .dropdown-chevron { margin-left: auto; color: #555; font-size: 11px; transition: transform 0.15s; }
 .dropdown-chevron.open { transform: rotate(180deg); }
-.dropdown-menu { position: absolute; top: calc(100% + 6px); right: 0; background: #1a1a1a; border: 0.5px solid #2a2a2a; border-radius: 10px; overflow: hidden; z-index: 100; min-width: 190px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); display: none; }
+.dropdown-menu { position: absolute; top: calc(100% + 6px); right: 0; background: #1a1a1a; border: 0.5px solid #2a2a2a; border-radius: 10px; overflow: hidden; z-index: 100; min-width: 200px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); display: none; }
 .dropdown-menu.open { display: block; }
 .dropdown-group-label { font-size: 10px; color: #444; text-transform: uppercase; letter-spacing: 0.08em; padding: 10px 14px 4px; }
 .dropdown-item { padding: 9px 14px; font-size: 13px; color: #888; cursor: pointer; transition: all 0.1s; display: flex; align-items: center; gap: 8px; }
@@ -32,7 +32,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
 .btn-refresh { background: transparent; border: 0.5px solid #2a2a2a; border-radius: 8px; padding: 8px 12px; font-size: 15px; color: #666; cursor: pointer; transition: all 0.15s; }
 .btn-refresh:hover { color: #ccc; border-color: #444; background: #1a1a1a; }
-
 .ciclo-badge { font-size: 11px; color: #555; background: #1a1a1a; border: 0.5px solid #222; border-radius: 6px; padding: 4px 10px; white-space: nowrap; }
 
 .tabs { display: flex; background: #1a1a1a; border: 0.5px solid #222; border-radius: 10px; padding: 3px; margin-bottom: 1.5rem; gap: 2px; }
@@ -47,15 +46,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .metric-value.danger { color: #E24B4A; }
 .metric-value.success { color: #639922; }
 
-.proj-banner { background: #1a1a1a; border: 0.5px solid #2a2a2a; border-radius: 8px; padding: 12px 16px; margin-bottom: 1.5rem; display: flex; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
-.proj-banner.saving  { border-left: 2px solid #1D9E75; }
-.proj-banner.warning { border-left: 2px solid #EF9F27; }
-.proj-banner.danger  { border-left: 2px solid #E24B4A; }
+.proj-banner { background: #1a1a1a; border: 0.5px solid #2a2a2a; border-left: 2px solid #EF9F27; border-radius: 8px; padding: 12px 16px; margin-bottom: 1.5rem; display: flex; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
 .proj-banner-content { flex: 1; }
-.proj-banner-title { font-size: 10px; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.06em; }
-.proj-banner.saving  .proj-banner-title { color: #1D9E75; }
-.proj-banner.warning .proj-banner-title { color: #EF9F27; }
-.proj-banner.danger  .proj-banner-title { color: #E24B4A; }
+.proj-banner-title { font-size: 10px; color: #EF9F27; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.06em; }
 .proj-banner-body { font-size: 13px; color: #888; line-height: 1.6; }
 .proj-banner-body strong { color: #e8e8e8; font-weight: 500; }
 
@@ -93,33 +86,33 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .badge-desconocido { background: #222; color: #888; }
 .cat-tag { background: #222; padding: 3px 8px; border-radius: 4px; font-size: 11px; color: #aaa; white-space: nowrap; }
 
+/* Tarjetas tab */
+.tarjetas-controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 1.5rem; }
+.tarjetas-label { font-size: 11px; color: #444; text-transform: uppercase; letter-spacing: 0.05em; }
+.tarjetas-select { background: #1a1a1a; border: 0.5px solid #2a2a2a; border-radius: 8px; padding: 7px 28px 7px 12px; font-size: 12px; color: #ccc; cursor: pointer; outline: none; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23555' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; background-color: #1a1a1a; }
+.tarjetas-select:hover { border-color: #444; background-color: #222; }
+.tarjetas-toggle-group { display: flex; background: #1a1a1a; border: 0.5px solid #222; border-radius: 8px; padding: 2px; gap: 2px; }
+.tarjetas-toggle { padding: 6px 12px; font-size: 11px; color: #555; background: transparent; border: none; cursor: pointer; border-radius: 6px; transition: all 0.15s; white-space: nowrap; }
+.tarjetas-toggle:hover { color: #aaa; }
+.tarjetas-toggle.active { color: #fff; background: #2a2a2a; }
+
+.tarjeta-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
+.tarjeta-card { background: #1a1a1a; border: 0.5px solid #222; border-radius: 10px; padding: 14px 16px; }
+.tarjeta-card-name { font-size: 10px; color: #444; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+.tarjeta-card-amount { font-size: 18px; font-weight: 500; color: #e8e8e8; }
+.tarjeta-card-sub { font-size: 11px; color: #555; margin-top: 3px; }
+.tarjeta-card-bar { background: #222; border-radius: 3px; height: 3px; margin-top: 10px; }
+.tarjeta-card-bar-fill { height: 3px; border-radius: 3px; }
+
+.line-chip { padding: 4px 10px; border-radius: 20px; font-size: 11px; cursor: pointer; transition: all 0.15s; border-width: 1px; border-style: solid; }
+
 .loading { text-align: center; padding: 3rem 0; color: #444; font-size: 14px; }
 .error-msg { background: #2a1010; color: #E24B4A; border: 0.5px solid #3a1515; border-radius: 8px; padding: 12px 16px; font-size: 13px; margin-bottom: 1rem; }
-
-/* ── TARJETAS ── */
-.tc-hero { margin-bottom: 1.5rem; }
-.tc-venc-group { background: #1a1a1a; border: 0.5px solid #222; border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem; }
-.tc-venc-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; flex-wrap: wrap; gap: 8px; }
-.tc-venc-nombre { font-size: 15px; font-weight: 500; color: #e8e8e8; }
-.tc-venc-badge { display: flex; align-items: center; gap: 6px; }
-.tc-venc-label { font-size: 10px; color: #555; text-transform: uppercase; letter-spacing: 0.06em; }
-.tc-venc-fecha { font-size: 13px; font-weight: 500; }
-.tc-montos { display: flex; gap: 10px; flex-wrap: wrap; }
-.tc-monto-card { flex: 1; min-width: 120px; background: #111; border: 0.5px solid #1e1e1e; border-radius: 8px; padding: 14px 16px; }
-.tc-monto-label { font-size: 10px; color: #444; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
-.tc-monto-value { font-size: 26px; font-weight: 600; letter-spacing: -0.5px; }
-.tc-monto-value.ars { color: #e8e8e8; }
-.tc-monto-value.usd { color: #1D9E75; }
-.tc-monto-value.zero { color: #333; font-size: 20px; }
-.tc-seccion-titulo { font-size: 10px; color: #444; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 10px; margin-top: 1.5rem; }
-
-.cuota-tag { background: #252525; color: #888; padding: 2px 7px; border-radius: 4px; font-size: 11px; white-space: nowrap; }
-.cuota-tag.en-curso { background: #1a2535; color: #378ADD; }
 
 @media (max-width: 540px) {
   .charts { grid-template-columns: 1fr; }
   .metrics { grid-template-columns: repeat(2, 1fr); }
-  .tc-montos { flex-direction: column; }
+  .tarjeta-grid { grid-template-columns: repeat(2, 1fr); }
 }
 </style>
 </head>
@@ -146,15 +139,17 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
   <div id="errorBox" style="display:none;" class="error-msg"></div>
 
+  <!-- TABS: Este ciclo | Detalle | Comparativa | Tarjetas -->
   <div class="tabs">
     <button class="tab active" onclick="setTab('mes', this)">Este ciclo</button>
-    <button class="tab" onclick="setTab('comparativa', this)">Comparativa</button>
     <button class="tab" onclick="setTab('detalle', this)">Detalle</button>
+    <button class="tab" onclick="setTab('comparativa', this)">Comparativa</button>
     <button class="tab" onclick="setTab('tarjetas', this)">Tarjetas</button>
   </div>
 
   <div id="loadingBox" class="loading">Conectando con Google Sheets...</div>
 
+  <!-- TAB: ESTE CICLO -->
   <div id="tabMes" style="display:none;">
     <div id="cicloProgressWrap" class="ciclo-progress" style="display:none;">
       <div class="ciclo-progress-header">
@@ -170,7 +165,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
     <div id="projBanner" class="proj-banner" style="display:none;">
       <div class="proj-banner-content">
-        <p class="proj-banner-title" id="projBannerTitle"></p>
+        <p class="proj-banner-title">Proyección al cierre del ciclo</p>
         <p class="proj-banner-body" id="projText"></p>
       </div>
     </div>
@@ -195,6 +190,21 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     </div>
   </div>
 
+  <!-- TAB: DETALLE -->
+  <div id="tabDetalle" style="display:none;">
+    <div class="table-card">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
+        <p class="chart-title" style="margin-bottom:0;">Registro de gastos</p>
+        <input type="text" id="searchInput" placeholder="Buscar..." onkeyup="filtrarLog()"
+          style="background:#111; border:0.5px solid #2a2a2a; border-radius:6px; padding:6px 10px; font-size:12px; color:#ccc; outline:none; width:160px;">
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="ranking-table" id="logTable" style="width:100%; min-width:560px;"></table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: COMPARATIVA -->
   <div id="tabComparativa" style="display:none;">
     <div class="chart-card-full">
       <p class="chart-title">Total de gastos por ciclo</p>
@@ -217,117 +227,169 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     </div>
   </div>
 
-  <div id="tabDetalle" style="display:none;">
+  <!-- TAB: TARJETAS -->
+  <div id="tabTarjetas" style="display:none;">
+
+    <div class="tarjetas-controls">
+      <span class="tarjetas-label">Ciclo:</span>
+      <select class="tarjetas-select" id="tarjetasCicloSelect" onchange="loadTarjetasData()"></select>
+
+      <span class="tarjetas-label" style="margin-left:4px;">Moneda:</span>
+      <div class="tarjetas-toggle-group">
+        <button class="tarjetas-toggle active" id="toggleARS" onclick="setMoneda('ARS')">ARS</button>
+        <button class="tarjetas-toggle" id="toggleUSD" onclick="setMoneda('USD')">USD</button>
+      </div>
+
+      <span class="tarjetas-label" style="margin-left:4px;">Ver por:</span>
+      <div class="tarjetas-toggle-group">
+        <button class="tarjetas-toggle active" id="toggleBanco" onclick="setAgrupacion('banco')">Banco</button>
+        <button class="tarjetas-toggle" id="toggleTarjeta" onclick="setAgrupacion('tarjeta')">Tarjeta</button>
+        <button class="tarjetas-toggle" id="toggleTipo" onclick="setAgrupacion('tipo')">Tipo</button>
+      </div>
+    </div>
+
+    <!-- Cards por entidad -->
+    <div class="tarjeta-grid" id="tarjetaCards"></div>
+
+    <!-- Gráfico de línea comparativo mes a mes -->
+    <div class="chart-card-full">
+      <div style="display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
+        <div>
+          <p class="chart-title" style="margin-bottom:4px;">Evolución mes a mes</p>
+          <p style="font-size:11px; color:#444;">Seleccioná las series a comparar</p>
+        </div>
+        <div style="display:flex; gap:6px; flex-wrap:wrap;" id="tarjetasLineControls"></div>
+      </div>
+      <div style="position:relative; height:240px;"><canvas id="tarjetasLineChart"></canvas></div>
+      <div class="legend" id="tarjetasLineLegend"></div>
+    </div>
+
+    <!-- Tabla de movimientos -->
     <div class="table-card">
       <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
-        <p class="chart-title" style="margin-bottom:0;">Registro de gastos</p>
-        <input type="text" id="searchInput" placeholder="Buscar..." onkeyup="filtrarLog()"
+        <p class="chart-title" style="margin-bottom:0;">Movimientos</p>
+        <input type="text" id="tarjetasSearch" placeholder="Buscar..." onkeyup="filtrarTarjetasLog()"
           style="background:#111; border:0.5px solid #2a2a2a; border-radius:6px; padding:6px 10px; font-size:12px; color:#ccc; outline:none; width:160px;">
       </div>
       <div style="overflow-x:auto;">
-        <table class="ranking-table" id="logTable" style="width:100%; min-width:560px;"></table>
+        <table class="ranking-table" id="tarjetasLogTable" style="width:100%; min-width:580px;"></table>
       </div>
     </div>
   </div>
 
-  <div id="tabTarjetas" style="display:none;">
-    </div>
-
 </div>
 
 <script>
-// ─── CONFIGURACIÓN ────────────────────────────────────────────────────────────
+// ─── CICLOS PRINCIPALES ───────────────────────────────────────────────────────
+// Solo Julio 2026. Agregar más ciclos acá cuando corresponda.
 const CICLOS = [
   {
-    label: 'Ciclo Junio 2026',
-    cicloDesde: new Date(2026, 4, 25),
-    cicloHasta: new Date(2026, 5, 24),
-    url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTSR-jEHWGJNTU5Wk2HOm6U5_pQkHudAuzgL46QYnVg5WNv-2K9H8hDsNVGUtFifICuhdcCzBWich3V/pub?gid=1978138079&single=true&output=csv'
-  },
-  {
     label: 'Ciclo Julio 2026',
-    cicloDesde: new Date(2026, 5, 25),
-    cicloHasta: new Date(2026, 6, 24),
-    url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTSR-jEHWGJNTU5Wk2HOm6U5_pQkHudAuzgL46QYnVg5WNv-2K9H8hDsNVGUtFifICuhdcCzBWich3V/pub?gid=815384903&single=true&output=csv'
+    cicloDesde: new Date(2026, 5, 25),  // 25 jun 2026
+    cicloHasta: new Date(2026, 6, 24),  // 24 jul 2026
+    url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTSR-jEHWGJNTU5Wk2HOm6U5_pQkHudAuzgL46QYnVg5WNv-2K9H8hDsNVGUtFifICuhdcCzBWich3V/pub?gid=768994311&single=true&output=csv'
+  }
+  // Para agregar el próximo mes:
+  // { label: 'Ciclo Agosto 2026', cicloDesde: new Date(2026,6,25), cicloHasta: new Date(2026,7,24), url: '...' }
+];
+
+// ─── CICLOS TARJETAS ──────────────────────────────────────────────────────────
+// Cada entrada tiene "label" (con año, ej. "Julio 2026") y url del sheet de tarjetas.
+// Si url es null, se usan datos de ejemplo (mock).
+const TARJETAS_CICLOS = [
+  {
+    label: 'Julio 2026',
+    url: null  // <- poner la URL del CSV de tarjetas cuando esté listo
   }
 ];
 
-const URL_TARJETAS = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTSR-jEHWGJNTU5Wk2HOm6U5_pQkHudAuzgL46QYnVg5WNv-2K9H8hDsNVGUtFifICuhdcCzBWich3V/pub?gid=1050964641&single=true&output=csv';
+// Datos de ejemplo para tarjetas
+const TARJETAS_MOCK = [
+  { fecha:'25/06/2026', detalle:'Supermercado Jumbo',    banco:'Santander', tarjeta:'VISA Crédito',  tipo:'Crédito', montoARS:45000,  cotizacion:1180, quien:'Lucas'   },
+  { fecha:'26/06/2026', detalle:'Netflix',               banco:'Galicia',   tarjeta:'MC Crédito',    tipo:'Crédito', montoARS:8200,   cotizacion:1180, quien:'Mariana' },
+  { fecha:'27/06/2026', detalle:'SUBE',                  banco:'Santander', tarjeta:'VISA Débito',   tipo:'Débito',  montoARS:3500,   cotizacion:1182, quien:'Lucas'   },
+  { fecha:'28/06/2026', detalle:'Farmacia',              banco:'BBVA',      tarjeta:'MC Débito',     tipo:'Débito',  montoARS:12000,  cotizacion:1182, quien:'Mariana' },
+  { fecha:'29/06/2026', detalle:'Restaurante',           banco:'Galicia',   tarjeta:'MC Crédito',    tipo:'Crédito', montoARS:38000,  cotizacion:1185, quien:'Lucas'   },
+  { fecha:'30/06/2026', detalle:'Combustible',           banco:'Santander', tarjeta:'VISA Crédito',  tipo:'Crédito', montoARS:55000,  cotizacion:1185, quien:'Lucas'   },
+  { fecha:'01/07/2026', detalle:'Spotify',               banco:'Galicia',   tarjeta:'MC Crédito',    tipo:'Crédito', montoARS:4500,   cotizacion:1190, quien:'Mariana' },
+  { fecha:'02/07/2026', detalle:'Almacén',               banco:'BBVA',      tarjeta:'MC Débito',     tipo:'Débito',  montoARS:9800,   cotizacion:1190, quien:'Mariana' },
+  { fecha:'03/07/2026', detalle:'Ropa',                  banco:'Santander', tarjeta:'VISA Crédito',  tipo:'Crédito', montoARS:72000,  cotizacion:1192, quien:'Mariana' },
+  { fecha:'04/07/2026', detalle:'Bar',                   banco:'Galicia',   tarjeta:'MC Crédito',    tipo:'Crédito', montoARS:18000,  cotizacion:1192, quien:'Lucas'   },
+  { fecha:'05/07/2026', detalle:'Peluquería',            banco:'BBVA',      tarjeta:'MC Débito',     tipo:'Débito',  montoARS:11000,  cotizacion:1195, quien:'Mariana' },
+  { fecha:'06/07/2026', detalle:'Amazon',                banco:'Santander', tarjeta:'VISA Crédito',  tipo:'Crédito', montoARS:29000,  cotizacion:1195, quien:'Lucas'   },
+  { fecha:'07/07/2026', detalle:'Supermercado Dia',      banco:'Galicia',   tarjeta:'MC Débito',     tipo:'Débito',  montoARS:22000,  cotizacion:1198, quien:'Mariana' },
+  { fecha:'08/07/2026', detalle:'Cine',                  banco:'BBVA',      tarjeta:'MC Crédito',    tipo:'Crédito', montoARS:14000,  cotizacion:1198, quien:'Lucas'   },
+  { fecha:'09/07/2026', detalle:'Farmacia Plus',         banco:'Santander', tarjeta:'VISA Débito',   tipo:'Débito',  montoARS:7500,   cotizacion:1200, quien:'Mariana' },
+];
 
-const PALETTE = ['#378ADD','#1D9E75','#EF9F27','#7F77DD','#D4537E','#D85A30','#639922','#888780'];
+const PALETTE = ['#378ADD','#1D9E75','#EF9F27','#7F77DD','#D4537E','#D85A30','#639922','#888780','#185FA5','#5DCAA5','#F09595','#B4B2A9'];
 const GRID = 'rgba(255,255,255,0.05)';
 const TICK = '#444';
 
 let cicloActivo = CICLOS.length - 1;
 let tabActivo = 'mes';
 let datosCache = {};
-let tarjetasCache = null;
 let logDatos = [];
-let donutInst = null, barInst = null, compareBarInst = null, ratioLineInst = null, catCompareInst = null;
-let mesTarjetaActivo = null;
+let tarjetasDatos = [];
+let tarjetasMoneda = 'ARS';
+let tarjetasAgrupacion = 'banco';
+let tarjetasLineSelected = [];
+let donutInst, barInst, compareBarInst, ratioLineInst, catCompareInst, tarjetasLineInst;
 
-// ─── UTILIDADES ───────────────────────────────────────────────────────────────
-function fmt(n) {
-  return '$' + Math.round(n).toLocaleString('es-AR');
-}
-function fmtUSD(n) {
-  return 'U$S ' + n.toFixed(2).replace('.', ',');
-}
+// ─── UTILS ────────────────────────────────────────────────────────────────────
+const fmt    = n => '$' + Math.round(n).toLocaleString('es-AR');
+const fmtUSD = n => 'U$S ' + Number(n).toFixed(0);
+
 function parseMonto(s) {
   if (!s) return 0;
-  let str = s.toString().trim().replace(/\$/g, '').replace(/\s/g, '');
+  let str = s.toString().trim().replace(/\$/g,'').replace(/\s/g,'');
   const tieneComaDecimal = /,\d{1,2}$/.test(str);
-  if (tieneComaDecimal) str = str.replace(/\./g, '').replace(',', '.');
-  else str = str.replace(/,/g, '');
+  if (tieneComaDecimal) str = str.replace(/\./g,'').replace(',','.');
+  else str = str.replace(/,/g,'');
   return parseFloat(str) || 0;
 }
+
 function parseDate(s) {
   if (!s) return null;
   const p = s.trim().split('/');
   if (p.length === 3) return new Date(parseInt(p[2]), parseInt(p[1])-1, parseInt(p[0]));
   return null;
 }
-function formatDateShort(d) {
-  if (!d) return '';
-  return d.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit' });
-}
-function diasEntre(desde, hasta) {
-  return Math.round((hasta - desde) / (1000 * 60 * 60 * 24)) + 1;
-}
 
-// ─── DROPDOWN DASHBOARD ──────────────────────────────────────────────────────
+const formatDateShort = d => d ? d.toLocaleDateString('es-AR', { day:'2-digit', month:'2-digit' }) : '';
+const diasEntre = (a,b) => Math.round((b-a)/(1000*60*60*24))+1;
+
+// ─── DROPDOWN ─────────────────────────────────────────────────────────────────
 function buildDropdown() {
-  const menu = document.getElementById('dropdownMenu');
   const byAnio = {};
-  CICLOS.forEach((c, i) => {
-    const anio = c.cicloHasta.getFullYear();
-    if (!byAnio[anio]) byAnio[anio] = [];
-    byAnio[anio].push({ ...c, idx: i });
+  CICLOS.forEach((c,i) => {
+    const y = c.cicloHasta.getFullYear();
+    (byAnio[y] = byAnio[y]||[]).push({...c, idx:i});
   });
   let html = '';
-  Object.keys(byAnio).sort((a,b) => b - a).forEach(anio => {
-    html += `<div class="dropdown-group-label">${anio}</div>`;
-    [...byAnio[anio]].reverse().forEach(c => {
-      const shortLabel = c.label.replace(' ' + anio, '').replace('Ciclo ','');
-      html += `<div class="dropdown-item ${c.idx === cicloActivo ? 'active' : ''}" onclick="cambiarCiclo(${c.idx})">
-        <span class="dot"></span>${shortLabel}</div>`;
+  Object.keys(byAnio).sort((a,b)=>b-a).forEach(y => {
+    html += `<div class="dropdown-group-label">${y}</div>`;
+    [...byAnio[y]].reverse().forEach(c => {
+      html += `<div class="dropdown-item ${c.idx===cicloActivo?'active':''}" onclick="cambiarCiclo(${c.idx})">
+        <span class="dot"></span>${c.label.replace('Ciclo ','')}</div>`;
     });
   });
-  menu.innerHTML = html;
+  document.getElementById('dropdownMenu').innerHTML = html;
   document.getElementById('dropdownLabel').textContent = CICLOS[cicloActivo].label;
 }
+
 function toggleDropdown() {
-  const menu = document.getElementById('dropdownMenu');
-  const chev = document.getElementById('dropdownChevron');
-  const open = menu.classList.toggle('open');
-  chev.classList.toggle('open', open);
+  document.getElementById('dropdownMenu').classList.toggle('open');
+  document.getElementById('dropdownChevron').classList.toggle('open');
 }
+
 document.addEventListener('click', e => {
   if (!document.getElementById('dropdownWrap').contains(e.target)) {
     document.getElementById('dropdownMenu').classList.remove('open');
     document.getElementById('dropdownChevron').classList.remove('open');
   }
 });
+
 function cambiarCiclo(idx) {
   cicloActivo = idx;
   buildDropdown();
@@ -341,448 +403,416 @@ function setTab(tab, el) {
   tabActivo = tab;
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
-  ['tabMes','tabComparativa','tabDetalle','tabTarjetas'].forEach(id => document.getElementById(id).style.display = 'none');
-  if (tab === 'mes')         document.getElementById('tabMes').style.display = 'block';
-  if (tab === 'comparativa') { document.getElementById('tabComparativa').style.display = 'block'; renderComparativa(); }
-  if (tab === 'detalle')     document.getElementById('tabDetalle').style.display = 'block';
-  if (tab === 'tarjetas')    { document.getElementById('tabTarjetas').style.display = 'block'; renderTarjetas(); }
+  ['tabMes','tabDetalle','tabComparativa','tabTarjetas'].forEach(id =>
+    document.getElementById(id).style.display='none');
+  if (tab==='mes')         document.getElementById('tabMes').style.display='block';
+  if (tab==='detalle')     document.getElementById('tabDetalle').style.display='block';
+  if (tab==='comparativa') { document.getElementById('tabComparativa').style.display='block'; renderComparativa(); }
+  if (tab==='tarjetas')    { document.getElementById('tabTarjetas').style.display='block'; initTarjetas(); }
 }
 
 // ─── CARGA DE DATOS ───────────────────────────────────────────────────────────
 function loadData() {
-  document.getElementById('loadingBox').style.display = 'block';
-  document.getElementById('errorBox').style.display = 'none';
-  ['tabMes','tabComparativa','tabDetalle','tabTarjetas'].forEach(id => document.getElementById(id).style.display = 'none');
-  tarjetasCache = null;
+  document.getElementById('loadingBox').style.display='block';
+  document.getElementById('errorBox').style.display='none';
+  ['tabMes','tabDetalle','tabComparativa','tabTarjetas'].forEach(id =>
+    document.getElementById(id).style.display='none');
 
-  const fetchCiclo = (c, i) => new Promise((resolve, reject) => {
-    if (datosCache[i]) { resolve(datosCache[i]); return; }
-    Papa.parse(c.url, {
-      download: true, header: true, skipEmptyLines: true,
-      complete: r => { datosCache[i] = r.data; resolve(r.data); },
-      error: reject
+  const fetchCiclo = (c,i) => new Promise((res,rej) => {
+    if (datosCache[i]) { res(datosCache[i]); return; }
+    Papa.parse(c.url, { download:true, header:true, skipEmptyLines:true,
+      complete: r => { datosCache[i]=r.data; res(r.data); }, error: rej });
+  });
+
+  Promise.all(CICLOS.map((c,i) => fetchCiclo(c,i).catch(()=>null)))
+    .then(results => {
+      results.forEach((r,i) => { if(r) datosCache[i]=r; });
+      if (!datosCache[cicloActivo]) {
+        document.getElementById('loadingBox').style.display='none';
+        document.getElementById('errorBox').textContent='No se pudo cargar el ciclo. Verificá que el sheet esté publicado.';
+        document.getElementById('errorBox').style.display='block';
+        return;
+      }
+      buildDashboard(datosCache[cicloActivo]);
     });
-  });
-
-  const fetchTarjetas = new Promise((resolve) => {
-    Papa.parse(URL_TARJETAS, {
-      download: true, header: true, skipEmptyLines: true,
-      complete: r => { tarjetasCache = r.data; resolve(r.data); },
-      error: () => resolve([])
-    });
-  });
-
-  Promise.all([
-    ...CICLOS.map((c, i) => fetchCiclo(c, i).catch(() => null)),
-    fetchTarjetas
-  ]).then(results => {
-    results.slice(0, CICLOS.length).forEach((r, i) => { if (r) datosCache[i] = r; });
-    if (!datosCache[cicloActivo]) {
-      document.getElementById('loadingBox').style.display = 'none';
-      document.getElementById('errorBox').textContent = 'No se pudo cargar el ciclo seleccionado.';
-      document.getElementById('errorBox').style.display = 'block';
-      return;
-    }
-    buildDashboard(datosCache[cicloActivo]);
-  });
 }
 
-// ─── PARSEO DE GASTOS ────────────────────────────────────────────────────────
+// ─── PARSEO ───────────────────────────────────────────────────────────────────
 function parsearCiclo(rows) {
-  if (!rows || rows.length === 0) return null;
+  if (!rows || !rows.length) return null;
   const cols = Object.keys(rows[0]);
-  const colFecha = cols[0], colDetalle = cols[1], colCat = cols[2], colMonto = cols[3], colQuien = cols[4];
-  let ingresosLucas = 0, ingresosMari = 0;
-  const datos = [];
+  const [cFecha,cDet,cCat,cMonto,cQuien] = cols;
+  let ingresosLucas=0, ingresosMari=0;
+  const datos=[];
   rows.forEach(r => {
-    const fecha  = r[colFecha]   ? r[colFecha].trim()   : '';
-    const cat    = r[colCat]     ? r[colCat].trim()     : '';
-    const monto  = parseMonto(r[colMonto]);
-    const det    = r[colDetalle] ? r[colDetalle].trim() : '';
-    const quien  = r[colQuien]   ? r[colQuien].trim()   : 'Desconocido';
-    const dL = det.toLowerCase();
-    if (dL.includes('ingres. lucas'))   { ingresosLucas = monto; return; }
-    if (dL.includes('ingres. mariana')) { ingresosMari  = monto; return; }
-    if (!fecha || !cat || monto <= 0) return;
-    datos.push({ fecha, detalle: det, categoria: cat, monto, quien });
+    const fecha=(r[cFecha]||'').trim(), cat=(r[cCat]||'').trim();
+    const monto=parseMonto(r[cMonto]), det=(r[cDet]||'').trim();
+    const quien=(r[cQuien]||'Desconocido').trim();
+    const dL=det.toLowerCase();
+    if (dL.includes('ingres. lucas'))   { ingresosLucas=monto; return; }
+    if (dL.includes('ingres. mariana')) { ingresosMari=monto; return; }
+    if (!fecha||!cat||monto<=0) return;
+    datos.push({fecha,detalle:det,categoria:cat,monto,quien});
   });
-  return { datos, ingresosLucas, ingresosMari };
+  if (!ingresosLucas) ingresosLucas=3600000;
+  if (!ingresosMari)  ingresosMari=3600000;
+  return {datos,ingresosLucas,ingresosMari};
 }
 
-// ─── PARSEO DE TARJETAS ──────────────────────────────────────────────────────
-function parsearTarjetas(rows) {
-  if (!rows || rows.length === 0) return [];
-  const datos = [];
-  rows.forEach(r => {
-    const getVal = (colName) => {
-      const key = Object.keys(r).find(k => k.trim().toLowerCase() === colName.toLowerCase());
-      return key ? r[key].trim() : '';
-    };
-
-    const bancoTipo = getVal('Banco y tipo') || getVal('Banco');
-    const mes = getVal('Mes');
-    const fecha = getVal('Fecha');
-    const tarjeta = getVal('Tarjeta');
-    const detalle = getVal('Detalle');
-    const cuota = getVal('Cuota');
-    const montoARS = parseMonto(getVal('Detalle monto ARS'));
-    const montoUSD = parseMonto(getVal('Detalle monto USD'));
-    const vencStr = getVal('Vencimiento');
-    const totalARS = parseMonto(getVal('Total a pagar ARS') || getVal('Total ARS'));
-    const totalUSD = parseMonto(getVal('Total a pagar USD') || getVal('Total USD'));
-
-    if (!mes && !bancoTipo) return;
-
-    datos.push({ bancoTipo, mes, fecha, tarjeta, detalle, cuota, montoARS, montoUSD, vencStr, totalARS, totalUSD });
-  });
-  return datos;
-}
-
-// ─── CONSTRUCCIÓN DEL DASHBOARD ───────────────────────────────────────────────
+// ─── DASHBOARD ────────────────────────────────────────────────────────────────
 function buildDashboard(rows) {
-  const parsed = parsearCiclo(rows);
-  const { datos, ingresosLucas, ingresosMari } = parsed;
+  const {datos,ingresosLucas,ingresosMari} = parsearCiclo(rows);
   logDatos = [...datos].sort((a,b) => {
-    const da = parseDate(a.fecha), db = parseDate(b.fecha);
-    return (!da || !db) ? 0 : db - da;
+    const da=parseDate(a.fecha),db=parseDate(b.fecha);
+    return (!da||!db)?0:db-da;
   });
 
-  const ciclo = CICLOS[cicloActivo];
-  const hoy   = new Date(); hoy.setHours(0,0,0,0);
-  const desde = ciclo.cicloDesde;
-  const hasta = ciclo.cicloHasta;
+  const ciclo=CICLOS[cicloActivo], hoy=new Date();
+  hoy.setHours(0,0,0,0);
+  const {cicloDesde:desde, cicloHasta:hasta} = ciclo;
+  const totalDias = diasEntre(desde,hasta);
+  const esCicloActual = hoy>=desde && hoy<=hasta;
+  const diasTrans = esCicloActual ? diasEntre(desde,hoy) : (hoy>hasta?totalDias:0);
+  const pctTiempo = Math.min(100,(diasTrans/totalDias)*100);
 
-  const totalDiasCiclo    = diasEntre(desde, hasta);
-  const esCicloActual     = hoy >= desde && hoy <= hasta;
-  const diasTranscurridos = esCicloActual ? diasEntre(desde, hoy) : (hoy > hasta ? totalDiasCiclo : 0);
-  const pctTiempo         = Math.min(100, (diasTranscurridos / totalDiasCiclo) * 100);
+  const totalGastos=datos.reduce((s,r)=>s+r.monto,0);
+  const totalIngresos=ingresosLucas+ingresosMari;
+  const resto=totalIngresos-totalGastos;
+  const pctGastado=((totalGastos/totalIngresos)*100).toFixed(1);
 
-  const totalGastos   = datos.reduce((s, r) => s + r.monto, 0);
-  const totalIngresos = ingresosLucas + ingresosMari;
-  const resto         = totalIngresos - totalGastos;
-  const pctGastado    = totalIngresos > 0 ? ((totalGastos / totalIngresos) * 100).toFixed(1) : '0.0';
+  document.getElementById('cicloBadge').textContent=`${formatDateShort(desde)} – ${formatDateShort(hasta)}`;
+  document.getElementById('dashSub').textContent=`${datos.length} movimientos · ${ciclo.label}`;
 
-  document.getElementById('cicloBadge').textContent = `${formatDateShort(desde)} – ${formatDateShort(hasta)}`;
-  document.getElementById('dashSub').textContent = `${datos.length} movimientos · ${ciclo.label}`;
-
-  const pctGastadoNum = totalIngresos > 0 ? (totalGastos / totalIngresos) * 100 : 0;
-  document.getElementById('progressTiempo').style.width = pctTiempo.toFixed(1) + '%';
-  document.getElementById('progressGastos').style.width = Math.min(100, pctGastadoNum).toFixed(1) + '%';
-  document.getElementById('cicloProgressPct').textContent = `Día ${diasTranscurridos} de ${totalDiasCiclo}`;
-  document.getElementById('cicloLegendText').innerHTML =
+  // Progreso
+  const pctG=(totalGastos/totalIngresos)*100;
+  document.getElementById('progressTiempo').style.width=pctTiempo.toFixed(1)+'%';
+  document.getElementById('progressGastos').style.width=Math.min(100,pctG).toFixed(1)+'%';
+  document.getElementById('cicloProgressPct').textContent=`Día ${diasTrans} de ${totalDias}`;
+  document.getElementById('cicloLegendText').innerHTML=
     `<span style="color:#E24B4A">■</span> Gastos: ${pctGastado}% del ingreso &nbsp;·&nbsp; `+
     `<span style="color:#378ADD">▏</span> Tiempo transcurrido: ${pctTiempo.toFixed(0)}%`;
-  document.getElementById('cicloProgressWrap').style.display = esCicloActual || hoy > hasta ? 'block' : 'none';
+  document.getElementById('cicloProgressWrap').style.display=(esCicloActual||hoy>hasta)?'block':'none';
 
-  const banner = document.getElementById('projBanner');
-  if (esCicloActual && diasTranscurridos > 0 && totalGastos > 0 && totalIngresos > 0) {
-    const promDiario    = totalGastos / diasTranscurridos;
-    const gastoProy     = promDiario * totalDiasCiclo;
-    const ahorroProy    = totalIngresos - gastoProy;
-    const pctAhorroProy = ((ahorroProy / totalIngresos) * 100).toFixed(1);
-    const diasRestan    = totalDiasCiclo - diasTranscurridos;
-    let tono, titulo, texto;
-    if (ahorroProy >= totalIngresos * 0.20) {
-      tono = 'saving'; titulo = 'Van muy bien 🎯';
-      texto = `Al ritmo actual (<strong>${fmt(Math.round(promDiario))}/día</strong>), cerrarían el ciclo ahorrando <strong>${fmt(Math.round(ahorroProy))}</strong> — el <strong>${pctAhorroProy}%</strong> del ingreso. Quedan ${diasRestan} días.`;
-    } else if (ahorroProy > 0) {
-      tono = 'warning'; titulo = 'Ahorro proyectado ajustado';
-      texto = `Al ritmo actual (<strong>${fmt(Math.round(promDiario))}/día</strong>), cerrarían ahorrando <strong>${fmt(Math.round(ahorroProy))}</strong> (<strong>${pctAhorroProy}%</strong> del ingreso). Quedan ${diasRestan} días.`;
-    } else {
-      const deficit = Math.abs(ahorroProy);
-      tono = 'danger'; titulo = 'Ritmo por encima del ingreso';
-      texto = `Al ritmo actual (<strong>${fmt(Math.round(promDiario))}/día</strong>), el ciclo cerraría con un déficit de <strong>${fmt(Math.round(deficit))}</strong>. Quedan ${diasRestan} días.`;
-    }
-    banner.className = `proj-banner ${tono}`;
-    document.getElementById('projBannerTitle').textContent = titulo;
-    document.getElementById('projText').innerHTML = texto;
-    banner.style.display = 'flex';
+  // Proyección
+  if (esCicloActual && diasTrans>0 && totalGastos>0) {
+    const prom=totalGastos/diasTrans, proy=prom*totalDias;
+    const pctProy=((proy/totalIngresos)*100).toFixed(1), restan=totalDias-diasTrans;
+    document.getElementById('projText').innerHTML=
+      `Llevan <strong>${fmt(totalGastos)}</strong> en ${diasTrans} días `+
+      `(promedio <strong>${fmt(Math.round(prom))}/día</strong>). `+
+      `Si el ritmo continúa, el ciclo cerraría en <strong>${fmt(Math.round(proy))}</strong> `+
+      `(<strong>${pctProy}%</strong> del ingreso). `+
+      `Quedan ${restan} días y ~<strong>${fmt(Math.round(proy-totalGastos))}</strong> por gastar.`;
+    document.getElementById('projBanner').style.display='flex';
   } else {
-    banner.style.display = 'none';
+    document.getElementById('projBanner').style.display='none';
   }
 
-  document.getElementById('metricsBox').innerHTML = `
+  // Métricas
+  document.getElementById('metricsBox').innerHTML=`
     <div class="metric"><p class="metric-label">Lucas</p><p class="metric-value">${fmt(ingresosLucas)}</p></div>
     <div class="metric"><p class="metric-label">Mariana</p><p class="metric-value">${fmt(ingresosMari)}</p></div>
     <div class="metric"><p class="metric-label">Total ingresos</p><p class="metric-value">${fmt(totalIngresos)}</p></div>
     <div class="metric"><p class="metric-label">Total gastos</p><p class="metric-value danger">${fmt(totalGastos)}</p></div>
-    <div class="metric"><p class="metric-label">Saldo</p><p class="metric-value ${resto >= 0 ? 'success' : 'danger'}">${fmt(resto)}</p></div>
+    <div class="metric"><p class="metric-label">Saldo</p><p class="metric-value success">${fmt(resto)}</p></div>
     <div class="metric"><p class="metric-label">% gastado</p><p class="metric-value">${pctGastado}%</p></div>
   `;
 
-  const fechasSorted = [...new Set(datos.map(r => r.fecha))].sort((a,b) => {
-    const da = parseDate(a), db = parseDate(b);
-    return (!da || !db) ? 0 : da - db;
+  // Fechas
+  const fechas=[...new Set(datos.map(r=>r.fecha))].sort((a,b)=>{
+    const da=parseDate(a),db=parseDate(b); return (!da||!db)?0:da-db;
   });
-  const montosPorFecha = fechasSorted.map(f =>
-    datos.filter(r => r.fecha === f).reduce((s, r) => s + r.monto, 0)
-  );
+  const montosFecha=fechas.map(f=>datos.filter(r=>r.fecha===f).reduce((s,r)=>s+r.monto,0));
 
-  const catMap = {};
-  datos.forEach(r => { catMap[r.categoria] = (catMap[r.categoria] || 0) + r.monto; });
-  const categorias = Object.entries(catMap)
-    .sort((a,b) => b[1] - a[1])
-    .map(([nombre, monto], i) => ({ nombre, monto, color: PALETTE[i % PALETTE.length] }));
+  // Categorías
+  const catMap={};
+  datos.forEach(r=>{ catMap[r.categoria]=(catMap[r.categoria]||0)+r.monto; });
+  const cats=Object.entries(catMap).sort((a,b)=>b[1]-a[1])
+    .map(([nombre,monto],i)=>({nombre,monto,color:PALETTE[i%PALETTE.length]}));
 
+  // Donut
   if (donutInst) donutInst.destroy();
-  donutInst = new Chart(document.getElementById('donutChart'), {
-    type: 'doughnut',
-    data: { labels: categorias.map(c => c.nombre), datasets: [{ data: categorias.map(c => c.monto), backgroundColor: categorias.map(c => c.color), borderWidth: 2, borderColor: '#111' }] },
-    options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${fmt(ctx.raw)} (${totalGastos > 0 ? ((ctx.raw/totalGastos)*100).toFixed(1) : 0}%)` } } } }
+  donutInst=new Chart(document.getElementById('donutChart'),{
+    type:'doughnut',
+    data:{labels:cats.map(c=>c.nombre),datasets:[{data:cats.map(c=>c.monto),backgroundColor:cats.map(c=>c.color),borderWidth:2,borderColor:'#111'}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${fmt(ctx.raw)} (${((ctx.raw/totalGastos)*100).toFixed(1)}%)`}}}}
   });
-  document.getElementById('donutLegend').innerHTML = categorias.slice(0, 6).map(c =>
-    `<span class="legend-item"><span class="legend-dot" style="background:${c.color}"></span>${c.nombre.split(' ')[0]} ${totalGastos > 0 ? ((c.monto/totalGastos)*100).toFixed(1) : 0}%</span>`
+  document.getElementById('donutLegend').innerHTML=cats.slice(0,6).map(c=>
+    `<span class="legend-item"><span class="legend-dot" style="background:${c.color}"></span>${c.nombre.split(' ')[0]} ${((c.monto/totalGastos)*100).toFixed(1)}%</span>`
   ).join('');
 
+  // Bar fechas
   if (barInst) barInst.destroy();
-  barInst = new Chart(document.getElementById('barChart'), {
-    type: 'bar',
-    data: { labels: fechasSorted, datasets: [{ data: montosPorFecha, backgroundColor: '#378ADD33', borderColor: '#378ADD', borderWidth: 1.5, borderRadius: 4 }] },
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: GRID }, ticks: { color: TICK, font: { size: 10 }, maxRotation: 45, autoSkip: true, maxTicksLimit: 8 } }, y: { grid: { color: GRID }, ticks: { color: TICK, font: { size: 10 }, callback: v => '$' + (v >= 1000 ? Math.round(v/1000) + 'k' : v) } } } }
+  barInst=new Chart(document.getElementById('barChart'),{
+    type:'bar',
+    data:{labels:fechas,datasets:[{data:montosFecha,backgroundColor:'#378ADD33',borderColor:'#378ADD',borderWidth:1.5,borderRadius:4}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{
+      x:{grid:{color:GRID},ticks:{color:TICK,font:{size:10},maxRotation:45,autoSkip:true,maxTicksLimit:8}},
+      y:{grid:{color:GRID},ticks:{color:TICK,font:{size:10},callback:v=>'$'+(v>=1000?Math.round(v/1000)+'k':v)}}
+    }}
   });
 
-  document.getElementById('rankingTable').innerHTML = categorias.map((c, i) => {
-    const pct = totalGastos > 0 ? ((c.monto / totalGastos) * 100).toFixed(1) : '0.0';
+  // Ranking
+  document.getElementById('rankingTable').innerHTML=cats.map((c,i)=>{
+    const pct=((c.monto/totalGastos)*100).toFixed(1);
     return `<tr><td>${i+1}</td><td>${c.nombre}<div class="bar-bg"><div class="bar-fill" style="width:${pct}%;background:${c.color};"></div></div></td><td>${fmt(c.monto)}<br><span class="pct-label">${pct}%</span></td></tr>`;
   }).join('');
 
   renderLog(logDatos);
-
-  document.getElementById('loadingBox').style.display = 'none';
-  document.getElementById('tabMes').style.display = 'block';
-  if (tabActivo === 'comparativa') renderComparativa();
-  if (tabActivo === 'detalle') document.getElementById('tabDetalle').style.display = 'block';
-  if (tabActivo === 'tarjetas') { document.getElementById('tabTarjetas').style.display = 'block'; renderTarjetas(); }
+  document.getElementById('loadingBox').style.display='none';
+  document.getElementById('tabMes').style.display='block';
+  if (tabActivo==='comparativa') renderComparativa();
+  if (tabActivo==='detalle') document.getElementById('tabDetalle').style.display='block';
+  if (tabActivo==='tarjetas') { document.getElementById('tabTarjetas').style.display='block'; initTarjetas(); }
 }
 
-// ─── LOG / DETALLE ────────────────────────────────────────────────────────────
+// ─── LOG ──────────────────────────────────────────────────────────────────────
 function renderLog(datos) {
-  document.getElementById('logTable').innerHTML = `
-    <thead><tr>
-      <th style="width:15%">Fecha</th><th style="width:35%">Detalle</th>
-      <th style="width:22%">Categoría</th><th style="width:15%;text-align:right">Monto</th>
-      <th style="width:13%;text-align:center">Quién</th>
-    </tr></thead>
-    <tbody>${datos.map(r => {
-      let bc = 'badge-desconocido';
-      const q = r.quien.toLowerCase();
-      if (q === 'lucas') bc = 'badge-lucas';
-      if (q === 'mariana' || q === 'mari') bc = 'badge-mariana';
-      return `<tr>
-        <td style="color:#555;font-size:12px">${r.fecha}</td>
-        <td style="font-weight:500">${r.detalle}</td>
-        <td><span class="cat-tag">${r.categoria}</span></td>
-        <td style="text-align:right;font-weight:500">${fmt(r.monto)}</td>
-        <td style="text-align:center"><span class="badge-user ${bc}">${r.quien}</span></td>
-      </tr>`;
+  document.getElementById('logTable').innerHTML=`
+    <thead><tr><th style="width:15%">Fecha</th><th style="width:35%">Detalle</th><th style="width:22%">Categoría</th><th style="width:15%;text-align:right">Monto</th><th style="width:13%;text-align:center">Quién</th></tr></thead>
+    <tbody>${datos.map(r=>{
+      let bc='badge-desconocido';
+      const q=r.quien.toLowerCase();
+      if(q==='lucas') bc='badge-lucas';
+      if(q==='mariana'||q==='mari') bc='badge-mariana';
+      return `<tr><td style="color:#555;font-size:12px">${r.fecha}</td><td style="font-weight:500">${r.detalle}</td><td><span class="cat-tag">${r.categoria}</span></td><td style="text-align:right;font-weight:500">${fmt(r.monto)}</td><td style="text-align:center"><span class="badge-user ${bc}">${r.quien}</span></td></tr>`;
     }).join('')}</tbody>`;
 }
 function filtrarLog() {
-  const q = document.getElementById('searchInput').value.toLowerCase();
-  renderLog(logDatos.filter(r =>
-    r.detalle.toLowerCase().includes(q) || r.categoria.toLowerCase().includes(q) || r.quien.toLowerCase().includes(q)
-  ));
-}
-
-// ─── TARJETAS REVISADO ───────────────────────────────────────────────────────
-function renderTarjetas() {
-  const datos = parsearTarjetas(tarjetasCache || []);
-
-  if (!datos.length) {
-    document.getElementById('tabTarjetas').innerHTML = '<p style="color:#444;font-size:13px;padding:2rem 0;">No hay datos de tarjetas cargados todavía o las columnas no coinciden.</p>';
-    return;
-  }
-
-  // 1. Obtener los meses únicos disponibles
-  const meses = [...new Set(datos.map(d => d.mes).filter(Boolean))];
-  if (!meses.length) return;
-
-  // 2. Definir el mes activo
-  if (!mesTarjetaActivo || !meses.includes(mesTarjetaActivo)) {
-    mesTarjetaActivo = meses[meses.length - 1];
-  }
-
-  // 3. Filtrar los datos por el mes
-  const datosMes = datos.filter(d => d.mes === mesTarjetaActivo);
-
-  // 4. Agrupar la información por Banco/Tipo
-  const grupos = {};
-  datosMes.forEach(d => {
-    const key = d.bancoTipo || d.tarjeta || 'Desconocido';
-    if (!grupos[key]) {
-      grupos[key] = {
-        bancoTipo: d.bancoTipo,
-        tarjeta: d.tarjeta,
-        vencStr: d.vencStr,
-        totalARS: d.totalARS,
-        totalUSD: d.totalUSD
-      };
-    }
-    if (d.totalARS > 0) grupos[key].totalARS = d.totalARS;
-    if (d.totalUSD > 0) grupos[key].totalUSD = d.totalUSD;
-    if (d.vencStr) grupos[key].vencStr = d.vencStr;
-  });
-
-  const gruposArr = Object.values(grupos);
-
-  // --- CÁLCULO DE TOTALES GENERALES DEL MES ---
-  const granTotalARS = gruposArr.reduce((acc, g) => acc + (g.totalARS || 0), 0);
-  const granTotalUSD = gruposArr.reduce((acc, g) => acc + (g.totalUSD || 0), 0);
-
-  // 5. Construir la UI
-  let html = `
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; gap:10px;">
-      <p class="tc-seccion-titulo" style="margin:0;">Resumen de Tarjetas</p>
-      <select onchange="cambiarMesTarjeta(this.value)" style="background:#1a1a1a; border:0.5px solid #2a2a2a; border-radius:8px; padding:8px 12px; color:#e8e8e8; font-size:13px; outline:none; cursor:pointer;">
-        ${meses.map(m => `<option value="${m}" ${m === mesTarjetaActivo ? 'selected' : ''}>Mes: ${m}</option>`).join('')}
-      </select>
-    </div>
-  `;
-
-  // --- BLOQUE DE RESUMEN CONSOLIDADO ---
-  let heroHTML = `
-    <div style="background: rgba(55,138,221,0.05); border: 0.5px solid #2a2a2a; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; display: flex; gap: 20px; flex-wrap: wrap;">
-      <div style="flex: 1; min-width: 150px;">
-        <p style="font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px;">Total general a pagar ARS</p>
-        <p style="font-size: 32px; font-weight: 600; color: #e8e8e8; letter-spacing: -1px;">${granTotalARS > 0 ? fmt(granTotalARS) : '$0'}</p>
-      </div>
-      <div style="flex: 1; min-width: 150px;">
-        <p style="font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px;">Total general a pagar USD</p>
-        <p style="font-size: 32px; font-weight: 600; color: #1D9E75; letter-spacing: -1px;">${granTotalUSD > 0 ? fmtUSD(granTotalUSD) : 'U$S 0,00'}</p>
-      </div>
-    </div>
-  `;
-
-  gruposArr.forEach((g, idx) => {
-    const color = PALETTE[idx % PALETTE.length];
-    heroHTML += `
-      <div class="tc-venc-group">
-        <div class="tc-venc-header">
-          <span class="tc-venc-nombre">
-            <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${color};margin-right:7px;vertical-align:middle;"></span>
-            ${g.bancoTipo || g.tarjeta}
-          </span>
-          <div class="tc-venc-badge">
-            <span class="tc-venc-label">Vencimiento &nbsp;</span>
-            <span class="tc-venc-fecha" style="color:#ccc;">${g.vencStr || '—'}</span>
-          </div>
-        </div>
-        <div class="tc-montos">
-          <div class="tc-monto-card">
-            <p class="tc-monto-label">Total a pagar ARS</p>
-            <p class="tc-monto-value ars ${g.totalARS === 0 ? 'zero' : ''}">${g.totalARS > 0 ? fmt(g.totalARS) : '—'}</p>
-          </div>
-          <div class="tc-monto-card">
-            <p class="tc-monto-label">Total a pagar USD</p>
-            <p class="tc-monto-value usd ${g.totalUSD === 0 ? 'zero' : ''}">${g.totalUSD > 0 ? fmtUSD(g.totalUSD) : '—'}</p>
-          </div>
-        </div>
-      </div>
-    `;
-  });
-  html += `<div id="tcHero">${heroHTML}</div>`;
-
-  // 6. Construir la tabla
-  html += `
-    <div class="table-card" style="margin-top:2rem;">
-      <p class="chart-title" style="margin-bottom:14px;">Detalle de consumos - ${mesTarjetaActivo}</p>
-      <div style="overflow-x:auto;">
-        <table class="ranking-table" style="min-width:600px;">
-          <thead>
-            <tr>
-              <th>Fecha</th>
-              <th>Tarjeta</th>
-              <th>Detalle</th>
-              <th style="text-align:center">Cuota</th>
-              <th style="text-align:right">Monto ARS</th>
-              <th style="text-align:right">Monto USD</th>
-            </tr>
-          </thead>
-          <tbody>
-  `;
-
-  datosMes.forEach(d => {
-    const cuotaTag = d.cuota ? `<span class="cuota-tag en-curso">${d.cuota}</span>` : '<span style="color:#333;font-size:11px;">—</span>';
-    html += `
-      <tr>
-        <td style="color:#555;font-size:12px;white-space:nowrap">${d.fecha}</td>
-        <td><span style="font-size:12px;font-weight:500;color:#ccc;">${d.tarjeta}</span></td>
-        <td style="font-size:12px">${d.detalle}</td>
-        <td style="text-align:center">${cuotaTag}</td>
-        <td style="text-align:right;font-size:12px">${d.montoARS > 0 ? fmt(d.montoARS) : '—'}</td>
-        <td style="text-align:right;font-size:12px;color:#1D9E75">${d.montoUSD > 0 ? fmtUSD(d.montoUSD) : '—'}</td>
-      </tr>
-    `;
-  });
-
-  html += `
-          </tbody>
-        </table>
-      </div>
-    </div>
-  `;
-
-  document.getElementById('tabTarjetas').innerHTML = html;
-}
-
-window.cambiarMesTarjeta = function(mes) {
-  mesTarjetaActivo = mes;
-  renderTarjetas();
+  const q=document.getElementById('searchInput').value.toLowerCase();
+  renderLog(logDatos.filter(r=>r.detalle.toLowerCase().includes(q)||r.categoria.toLowerCase().includes(q)||r.quien.toLowerCase().includes(q)));
 }
 
 // ─── COMPARATIVA ──────────────────────────────────────────────────────────────
 function renderComparativa() {
-  const parsed = CICLOS.map((c, i) => datosCache[i] ? { label: c.label, ciclo: c, ...parsearCiclo(datosCache[i]) } : null).filter(Boolean);
-  if (parsed.length < 1) return;
-
-  const labels   = parsed.map(p => p.label.replace('Ciclo ','').replace(' 2026',''));
-  const totales  = parsed.map(p => Math.round(p.datos.reduce((s,r) => s + r.monto, 0)));
-  const ingresos = parsed.map(p => p.ingresosLucas + p.ingresosMari);
-  const ratios   = parsed.map((p,i) => ingresos[i] > 0 ? parseFloat(((totales[i] / ingresos[i]) * 100).toFixed(1)) : 0);
+  const parsed=CICLOS.map((c,i)=>datosCache[i]?{label:c.label,...parsearCiclo(datosCache[i])}:null).filter(Boolean);
+  if (!parsed.length) return;
+  const labels=parsed.map(p=>p.label.replace('Ciclo ',''));
+  const totales=parsed.map(p=>Math.round(p.datos.reduce((s,r)=>s+r.monto,0)));
+  const ingresos=parsed.map(p=>p.ingresosLucas+p.ingresosMari);
+  const ratios=parsed.map((p,i)=>parseFloat(((totales[i]/ingresos[i])*100).toFixed(1)));
 
   if (compareBarInst) compareBarInst.destroy();
-  compareBarInst = new Chart(document.getElementById('compareBarChart'), {
-    type: 'bar',
-    data: { labels, datasets: [
-      { label: 'Gastos', data: totales, backgroundColor: labels.map((_, i) => parsed[i].label === CICLOS[cicloActivo].label ? '#378ADD' : '#378ADD44'), borderColor: '#378ADD', borderWidth: 1.5, borderRadius: 6 },
-      { label: 'Ingresos', data: ingresos, type: 'line', borderColor: '#1D9E75', backgroundColor: 'transparent', borderWidth: 1.5, borderDash: [4,4], pointRadius: 4, pointBackgroundColor: '#1D9E75', tension: 0.3 }
-    ]},
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: GRID }, ticks: { color: TICK, font: { size: 11 } } }, y: { grid: { color: GRID }, ticks: { color: TICK, font: { size: 10 }, callback: v => '$' + (v >= 1000000 ? Math.round(v/1000000)+'M' : v >= 1000 ? Math.round(v/1000)+'k' : v) } } } }
-  });
+  compareBarInst=new Chart(document.getElementById('compareBarChart'),{type:'bar',data:{labels,datasets:[
+    {label:'Gastos',data:totales,backgroundColor:labels.map((_,i)=>parsed[i].label===CICLOS[cicloActivo].label?'#378ADD':'#378ADD44'),borderColor:'#378ADD',borderWidth:1.5,borderRadius:6},
+    {label:'Ingresos',data:ingresos,type:'line',borderColor:'#1D9E75',backgroundColor:'transparent',borderWidth:1.5,borderDash:[4,4],pointRadius:4,pointBackgroundColor:'#1D9E75',tension:0.3}
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{
+    x:{grid:{color:GRID},ticks:{color:TICK,font:{size:11}}},
+    y:{grid:{color:GRID},ticks:{color:TICK,font:{size:10},callback:v=>'$'+(v>=1000000?Math.round(v/1000000)+'M':v>=1000?Math.round(v/1000)+'k':v)}}
+  }}});
 
   if (ratioLineInst) ratioLineInst.destroy();
-  ratioLineInst = new Chart(document.getElementById('ratioLineChart'), {
-    type: 'line',
-    data: { labels, datasets: [{ label: '% gastado', data: ratios, borderColor: '#EF9F27', backgroundColor: '#EF9F2715', borderWidth: 2, pointRadius: 5, pointBackgroundColor: '#EF9F27', tension: 0.3, fill: true }] },
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => `${ctx.raw}% del ingreso` } } }, scales: { x: { grid: { color: GRID }, ticks: { color: TICK, font: { size: 11 } } }, y: { grid: { color: GRID }, ticks: { color: TICK, font: { size: 10 }, callback: v => v + '%' }, min: 0, max: 100 } } }
-  });
+  ratioLineInst=new Chart(document.getElementById('ratioLineChart'),{type:'line',data:{labels,datasets:[{label:'%',data:ratios,borderColor:'#EF9F27',backgroundColor:'#EF9F2715',borderWidth:2,pointRadius:5,pointBackgroundColor:'#EF9F27',tension:0.3,fill:true}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.raw}% del ingreso`}}},scales:{
+      x:{grid:{color:GRID},ticks:{color:TICK,font:{size:11}}},
+      y:{grid:{color:GRID},ticks:{color:TICK,font:{size:10},callback:v=>v+'%'},min:0,max:100}
+    }}});
 
-  const allCats = [...new Set(parsed.flatMap(p => p.datos.map(d => d.categoria)))];
-  const topCats = allCats.map(cat => ({ cat, total: parsed.reduce((s,p) => s + p.datos.filter(d => d.categoria === cat).reduce((ss,r) => ss + r.monto, 0), 0) })).sort((a,b) => b.total - a.total).slice(0, 5).map(x => x.cat);
-
+  const allCats=[...new Set(parsed.flatMap(p=>p.datos.map(d=>d.categoria)))];
+  const topCats=allCats.map(cat=>({cat,total:parsed.reduce((s,p)=>s+p.datos.filter(d=>d.categoria===cat).reduce((ss,r)=>ss+r.monto,0),0)})).sort((a,b)=>b.total-a.total).slice(0,5).map(x=>x.cat);
   if (catCompareInst) catCompareInst.destroy();
-  catCompareInst = new Chart(document.getElementById('catCompareChart'), {
-    type: 'bar',
-    data: { labels, datasets: topCats.map((cat, i) => ({ label: cat, data: parsed.map(p => Math.round(p.datos.filter(d => d.categoria === cat).reduce((s,r) => s + r.monto, 0))), backgroundColor: PALETTE[i] + '88', borderColor: PALETTE[i], borderWidth: 1.5, borderRadius: 4 })) },
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { stacked: true, grid: { color: GRID }, ticks: { color: TICK, font: { size: 11 } } }, y: { stacked: true, grid: { color: GRID }, ticks: { color: TICK, font: { size: 10 }, callback: v => '$' + (v >= 1000 ? Math.round(v/1000)+'k' : v) } } } }
-  });
-  document.getElementById('catCompareLegend').innerHTML = topCats.slice(0,5).map((cat, i) =>
-    `<span class="legend-item"><span class="legend-dot" style="background:${PALETTE[i]}"></span>${cat.split(' ')[0]}</span>`
-  ).join('');
+  catCompareInst=new Chart(document.getElementById('catCompareChart'),{type:'bar',data:{labels,datasets:topCats.map((cat,i)=>({label:cat,data:parsed.map(p=>Math.round(p.datos.filter(d=>d.categoria===cat).reduce((s,r)=>s+r.monto,0))),backgroundColor:PALETTE[i]+'88',borderColor:PALETTE[i],borderWidth:1.5,borderRadius:4}))},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{stacked:true,grid:{color:GRID},ticks:{color:TICK,font:{size:11}}},y:{stacked:true,grid:{color:GRID},ticks:{color:TICK,font:{size:10},callback:v=>'$'+(v>=1000?Math.round(v/1000)+'k':v)}}}}});
+  document.getElementById('catCompareLegend').innerHTML=topCats.map((cat,i)=>`<span class="legend-item"><span class="legend-dot" style="background:${PALETTE[i]}"></span>${cat.split(' ')[0]}</span>`).join('');
 
-  document.getElementById('compareTable').innerHTML = `
+  document.getElementById('compareTable').innerHTML=`
     <thead><tr><th>Ciclo</th><th style="text-align:right">Ingresos</th><th style="text-align:right">Gastos</th><th style="text-align:right">Saldo</th><th style="text-align:right">%</th></tr></thead>
-    <tbody>${parsed.map((p, i) => {
-      const t = totales[i], ing = ingresos[i], s = ing - t, r = ratios[i];
-      const isCurrent = p.label === CICLOS[cicloActivo].label;
-      return `<tr style="${isCurrent ? 'color:#fff' : ''}">
-        <td style="color:${isCurrent ? '#378ADD' : '#666'};font-size:12px">${labels[i]}</td>
-        <td style="text-align:right">${fmt(ing)}</td>
-        <td style="text-align:right;color:#E24B4A">${fmt(t)}</td>
-        <td style="text-align:right;color:#639922">${fmt(s)}</td>
-        <td style="text-align:right">${r}%</td>
+    <tbody>${parsed.map((p,i)=>{
+      const t=totales[i],ing=ingresos[i],s=ing-t,r=ratios[i],isCurr=p.label===CICLOS[cicloActivo].label;
+      return `<tr style="${isCurr?'color:#fff':''}"><td style="color:${isCurr?'#378ADD':'#666'};font-size:12px">${labels[i]}</td><td style="text-align:right">${fmt(ing)}</td><td style="text-align:right;color:#E24B4A">${fmt(t)}</td><td style="text-align:right;color:#639922">${fmt(s)}</td><td style="text-align:right">${r}%</td></tr>`;
+    }).join('')}</tbody>`;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// ─── TAB TARJETAS ─────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════
+
+function initTarjetas() {
+  // Poblar select con año incluido en la label (ej. "Julio 2026")
+  const sel = document.getElementById('tarjetasCicloSelect');
+  sel.innerHTML = TARJETAS_CICLOS.map((t,i) =>
+    `<option value="${i}">${t.label}</option>`
+  ).join('');
+  sel.value = TARJETAS_CICLOS.length - 1;
+  loadTarjetasData();
+}
+
+function loadTarjetasData() {
+  const idx = parseInt(document.getElementById('tarjetasCicloSelect').value);
+  const conf = TARJETAS_CICLOS[idx];
+  tarjetasLineSelected = []; // reset selección al cambiar ciclo
+
+  if (!conf.url) {
+    tarjetasDatos = TARJETAS_MOCK;
+    renderTarjetas();
+    return;
+  }
+  Papa.parse(conf.url, {
+    download:true, header:true, skipEmptyLines:true,
+    complete: r => {
+      const cols = Object.keys(r.data[0]||{});
+      tarjetasDatos = r.data.map(row => ({
+        fecha:      (row[cols[0]]||'').trim(),
+        detalle:    (row[cols[1]]||'').trim(),
+        banco:      (row[cols[2]]||'').trim(),
+        tarjeta:    (row[cols[3]]||'').trim(),
+        tipo:       (row[cols[4]]||'').trim(),
+        montoARS:   parseMonto(row[cols[5]]),
+        cotizacion: parseMonto(row[cols[6]])||1,
+        quien:      (row[cols[7]]||'Desconocido').trim()
+      })).filter(r=>r.montoARS>0);
+      renderTarjetas();
+    },
+    error: () => { tarjetasDatos=TARJETAS_MOCK; renderTarjetas(); }
+  });
+}
+
+function setMoneda(m) {
+  tarjetasMoneda=m;
+  document.getElementById('toggleARS').classList.toggle('active',m==='ARS');
+  document.getElementById('toggleUSD').classList.toggle('active',m==='USD');
+  renderTarjetas();
+}
+
+function setAgrupacion(a) {
+  tarjetasAgrupacion=a;
+  ['banco','tarjeta','tipo'].forEach(k =>
+    document.getElementById('toggle'+k.charAt(0).toUpperCase()+k.slice(1)).classList.toggle('active',k===a)
+  );
+  tarjetasLineSelected=[];
+  renderTarjetas();
+}
+
+const getMontoConv = r => tarjetasMoneda==='USD' ? (r.cotizacion>1?r.montoARS/r.cotizacion:0) : r.montoARS;
+const getGroupKey  = r => tarjetasAgrupacion==='banco'?r.banco : tarjetasAgrupacion==='tarjeta'?r.tarjeta : r.tipo;
+
+function renderTarjetas() {
+  if (!tarjetasDatos||!tarjetasDatos.length) return;
+  const datos=tarjetasDatos;
+  const total=datos.reduce((s,r)=>s+getMontoConv(r),0);
+
+  // Grupos y orden
+  const gruposMap={};
+  datos.forEach(r=>{ const k=getGroupKey(r); gruposMap[k]=(gruposMap[k]||0)+getMontoConv(r); });
+  const grupos=Object.entries(gruposMap).sort((a,b)=>b[1]-a[1]);
+  const allKeys=grupos.map(g=>g[0]);
+
+  // Cards
+  document.getElementById('tarjetaCards').innerHTML=grupos.map(([key,val],i)=>{
+    const pct=total>0?((val/total)*100).toFixed(1):0;
+    const color=PALETTE[i%PALETTE.length];
+    return `<div class="tarjeta-card">
+      <p class="tarjeta-card-name">${key}</p>
+      <p class="tarjeta-card-amount">${tarjetasMoneda==='USD'?fmtUSD(val):fmt(val)}</p>
+      <p class="tarjeta-card-sub">${pct}% del total</p>
+      <div class="tarjeta-card-bar"><div class="tarjeta-card-bar-fill" style="width:${pct}%;background:${color};"></div></div>
+    </div>`;
+  }).join('');
+
+  // Meses disponibles (YYYY-MM)
+  const mesesSet=new Set();
+  datos.forEach(r=>{ const d=parseDate(r.fecha); if(d) mesesSet.add(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`); });
+  const meses=[...mesesSet].sort();
+  const MESES_NOMBRES=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const mesesLabel=meses.map(m=>{ const [y,mo]=m.split('-'); return `${MESES_NOMBRES[parseInt(mo)-1]} ${y}`; });
+
+  // Selección de series por defecto
+  if (!tarjetasLineSelected.length) tarjetasLineSelected=[...allKeys];
+
+  // Chips de selección de series
+  document.getElementById('tarjetasLineControls').innerHTML=allKeys.map((k,i)=>{
+    const color=PALETTE[i%PALETTE.length];
+    const on=tarjetasLineSelected.includes(k);
+    return `<button class="line-chip" onclick="toggleTarjetaLine('${k}')"
+      style="border-color:${color}44; background:${on?color+'22':'transparent'}; color:${on?color:'#444'};">
+      ${k}
+    </button>`;
+  }).join('');
+
+  // Datasets del gráfico de línea
+  const datasets=allKeys.filter(k=>tarjetasLineSelected.includes(k)).map(k=>{
+    const ci=allKeys.indexOf(k), color=PALETTE[ci%PALETTE.length];
+    const dataPoints=meses.map(mes=>
+      datos.filter(r=>{
+        const d=parseDate(r.fecha);
+        if(!d) return false;
+        return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`===mes && getGroupKey(r)===k;
+      }).reduce((s,r)=>s+getMontoConv(r),0)
+    );
+    return {label:k,data:dataPoints,borderColor:color,backgroundColor:color+'18',borderWidth:2,pointRadius:5,pointBackgroundColor:color,tension:0.35,fill:false};
+  });
+
+  if (tarjetasLineInst) tarjetasLineInst.destroy();
+  const yFmt=tarjetasMoneda==='USD'
+    ? v=>'U$S '+Math.round(v)
+    : v=>'$'+(v>=1000000?Math.round(v/1000000)+'M':v>=1000?Math.round(v/1000)+'k':v);
+
+  tarjetasLineInst=new Chart(document.getElementById('tarjetasLineChart'),{
+    type:'line',
+    data:{labels:mesesLabel.length?mesesLabel:['Sin datos'],datasets},
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{
+        legend:{display:false},
+        tooltip:{callbacks:{label:ctx=>` ${ctx.dataset.label}: ${tarjetasMoneda==='USD'?fmtUSD(ctx.raw):fmt(ctx.raw)}`}}
+      },
+      scales:{
+        x:{grid:{color:GRID},ticks:{color:TICK,font:{size:11}}},
+        y:{grid:{color:GRID},ticks:{color:TICK,font:{size:10},callback:yFmt},beginAtZero:true}
+      }
+    }
+  });
+
+  // Leyenda
+  document.getElementById('tarjetasLineLegend').innerHTML=allKeys.filter(k=>tarjetasLineSelected.includes(k)).map(k=>{
+    const color=PALETTE[allKeys.indexOf(k)%PALETTE.length];
+    return `<span class="legend-item"><span class="legend-dot" style="background:${color}"></span>${k}</span>`;
+  }).join('');
+
+  renderTarjetasLog(datos);
+}
+
+function toggleTarjetaLine(key) {
+  if (tarjetasLineSelected.includes(key)) {
+    if (tarjetasLineSelected.length>1) tarjetasLineSelected=tarjetasLineSelected.filter(k=>k!==key);
+  } else {
+    tarjetasLineSelected.push(key);
+  }
+  renderTarjetas();
+}
+
+function renderTarjetasLog(datos) {
+  document.getElementById('tarjetasLogTable').innerHTML=`
+    <thead><tr>
+      <th style="width:11%">Fecha</th>
+      <th style="width:27%">Detalle</th>
+      <th style="width:14%">Banco</th>
+      <th style="width:16%">Tarjeta</th>
+      <th style="width:11%">Tipo</th>
+      <th style="width:13%;text-align:right">ARS</th>
+      <th style="width:8%;text-align:right">USD</th>
+    </tr></thead>
+    <tbody>${datos.map(r=>{
+      const usd=r.cotizacion>1?fmtUSD(r.montoARS/r.cotizacion):'—';
+      return `<tr>
+        <td style="color:#555;font-size:12px">${r.fecha}</td>
+        <td style="font-weight:500">${r.detalle}</td>
+        <td><span class="cat-tag">${r.banco}</span></td>
+        <td style="color:#888;font-size:12px">${r.tarjeta}</td>
+        <td><span style="font-size:11px;color:${r.tipo==='Crédito'?'#EF9F27':'#1D9E75'}">${r.tipo}</span></td>
+        <td style="text-align:right;font-weight:500">${fmt(r.montoARS)}</td>
+        <td style="text-align:right;color:#555;font-size:12px">${usd}</td>
       </tr>`;
     }).join('')}</tbody>`;
+}
+
+function filtrarTarjetasLog() {
+  const q=document.getElementById('tarjetasSearch').value.toLowerCase();
+  renderTarjetasLog(tarjetasDatos.filter(r=>
+    r.detalle.toLowerCase().includes(q)||r.banco.toLowerCase().includes(q)||
+    r.tarjeta.toLowerCase().includes(q)||r.tipo.toLowerCase().includes(q)
+  ));
 }
 
 // ─── INICIO ───────────────────────────────────────────────────────────────────
