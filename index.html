@@ -249,14 +249,15 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     </div>
 
     <!-- Cards por entidad -->
+    <p id="tarjetasMesHeader" style="display:none;font-size:11px;color:#555;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;"></p>
     <div class="tarjeta-grid" id="tarjetaCards"></div>
 
     <!-- Gráfico de línea comparativo mes a mes -->
     <div class="chart-card-full">
       <div style="display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
         <div>
-          <p class="chart-title" style="margin-bottom:4px;">Evolución mes a mes</p>
-          <p style="font-size:11px; color:#444;">Seleccioná las series a comparar</p>
+          <p class="chart-title" style="margin-bottom:4px;">Evolución por mes de gasto</p>
+          <p style="font-size:11px; color:#444;">Total real por tarjeta · seleccioná bancos a comparar</p>
         </div>
         <div style="display:flex; gap:6px; flex-wrap:wrap;" id="tarjetasLineControls"></div>
       </div>
@@ -629,7 +630,6 @@ function renderComparativa() {
 // ═══════════════════════════════════════════════════════════════════════════
 
 function initTarjetas() {
-  // Poblar select con año incluido en la label (ej. "Julio 2026")
   const sel = document.getElementById('tarjetasCicloSelect');
   sel.innerHTML = TARJETAS_CICLOS.map((t,i) =>
     `<option value="${i}">${t.label}</option>`
@@ -652,38 +652,52 @@ function loadTarjetasData() {
   Papa.parse(conf.url, {
     download:true, header:true, skipEmptyLines:true,
     complete: r => {
-      // Columnas reales del sheet:
-      // [0] Banco y tipo  [1] Mes  [2] Fecha  [3] Tarjeta  [4] Detalle
-      // [5] Cuota  [6] Detalle monto ARS  [7] Detalle monto USD
-      // [8] Vencimiento  [9] Total ARS  [10] Total USD
+      // Columnas: [0]Banco y tipo [1]Mes [2]Fecha [3]Tarjeta [4]Detalle
+      //           [5]Cuota [6]Det.ARS [7]Det.USD [8]Venc. [9]Total ARS [10]Total USD
       const cols = Object.keys(r.data[0]||{});
+
+      // ── Paso 1: agrupar filas por tarjeta (bancoTipo) para obtener el total real ──
+      // El total real está en la última fila de cada grupo (col Total ARS / Total USD)
+      const tarjetaGroups = {}; // key = bancoTipo
+      r.data.forEach(row => {
+        const bt = (row[cols[0]]||'').trim();
+        if (!bt) return;
+        if (!tarjetaGroups[bt]) tarjetaGroups[bt] = { rows:[], totalARS:0, totalUSD:0, mes:'' };
+        const tARS = parseMonto(row[cols[9]]);   // Total ARS (solo en última fila)
+        const tUSD = parseMonto(row[cols[10]]);  // Total USD
+        if (tARS > 0) tarjetaGroups[bt].totalARS = tARS;
+        if (tUSD > 0) tarjetaGroups[bt].totalUSD = tUSD;
+        if (row[cols[1]]) tarjetaGroups[bt].mes = (row[cols[1]]||'').trim();
+        tarjetaGroups[bt].rows.push(row);
+      });
+
+      // ── Paso 2: construir array de movimientos individuales ──
       tarjetasDatos = r.data.map(row => {
         const bancoTipo = (row[cols[0]]||'').trim();
-        const montoARS  = parseMonto(row[cols[6]]);   // "Detalle monto ARS"
-        const montoUSD  = parseMonto(row[cols[7]]);   // "Detalle monto USD"
+        const montoARS  = parseMonto(row[cols[6]]);
+        const montoUSD  = parseMonto(row[cols[7]]);
         const cuota     = (row[cols[5]]||'').trim();
-
-        // Derivar banco y tipo del campo "Banco y tipo" (ej. "Visa Galicia", "Master Cencopay")
-        const partes = bancoTipo.split(' ');
-        const tipo   = partes[0] || '';           // "Visa" / "Master"
-        const banco  = partes.slice(1).join(' ') || bancoTipo; // "Galicia" / "Cencopay"
-
+        const partes    = bancoTipo.split(' ');
+        const tipo      = partes[0] || '';
+        const banco     = partes.slice(1).join(' ') || bancoTipo;
+        const mesGasto  = (row[cols[1]]||'').trim(); // "Mayo", "Junio", etc.
         return {
-          fecha:    (row[cols[2]]||'').trim(),
-          detalle:  (row[cols[4]]||'').trim(),
-          banco:    banco,
-          tarjeta:  (row[cols[3]]||'').trim(),
-          tipo:     tipo,          // "Visa" o "Master"
-          bancoTipo: bancoTipo,    // "Visa Galicia" completo para agrupar por tarjeta
-          mes:      (row[cols[1]]||'').trim(),
-          cuota:    cuota,
-          montoARS: montoARS,
-          montoUSD: montoUSD,
-          // cotizacion implícita: si hay ambos montos y ARS>0 y USD>0
-          cotizacion: (montoARS>0 && montoUSD>0) ? montoARS/montoUSD : 0,
+          fecha:      (row[cols[2]]||'').trim(),
+          detalle:    (row[cols[4]]||'').trim(),
+          banco, tipo, bancoTipo,
+          tarjeta:    (row[cols[3]]||'').trim(),
+          mes:        mesGasto,
+          cuota,
+          montoARS,
+          montoUSD,
           vencimiento:(row[cols[8]]||'').trim(),
+          // totales del grupo (para referencia)
+          totalARSGrupo: tarjetaGroups[bancoTipo]?.totalARS || 0,
         };
-      }).filter(r => r.montoARS > 0 || r.montoUSD > 0);
+      }).filter(r => r.bancoTipo); // excluir filas vacías
+
+      // ── Paso 3: enriquecer con totales reales por tarjeta ──
+      tarjetasDatos._groups = tarjetaGroups;
       renderTarjetas();
     },
     error: () => { tarjetasDatos=TARJETAS_MOCK; renderTarjetas(); }
@@ -706,87 +720,135 @@ function setAgrupacion(a) {
   renderTarjetas();
 }
 
-const getMontoConv = r => {
-  if (tarjetasMoneda === 'USD') {
-    // Si la fila tiene monto en USD directo, usarlo; si no, convertir desde ARS con cotizacion
-    if (r.montoUSD > 0) return r.montoUSD;
-    if (r.cotizacion > 0) return r.montoARS / r.cotizacion;
-    return 0;
-  }
-  return r.montoARS;
+// Paleta fija por banco para consistencia visual
+const BANCO_COLORS = {
+  'Galicia':       '#378ADD',
+  'Cencopay':      '#1D9E75',
+  'Mercardo Libre':'#EF9F27',
+  'Mercado Libre': '#EF9F27',
 };
-const getGroupKey  = r => {
-  if (tarjetasAgrupacion === 'banco')   return r.banco;
-  if (tarjetasAgrupacion === 'tarjeta') return r.bancoTipo || r.tarjeta; // "Visa Galicia"
-  if (tarjetasAgrupacion === 'tipo')    return r.tipo;                   // "Visa" / "Master"
-  return 'Otro';
-};
+const TIPO_COLORS = { 'Visa':'#378ADD', 'Master':'#EF9F27' };
+
+function getBancoColor(banco, idx) {
+  return BANCO_COLORS[banco] || PALETTE[idx % PALETTE.length];
+}
 
 function renderTarjetas() {
   if (!tarjetasDatos||!tarjetasDatos.length) return;
-  const datos=tarjetasDatos;
-  const total=datos.reduce((s,r)=>s+getMontoConv(r),0);
+  const datos = tarjetasDatos;
+  const groups = tarjetasDatos._groups || {};
 
-  // Grupos y orden
-  const gruposMap={};
-  datos.forEach(r=>{ const k=getGroupKey(r); gruposMap[k]=(gruposMap[k]||0)+getMontoConv(r); });
-  const grupos=Object.entries(gruposMap).sort((a,b)=>b[1]-a[1]);
-  const allKeys=grupos.map(g=>g[0]);
+  // ── Determinar el mes de gasto (del campo Mes del sheet) ──
+  const MES_NOMBRES_MAP = {
+    'enero':'Enero','febrero':'Febrero','marzo':'Marzo','abril':'Abril',
+    'mayo':'Mayo','junio':'Junio','julio':'Julio','agosto':'Agosto',
+    'septiembre':'Sep.','octubre':'Oct.','noviembre':'Nov.','diciembre':'Dic.'
+  };
+  const mesGastoRaw = datos.find(r=>r.mes)?.mes || '';
+  const mesGasto = MES_NOMBRES_MAP[mesGastoRaw.toLowerCase()] || mesGastoRaw;
+  // Deducir año del vencimiento (ej. 05/06/2026 → 2026)
+  const anioVenc = datos.find(r=>r.vencimiento)?.vencimiento?.split('/')?.[2] || '';
+  const mesLabel = mesGasto && anioVenc ? `${mesGasto} ${anioVenc}` : mesGasto;
 
-  // Cards
-  document.getElementById('tarjetaCards').innerHTML=grupos.map(([key,val],i)=>{
-    const pct=total>0?((val/total)*100).toFixed(1):0;
-    const color=PALETTE[i%PALETTE.length];
-    return `<div class="tarjeta-card">
-      <p class="tarjeta-card-name">${key}</p>
-      <p class="tarjeta-card-amount">${tarjetasMoneda==='USD'?fmtUSD(val):fmt(val)}</p>
-      <p class="tarjeta-card-sub">${pct}% del total</p>
+  // ── RESUMEN POR BANCO (usando totales reales) ──
+  // Agrupar tarjetaGroups por banco
+  const bancoTotales = {};
+  const bancoTarjetas = {}; // banco → lista de tarjetas con sus totales
+  Object.entries(groups).forEach(([bt, g]) => {
+    const partes = bt.split(' ');
+    const banco  = partes.slice(1).join(' ') || bt;
+    const tipo   = partes[0];
+    if (!bancoTotales[banco]) { bancoTotales[banco]=0; bancoTarjetas[banco]=[]; }
+    bancoTotales[banco] += tarjetasMoneda==='USD' ? g.totalUSD : g.totalARS;
+    bancoTarjetas[banco].push({
+      bancoTipo: bt, tipo,
+      total: tarjetasMoneda==='USD' ? g.totalUSD : g.totalARS,
+      totalARS: g.totalARS, totalUSD: g.totalUSD, mes: g.mes
+    });
+  });
+
+  const bancosArr = Object.entries(bancoTotales).sort((a,b)=>b[1]-a[1]);
+  const totalGral = bancosArr.reduce((s,[,v])=>s+v, 0);
+  const bancoKeys = bancosArr.map(b=>b[0]);
+
+  // ── Encabezado de mes ──
+  const mesHeaderEl = document.getElementById('tarjetasMesHeader');
+  if (mesHeaderEl && mesLabel) {
+    mesHeaderEl.textContent = `Gastos de ${mesLabel}`;
+    mesHeaderEl.style.display = 'block';
+  }
+
+  // ── Cards por BANCO (suma Visa+Master) ──
+  document.getElementById('tarjetaCards').innerHTML = bancosArr.map(([banco, total], i) => {
+    const pct = totalGral>0 ? ((total/totalGral)*100).toFixed(1) : 0;
+    const color = getBancoColor(banco, i);
+    const subTarjetas = bancoTarjetas[banco];
+    const subHtml = subTarjetas.length > 1
+      ? subTarjetas.map(t=>`<span style="font-size:10px;color:#555;margin-right:8px;">${t.tipo} ${tarjetasMoneda==='USD'?fmtUSD(t.total):fmt(t.total)}</span>`).join('')
+      : '';
+    return `<div class="tarjeta-card" style="border-left:2px solid ${color}22;">
+      <p class="tarjeta-card-name" style="color:${color}88;">${banco.toUpperCase()}</p>
+      <p class="tarjeta-card-amount">${tarjetasMoneda==='USD'?fmtUSD(total):fmt(total)}</p>
+      <p class="tarjeta-card-sub">${pct}% del total · ${subTarjetas.map(t=>t.tipo).join(' + ')}</p>
+      ${subHtml ? `<p style="margin-top:6px;">${subHtml}</p>` : ''}
       <div class="tarjeta-card-bar"><div class="tarjeta-card-bar-fill" style="width:${pct}%;background:${color};"></div></div>
     </div>`;
   }).join('');
 
-  // Meses disponibles (YYYY-MM)
-  const mesesSet=new Set();
-  datos.forEach(r=>{ const d=parseDate(r.fecha); if(d) mesesSet.add(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`); });
-  const meses=[...mesesSet].sort();
-  const MESES_NOMBRES=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-  const mesesLabel=meses.map(m=>{ const [y,mo]=m.split('-'); return `${MESES_NOMBRES[parseInt(mo)-1]} ${y}`; });
+  // ── Gráfico de línea: evolución por MES DE GASTO (campo Mes del sheet) ──
+  // Agrupar por (mes, banco) usando totales reales de cada tarjeta
+  // Cada entrada en groups tiene: { mes, totalARS, totalUSD }
+  const mesOrden = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Oct.','Nov.','Dic.'];
+  const lineDataByBanco = {}; // banco → { mesLabel → total }
+  Object.entries(groups).forEach(([bt, g]) => {
+    const partes = bt.split(' ');
+    const banco  = partes.slice(1).join(' ') || bt;
+    const mesNorm = MES_NOMBRES_MAP[(g.mes||'').toLowerCase()] || g.mes;
+    const total   = tarjetasMoneda==='USD' ? g.totalUSD : g.totalARS;
+    if (!lineDataByBanco[banco]) lineDataByBanco[banco] = {};
+    lineDataByBanco[banco][mesNorm] = (lineDataByBanco[banco][mesNorm]||0) + total;
+  });
+
+  // Todos los meses que aparecen, ordenados
+  const allMeses = [...new Set(
+    Object.values(lineDataByBanco).flatMap(m=>Object.keys(m))
+  )].sort((a,b)=>mesOrden.indexOf(a)-mesOrden.indexOf(b));
 
   // Selección de series por defecto
-  if (!tarjetasLineSelected.length) tarjetasLineSelected=[...allKeys];
+  if (!tarjetasLineSelected.length) tarjetasLineSelected = [...bancoKeys];
 
-  // Chips de selección de series
-  document.getElementById('tarjetasLineControls').innerHTML=allKeys.map((k,i)=>{
-    const color=PALETTE[i%PALETTE.length];
-    const on=tarjetasLineSelected.includes(k);
+  // Chips de selección
+  document.getElementById('tarjetasLineControls').innerHTML = bancoKeys.map((k, i) => {
+    const color = getBancoColor(k, i);
+    const on = tarjetasLineSelected.includes(k);
     return `<button class="line-chip" onclick="toggleTarjetaLine('${k}')"
-      style="border-color:${color}44; background:${on?color+'22':'transparent'}; color:${on?color:'#444'};">
+      style="border-color:${color}55; background:${on?color+'22':'transparent'}; color:${on?color:'#444'};">
       ${k}
     </button>`;
   }).join('');
 
-  // Datasets del gráfico de línea
-  const datasets=allKeys.filter(k=>tarjetasLineSelected.includes(k)).map(k=>{
-    const ci=allKeys.indexOf(k), color=PALETTE[ci%PALETTE.length];
-    const dataPoints=meses.map(mes=>
-      datos.filter(r=>{
-        const d=parseDate(r.fecha);
-        if(!d) return false;
-        return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`===mes && getGroupKey(r)===k;
-      }).reduce((s,r)=>s+getMontoConv(r),0)
-    );
-    return {label:k,data:dataPoints,borderColor:color,backgroundColor:color+'18',borderWidth:2,pointRadius:5,pointBackgroundColor:color,tension:0.35,fill:false};
+  // Datasets
+  const lineDatasets = bancoKeys.filter(k=>tarjetasLineSelected.includes(k)).map((banco, i) => {
+    const color = getBancoColor(banco, bancoKeys.indexOf(banco));
+    const bData = lineDataByBanco[banco] || {};
+    return {
+      label: banco,
+      data: allMeses.map(m => bData[m]||0),
+      borderColor: color, backgroundColor: color+'18',
+      borderWidth: 2.5, pointRadius: 6, pointBackgroundColor: color,
+      tension: 0.3, fill: false
+    };
   });
 
   if (tarjetasLineInst) tarjetasLineInst.destroy();
-  const yFmt=tarjetasMoneda==='USD'
+  const yFmt = tarjetasMoneda==='USD'
     ? v=>'U$S '+Math.round(v)
     : v=>'$'+(v>=1000000?Math.round(v/1000000)+'M':v>=1000?Math.round(v/1000)+'k':v);
 
-  tarjetasLineInst=new Chart(document.getElementById('tarjetasLineChart'),{
-    type:'line',
-    data:{labels:mesesLabel.length?mesesLabel:['Sin datos'],datasets},
-    options:{
+  tarjetasLineInst = new Chart(document.getElementById('tarjetasLineChart'), {
+    type: 'line',
+    data: { labels: allMeses.length ? allMeses : [mesLabel||'Sin datos'], datasets: lineDatasets },
+    options: {
       responsive:true, maintainAspectRatio:false,
       interaction:{mode:'index',intersect:false},
       plugins:{
@@ -801,10 +863,12 @@ function renderTarjetas() {
   });
 
   // Leyenda
-  document.getElementById('tarjetasLineLegend').innerHTML=allKeys.filter(k=>tarjetasLineSelected.includes(k)).map(k=>{
-    const color=PALETTE[allKeys.indexOf(k)%PALETTE.length];
-    return `<span class="legend-item"><span class="legend-dot" style="background:${color}"></span>${k}</span>`;
-  }).join('');
+  document.getElementById('tarjetasLineLegend').innerHTML = bancoKeys
+    .filter(k=>tarjetasLineSelected.includes(k))
+    .map((k,i)=>{
+      const color=getBancoColor(k,bancoKeys.indexOf(k));
+      return `<span class="legend-item"><span class="legend-dot" style="background:${color}"></span>${k}</span>`;
+    }).join('');
 
   renderTarjetasLog(datos);
 }
@@ -819,28 +883,42 @@ function toggleTarjetaLine(key) {
 }
 
 function renderTarjetasLog(datos) {
+  // Colores por bancoTipo para distinguir visualmente cada tarjeta
+  const allBancoTipos = [...new Set(datos.map(r=>r.bancoTipo))];
+  const btColorMap = {};
+  allBancoTipos.forEach((bt,i)=>{
+    const partes=bt.split(' '); const banco=partes.slice(1).join(' ')||bt;
+    btColorMap[bt] = getBancoColor(banco, i);
+  });
+
   document.getElementById('tarjetasLogTable').innerHTML=`
     <thead><tr>
       <th style="width:10%">Fecha</th>
-      <th style="width:25%">Detalle</th>
-      <th style="width:14%">Banco/Tipo</th>
-      <th style="width:15%">Tarjeta</th>
-      <th style="width:9%">Cuota</th>
-      <th style="width:14%;text-align:right">ARS</th>
-      <th style="width:13%;text-align:right">USD</th>
+      <th style="width:28%">Detalle</th>
+      <th style="width:18%">Tarjeta</th>
+      <th style="width:10%">Cuota</th>
+      <th style="width:11%">Vence</th>
+      <th style="width:12%;text-align:right">ARS</th>
+      <th style="width:11%;text-align:right">USD</th>
     </tr></thead>
     <tbody>${datos.map(r=>{
       const arsStr = r.montoARS > 0 ? fmt(r.montoARS) : '—';
-      const usdStr = r.montoUSD > 0 ? fmtUSD(r.montoUSD) : (r.cotizacion>0 && r.montoARS>0 ? fmtUSD(r.montoARS/r.cotizacion) : '—');
-      const tipoColor = r.tipo==='Visa'?'#378ADD':r.tipo==='Master'?'#EF9F27':'#888';
-      return `<tr>
-        <td style="color:#555;font-size:12px">${r.fecha}</td>
+      const usdStr = r.montoUSD > 0 ? fmtUSD(r.montoUSD) : '—';
+      const color  = btColorMap[r.bancoTipo] || '#555';
+      const venc   = r.vencimiento ? r.vencimiento.replace('/2026','') : '—';
+      return `<tr style="border-left:2px solid ${color}33;">
+        <td style="color:#555;font-size:12px;padding-left:8px">${r.fecha}</td>
         <td style="font-weight:500;font-size:12px">${r.detalle}</td>
-        <td><span class="cat-tag">${r.bancoTipo||r.banco}</span></td>
-        <td style="color:#888;font-size:12px">${r.tarjeta}</td>
-        <td style="font-size:11px;color:#555">${r.cuota||'—'}</td>
+        <td>
+          <span style="display:inline-flex;align-items:center;gap:5px;">
+            <span style="width:7px;height:7px;border-radius:50%;background:${color};flex-shrink:0;display:inline-block;"></span>
+            <span style="font-size:11px;color:#aaa">${r.bancoTipo}</span>
+          </span>
+        </td>
+        <td style="font-size:11px;color:#666">${r.cuota||'—'}</td>
+        <td style="font-size:11px;color:#555">${venc}</td>
         <td style="text-align:right;font-weight:500">${arsStr}</td>
-        <td style="text-align:right;color:#555;font-size:12px">${usdStr}</td>
+        <td style="text-align:right;color:${r.montoUSD>0?'#5DCAA5':'#444'};font-size:12px">${usdStr}</td>
       </tr>`;
     }).join('')}</tbody>`;
 }
