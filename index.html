@@ -97,7 +97,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .error-msg { background: #2a1010; color: #E24B4A; border: 0.5px solid #3a1515; border-radius: 8px; padding: 12px 16px; font-size: 13px; margin-bottom: 1rem; }
 
 /* ── TARJETAS ── */
-.tc-hero { margin-bottom: 1.5rem; }
 .tc-venc-group { background: #1a1a1a; border: 0.5px solid #222; border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem; }
 .tc-venc-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; flex-wrap: wrap; gap: 8px; }
 .tc-venc-nombre { font-size: 15px; font-weight: 500; color: #e8e8e8; }
@@ -115,6 +114,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
 .cuota-tag { background: #252525; color: #888; padding: 2px 7px; border-radius: 4px; font-size: 11px; white-space: nowrap; }
 .cuota-tag.en-curso { background: #1a2535; color: #378ADD; }
+
+/* ── FILTROS MULTISELECT HISTÓRICO ── */
+.filter-tag { display: inline-flex; align-items: center; padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 500; cursor: pointer; border: 0.5px solid #2a2a2a; background: #111; color: #555; transition: all 0.15s; user-select: none; }
+.filter-tag:hover { border-color: #444; color: #888; }
+.filter-tag.active { color: #fff; background: #1a1a1a; }
 
 @media (max-width: 540px) {
   .charts { grid-template-columns: 1fr; }
@@ -230,8 +234,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     </div>
   </div>
 
-  <div id="tabTarjetas" style="display:none;">
-    </div>
+  <div id="tabTarjetas" style="display:none;"></div>
 
 </div>
 
@@ -263,8 +266,9 @@ let tabActivo = 'mes';
 let datosCache = {};
 let tarjetasCache = null;
 let logDatos = [];
-let donutInst = null, barInst = null, compareBarInst = null, ratioLineInst = null, catCompareInst = null;
+let donutInst = null, barInst = null, compareBarInst = null, ratioLineInst = null, catCompareInst = null, cardsHistoryInst = null;
 let mesTarjetaActivo = null;
+let tarjetasSeleccionadasFiltro = [];
 
 // ─── UTILIDADES ───────────────────────────────────────────────────────────────
 function fmt(n) {
@@ -353,7 +357,6 @@ function loadData() {
   document.getElementById('loadingBox').style.display = 'block';
   document.getElementById('errorBox').style.display = 'none';
   ['tabMes','tabComparativa','tabDetalle','tabTarjetas'].forEach(id => document.getElementById(id).style.display = 'none');
-  tarjetasCache = null;
 
   const fetchCiclo = (c, i) => new Promise((resolve, reject) => {
     if (datosCache[i]) { resolve(datosCache[i]); return; }
@@ -387,7 +390,7 @@ function loadData() {
   });
 }
 
-// ─── PARSEO DE GASTOS ────────────────────────────────────────────────────────
+// ─── PARSEO DE GASTOS REVISADO (REMOVER INGRESOS AUTOMÁTICAMENTE) ─────────────
 function parsearCiclo(rows) {
   if (!rows || rows.length === 0) return null;
   const cols = Object.keys(rows[0]);
@@ -400,16 +403,30 @@ function parsearCiclo(rows) {
     const monto  = parseMonto(r[colMonto]);
     const det    = r[colDetalle] ? r[colDetalle].trim() : '';
     const quien  = r[colQuien]   ? r[colQuien].trim()   : 'Desconocido';
+    
     const dL = det.toLowerCase();
-    if (dL.includes('ingres. lucas'))   { ingresosLucas = monto; return; }
-    if (dL.includes('ingres. mariana')) { ingresosMari  = monto; return; }
+    const cL = cat.toLowerCase();
+    const q  = quien.toLowerCase();
+
+    // Filtro flexible y cruzado para detectar ingresos
+    if (cL === 'ingresos' || dL.includes('ingres') || dL.includes('sueldo')) {
+      if (dL.includes('lucas') || q === 'lucas') {
+        ingresosLucas = monto;
+        return; // Excluye la fila de los gastos y detiene su inserción al array 'datos' (y por ende al log)
+      }
+      if (dL.includes('mariana') || dL.includes('mari') || q === 'mariana' || q === 'mari') {
+        ingresosMari = monto;
+        return; // Excluye la fila
+      }
+    }
+
     if (!fecha || !cat || monto <= 0) return;
     datos.push({ fecha, detalle: det, categoria: cat, monto, quien });
   });
   return { datos, ingresosLucas, ingresosMari };
 }
 
-// ─── PARSEO DE TARJETAS ──────────────────────────────────────────────────────
+// ─── PARSEO DE TARJETAS (ESTRATEGIA AÑO DINÁMICO) ─────────────────────────────
 function parsearTarjetas(rows) {
   if (!rows || rows.length === 0) return [];
   const datos = [];
@@ -433,7 +450,21 @@ function parsearTarjetas(rows) {
 
     if (!mes && !bancoTipo) return;
 
-    datos.push({ bancoTipo, mes, fecha, tarjeta, detalle, cuota, montoARS, montoUSD, vencStr, totalARS, totalUSD });
+    // Detectar año dinámicamente desde alguna de las celdas de fecha
+    let anio = 2026;
+    if (fecha && fecha.includes('/')) {
+      const p = fecha.split('/'); if (p.length === 3) anio = parseInt(p[2]) || 2026;
+    } else if (vencStr && vencStr.includes('/')) {
+      const p = vencStr.split('/'); if (p.length === 3) anio = parseInt(p[2]) || 2026;
+    }
+
+    // Asegurar formato "Mes Año" unificado (ej: "Julio 2026")
+    let mesUnico = mes;
+    if (mes && !mes.includes(String(anio))) {
+      mesUnico = `${mes} ${anio}`;
+    }
+
+    datos.push({ bancoTipo, mes: mesUnico, fecha, tarjeta, detalle, cuota, montoARS, montoUSD, vencStr, totalARS, totalUSD });
   });
   return datos;
 }
@@ -584,63 +615,188 @@ function filtrarLog() {
   ));
 }
 
-// ─── TARJETAS REVISADO ───────────────────────────────────────────────────────
+// ─── MÓDULO NUEVO: TARJETAS (HISTÓRICO MULTI-SELECT + EVOLUCIÓN) ──────────────
 function renderTarjetas() {
   const datos = parsearTarjetas(tarjetasCache || []);
 
   if (!datos.length) {
-    document.getElementById('tabTarjetas').innerHTML = '<p style="color:#444;font-size:13px;padding:2rem 0;">No hay datos de tarjetas cargados todavía o las columnas no coinciden.</p>';
+    document.getElementById('tabTarjetas').innerHTML = '<p style="color:#444;font-size:13px;padding:2rem 0;">No hay datos de tarjetas cargados todavía.</p>';
     return;
   }
 
-  // 1. Obtener los meses únicos disponibles
-  const meses = [...new Set(datos.map(d => d.mes).filter(Boolean))];
-  if (!meses.length) return;
+  // 1. Clasificación cronológica de meses unificados ("Mes Año")
+  const mOrder = { 'enero':1, 'febrero':2, 'marzo':3, 'abril':4, 'mayo':5, 'junio':6, 'julio':7, 'agosto':8, 'septiembre':9, 'octubre':10, 'noviembre':11, 'diciembre':12 };
+  const parseMesAnio = (str) => {
+    if (!str) return 0;
+    const p = str.toLowerCase().split(' ');
+    const m = mOrder[p[0]] || 1;
+    const a = parseInt(p[1]) || 2026;
+    return a * 12 + m;
+  };
+  const mesesDisponibles = [...new Set(datos.map(d => d.mes).filter(Boolean))].sort((a,b) => parseMesAnio(a) - parseMesAnio(b));
 
-  // 2. Definir el mes activo
-  if (!mesTarjetaActivo || !meses.includes(mesTarjetaActivo)) {
-    mesTarjetaActivo = meses[meses.length - 1];
+  // 2. Extracción de universo completo de tarjetas para asignación de colores fija
+  const todasLasTarjetas = [...new Set(datos.map(d => d.bancoTipo || d.tarjeta || 'Desconocido').filter(Boolean))];
+
+  // Inicializar estado del multi-select
+  if (tarjetasSeleccionadasFiltro.length === 0) {
+    tarjetasSeleccionadasFiltro = [...todasLasTarjetas];
   }
 
-  // 3. Filtrar los datos por el mes
+  // Definición de mes activo para el desglose
+  if (!mesTarjetaActivo || !mesesDisponibles.includes(mesTarjetaActivo)) {
+    mesTarjetaActivo = mesesDisponibles[mesesDisponibles.length - 1];
+  }
+
+  // 3. Estructurar cascarón HTML de la vista
+  document.getElementById('tabTarjetas').innerHTML = `
+    <div class="chart-card-full" style="margin-bottom: 2rem;">
+      <p class="chart-title">Evolución Histórica de Tarjetas (ARS)</p>
+      <div id="cardTagsContainer" style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px;"></div>
+      <div style="position:relative; height:220px;"><canvas id="cardsHistoryChart"></canvas></div>
+    </div>
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; gap:10px;">
+      <p class="tc-seccion-titulo" style="margin:0;">Resumen mensual de Tarjetas</p>
+      <select onchange="cambiarMesTarjeta(this.value)" style="background:#1a1a1a; border:0.5px solid #2a2a2a; border-radius:8px; padding:8px 12px; color:#e8e8e8; font-size:13px; outline:none; cursor:pointer;">
+        ${mesesDisponibles.map(m => `<option value="${m}" ${m === mesTarjetaActivo ? 'selected' : ''}>Mes: ${m}</option>`).join('')}
+      </select>
+    </div>
+    <div id="tarjetaMensualUI"></div>
+  `;
+
+  // Renderizar componentes secundarios
+  renderCardFilterTags(todasLasTarjetas);
+  updateCardsHistoryChart(mesesDisponibles, todasLasTarjetas, datos);
+  renderTarjetaMensualUI(datos, todasLasTarjetas);
+}
+
+// Renderizador de Tags Multi-select
+function renderCardFilterTags(todasLasTarjetas) {
+  const container = document.getElementById('cardTagsContainer');
+  if (!container) return;
+
+  container.innerHTML = todasLasTarjetas.map((card, idx) => {
+    const isActive = tarjetasSeleccionadasFiltro.includes(card);
+    const color = PALETTE[idx % PALETTE.length];
+    const borderStyle = isActive ? `border-color: ${color}; background: ${color}12; color: #fff;` : '';
+    return `
+      <div class="filter-tag ${isActive ? 'active' : ''}" style="${borderStyle}" onclick="toggleCardFilter('${card}')">
+        <span style="display:inline-block; width:6px; height:6px; border-radius:50%; background:${color}; margin-right:7px;"></span>
+        ${card}
+      </div>
+    `;
+  }).join('');
+}
+
+// Toggle interactivo de filtros
+window.toggleCardFilter = function(card) {
+  const idx = tarjetasSeleccionadasFiltro.indexOf(card);
+  if (idx > -1) {
+    tarjetasSeleccionadasFiltro.splice(idx, 1);
+  } else {
+    tarjetasSeleccionadasFiltro.push(card);
+  }
+  // Actualización fluida sin refrescar cascarón completo
+  const datos = parsearTarjetas(tarjetasCache || []);
+  const mOrder = { 'enero':1, 'febrero':2, 'marzo':3, 'abril':4, 'mayo':5, 'junio':6, 'julio':7, 'agosto':8, 'septiembre':9, 'octubre':10, 'noviembre':11, 'diciembre':12 };
+  const parseMesAnio = (str) => {
+    if (!str) return 0;
+    const p = str.toLowerCase().split(' ');
+    const m = mOrder[p[0]] || 1;
+    const a = parseInt(p[1]) || 2026;
+    return a * 12 + m;
+  };
+  const mesesDisponibles = [...new Set(datos.map(d => d.mes).filter(Boolean))].sort((a,b) => parseMesAnio(a) - parseMesAnio(b));
+  const todasLasTarjetas = [...new Set(datos.map(d => d.bancoTipo || d.tarjeta || 'Desconocido').filter(Boolean))];
+
+  renderCardFilterTags(todasLasTarjetas);
+  updateCardsHistoryChart(mesesDisponibles, todasLasTarjetas, datos);
+}
+
+// Renderizador del Gráfico de Barras Apiladas Histórico
+function updateCardsHistoryChart(mesesDisponibles, todasLasTarjetas, datos) {
+  const ctx = document.getElementById('cardsHistoryChart');
+  if (!ctx) return;
+
+  const datasets = todasLasTarjetas.map((card, idx) => {
+    const color = PALETTE[idx % PALETTE.length];
+    const isSelected = tarjetasSeleccionadasFiltro.includes(card);
+
+    const dataPorMes = mesesDisponibles.map(mes => {
+      if (!isSelected) return 0;
+      const filtro = datos.filter(d => (d.bancoTipo || d.tarjeta || 'Desconocido') === card && d.mes === mes);
+      
+      let maxTotal = 0;
+      filtro.forEach(d => { if (d.totalARS > maxTotal) maxTotal = d.totalARS; });
+      if (maxTotal === 0) {
+        maxTotal = filtro.reduce((s, d) => s + (d.montoARS || 0), 0);
+      }
+      return Math.round(maxTotal);
+    });
+
+    return {
+      label: card,
+      data: dataPorMes,
+      backgroundColor: color,
+      borderColor: '#0f0f0f',
+      borderWidth: 1.5,
+      stack: 'tarjetasStack'
+    };
+  });
+
+  if (cardsHistoryInst) cardsHistoryInst.destroy();
+  cardsHistoryInst = new Chart(ctx, {
+    type: 'bar',
+    data: { labels: mesesDisponibles, datasets: datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: c => ` ${c.dataset.label}: ${fmt(c.raw)}` } }
+      },
+      scales: {
+        x: { stacked: true, grid: { color: GRID }, ticks: { color: TICK, font: { size: 11 } } },
+        y: { stacked: true, grid: { color: GRID }, ticks: { color: TICK, font: { size: 10 }, callback: v => '$' + (v >= 1000 ? Math.round(v/1000)+'k' : v) } }
+      }
+    }
+  });
+}
+
+// Renderizador de la Información Específica del Mes Seleccionado
+function renderTarjetaMensualUI(datos, todasLasTarjetas) {
+  const container = document.getElementById('tarjetaMensualUI');
+  if (!container) return;
+
   const datosMes = datos.filter(d => d.mes === mesTarjetaActivo);
 
-  // 4. Agrupar la información por Banco/Tipo
   const grupos = {};
   datosMes.forEach(d => {
     const key = d.bancoTipo || d.tarjeta || 'Desconocido';
     if (!grupos[key]) {
-      grupos[key] = {
-        bancoTipo: d.bancoTipo,
-        tarjeta: d.tarjeta,
-        vencStr: d.vencStr,
-        totalARS: d.totalARS,
-        totalUSD: d.totalUSD
-      };
+      grupos[key] = { bancoTipo: d.bancoTipo, tarjeta: d.tarjeta, vencStr: d.vencStr, totalARS: 0, totalUSD: 0 };
     }
     if (d.totalARS > 0) grupos[key].totalARS = d.totalARS;
     if (d.totalUSD > 0) grupos[key].totalUSD = d.totalUSD;
     if (d.vencStr) grupos[key].vencStr = d.vencStr;
   });
 
-  const gruposArr = Object.values(grupos);
+  // Fallback inteligente en caso de que falten los totales consolidados en la fila
+  Object.keys(grupos).forEach(key => {
+    if (grupos[key].totalARS === 0) {
+      grupos[key].totalARS = datosMes.filter(d => (d.bancoTipo || d.tarjeta || 'Desconocido') === key).reduce((s,d)=>s+(d.montoARS||0), 0);
+    }
+    if (grupos[key].totalUSD === 0) {
+      grupos[key].totalUSD = datosMes.filter(d => (d.bancoTipo || d.tarjeta || 'Desconocido') === key).reduce((s,d)=>s+(d.montoUSD||0), 0);
+    }
+  });
 
-  // --- CÁLCULO DE TOTALES GENERALES DEL MES ---
+  const gruposArr = Object.values(grupos);
   const granTotalARS = gruposArr.reduce((acc, g) => acc + (g.totalARS || 0), 0);
   const granTotalUSD = gruposArr.reduce((acc, g) => acc + (g.totalUSD || 0), 0);
 
-  // 5. Construir la UI
   let html = `
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; gap:10px;">
-      <p class="tc-seccion-titulo" style="margin:0;">Resumen de Tarjetas</p>
-      <select onchange="cambiarMesTarjeta(this.value)" style="background:#1a1a1a; border:0.5px solid #2a2a2a; border-radius:8px; padding:8px 12px; color:#e8e8e8; font-size:13px; outline:none; cursor:pointer;">
-        ${meses.map(m => `<option value="${m}" ${m === mesTarjetaActivo ? 'selected' : ''}>Mes: ${m}</option>`).join('')}
-      </select>
-    </div>
-  `;
-
-  // --- BLOQUE DE RESUMEN CONSOLIDADO ---
-  let heroHTML = `
     <div style="background: rgba(55,138,221,0.05); border: 0.5px solid #2a2a2a; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; display: flex; gap: 20px; flex-wrap: wrap;">
       <div style="flex: 1; min-width: 150px;">
         <p style="font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px;">Total general a pagar ARS</p>
@@ -653,14 +809,18 @@ function renderTarjetas() {
     </div>
   `;
 
-  gruposArr.forEach((g, idx) => {
-    const color = PALETTE[idx % PALETTE.length];
-    heroHTML += `
+  // Bloques individuales por Tarjeta
+  gruposArr.forEach((g) => {
+    const cardName = g.bancoTipo || g.tarjeta || 'Desconocido';
+    const origIdx = todasLasTarjetas.indexOf(cardName);
+    const color = PALETTE[origIdx > -1 ? origIdx % PALETTE.length : 0];
+
+    html += `
       <div class="tc-venc-group">
         <div class="tc-venc-header">
           <span class="tc-venc-nombre">
             <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${color};margin-right:7px;vertical-align:middle;"></span>
-            ${g.bancoTipo || g.tarjeta}
+            ${cardName}
           </span>
           <div class="tc-venc-badge">
             <span class="tc-venc-label">Vencimiento &nbsp;</span>
@@ -680,9 +840,8 @@ function renderTarjetas() {
       </div>
     `;
   });
-  html += `<div id="tcHero">${heroHTML}</div>`;
 
-  // 6. Construir la tabla
+  // Tabla detallada de transacciones del mes
   html += `
     <div class="table-card" style="margin-top:2rem;">
       <p class="chart-title" style="margin-bottom:14px;">Detalle de consumos - ${mesTarjetaActivo}</p>
@@ -722,7 +881,7 @@ function renderTarjetas() {
     </div>
   `;
 
-  document.getElementById('tabTarjetas').innerHTML = html;
+  container.innerHTML = html;
 }
 
 window.cambiarMesTarjeta = function(mes) {
