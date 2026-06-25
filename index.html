@@ -33,7 +33,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .btn-refresh { background: transparent; border: 0.5px solid #2a2a2a; border-radius: 8px; padding: 8px 12px; font-size: 15px; color: #666; cursor: pointer; transition: all 0.15s; }
 .btn-refresh:hover { color: #ccc; border-color: #444; background: #1a1a1a; }
 
-/* Ciclo badge */
 .ciclo-badge { font-size: 11px; color: #555; background: #1a1a1a; border: 0.5px solid #222; border-radius: 6px; padding: 4px 10px; white-space: nowrap; }
 
 .tabs { display: flex; background: #1a1a1a; border: 0.5px solid #222; border-radius: 10px; padding: 3px; margin-bottom: 1.5rem; gap: 2px; }
@@ -48,7 +47,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .metric-value.danger { color: #E24B4A; }
 .metric-value.success { color: #639922; }
 
-/* Banner proyección — variante ahorro (verde) */
 .proj-banner { background: #1a1a1a; border: 0.5px solid #2a2a2a; border-radius: 8px; padding: 12px 16px; margin-bottom: 1.5rem; display: flex; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
 .proj-banner.saving  { border-left: 2px solid #1D9E75; }
 .proj-banner.warning { border-left: 2px solid #EF9F27; }
@@ -61,7 +59,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .proj-banner-body { font-size: 13px; color: #888; line-height: 1.6; }
 .proj-banner-body strong { color: #e8e8e8; font-weight: 500; }
 
-/* Barra de progreso del ciclo */
 .ciclo-progress { background: #1a1a1a; border: 0.5px solid #222; border-radius: 8px; padding: 14px 16px; margin-bottom: 1.5rem; }
 .ciclo-progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
 .ciclo-progress-label { font-size: 10px; color: #444; text-transform: uppercase; letter-spacing: 0.06em; }
@@ -69,9 +66,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .progress-track { background: #222; border-radius: 4px; height: 6px; position: relative; overflow: hidden; }
 .progress-fill-gastos { height: 6px; border-radius: 4px; background: #E24B4A; position: absolute; left: 0; top: 0; transition: width 0.4s; }
 .progress-fill-tiempo { height: 6px; border-radius: 4px; background: #378ADD22; position: absolute; left: 0; top: 0; border-right: 1.5px solid #378ADD; }
-.ciclo-progress-legend { display: flex; gap: 16px; margin-top: 8px; }
-.ciclo-legend-item { font-size: 11px; color: #555; display: flex; align-items: center; gap: 5px; }
-.ciclo-legend-dot { width: 8px; height: 4px; border-radius: 2px; }
 
 .charts { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 1.5rem; }
 .chart-card { background: #1a1a1a; border: 0.5px solid #222; border-radius: 12px; padding: 1.25rem; }
@@ -102,7 +96,44 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .loading { text-align: center; padding: 3rem 0; color: #444; font-size: 14px; }
 .error-msg { background: #2a1010; color: #E24B4A; border: 0.5px solid #3a1515; border-radius: 8px; padding: 12px 16px; font-size: 13px; margin-bottom: 1rem; }
 
-@media (max-width: 540px) { .charts { grid-template-columns: 1fr; } .metrics { grid-template-columns: repeat(2, 1fr); } }
+/* ── TARJETAS ── */
+.tc-hero { margin-bottom: 1.5rem; }
+.tc-venc-group { background: #1a1a1a; border: 0.5px solid #222; border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem; }
+.tc-venc-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; flex-wrap: wrap; gap: 8px; }
+.tc-venc-nombre { font-size: 15px; font-weight: 500; color: #e8e8e8; }
+.tc-venc-badge { display: flex; align-items: center; gap: 6px; }
+.tc-venc-label { font-size: 10px; color: #555; text-transform: uppercase; letter-spacing: 0.06em; }
+.tc-venc-fecha { font-size: 13px; font-weight: 500; }
+.tc-venc-fecha.urgente { color: #E24B4A; }
+.tc-venc-fecha.pronto  { color: #EF9F27; }
+.tc-venc-fecha.ok      { color: #888; }
+.tc-montos { display: flex; gap: 10px; flex-wrap: wrap; }
+.tc-monto-card { flex: 1; min-width: 120px; background: #111; border: 0.5px solid #1e1e1e; border-radius: 8px; padding: 14px 16px; }
+.tc-monto-label { font-size: 10px; color: #444; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+.tc-monto-value { font-size: 26px; font-weight: 600; letter-spacing: -0.5px; }
+.tc-monto-value.ars { color: #e8e8e8; }
+.tc-monto-value.usd { color: #1D9E75; }
+.tc-monto-value.zero { color: #333; font-size: 20px; }
+
+.tc-seccion-titulo { font-size: 10px; color: #444; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 10px; margin-top: 1.5rem; }
+
+.tc-cuotas-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; margin-bottom: 1.5rem; }
+.tc-cuota-mes { background: #1a1a1a; border: 0.5px solid #222; border-radius: 8px; padding: 12px 14px; }
+.tc-cuota-mes-label { font-size: 10px; color: #555; margin-bottom: 6px; }
+.tc-cuota-mes-ars { font-size: 16px; font-weight: 500; color: #e8e8e8; }
+.tc-cuota-mes-usd { font-size: 11px; color: #1D9E75; margin-top: 2px; }
+.tc-cuota-mes.actual { border-color: #378ADD44; background: #1a2030; }
+.tc-cuota-mes.actual .tc-cuota-mes-label { color: #378ADD; }
+
+.tc-tarjeta-tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; }
+.cuota-tag { background: #252525; color: #888; padding: 2px 7px; border-radius: 4px; font-size: 11px; white-space: nowrap; }
+.cuota-tag.en-curso { background: #1a2535; color: #378ADD; }
+
+@media (max-width: 540px) {
+  .charts { grid-template-columns: 1fr; }
+  .metrics { grid-template-columns: repeat(2, 1fr); }
+  .tc-montos { flex-direction: column; }
+}
 </style>
 </head>
 <body>
@@ -132,13 +163,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     <button class="tab active" onclick="setTab('mes', this)">Este ciclo</button>
     <button class="tab" onclick="setTab('comparativa', this)">Comparativa</button>
     <button class="tab" onclick="setTab('detalle', this)">Detalle</button>
+    <button class="tab" onclick="setTab('tarjetas', this)">Tarjetas</button>
   </div>
 
   <div id="loadingBox" class="loading">Conectando con Google Sheets...</div>
 
   <!-- TAB: ESTE CICLO -->
   <div id="tabMes" style="display:none;">
-
     <div id="cicloProgressWrap" class="ciclo-progress" style="display:none;">
       <div class="ciclo-progress-header">
         <span class="ciclo-progress-label">Avance del ciclo</span>
@@ -148,7 +179,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
         <div class="progress-fill-tiempo" id="progressTiempo" style="width:0%"></div>
         <div class="progress-fill-gastos" id="progressGastos" style="width:0%"></div>
       </div>
-      <div class="ciclo-legend-item" style="margin-top:8px; font-size:11px; color:#555;" id="cicloLegendText"></div>
+      <div style="margin-top:8px; font-size:11px; color:#555;" id="cicloLegendText"></div>
     </div>
 
     <div id="projBanner" class="proj-banner" style="display:none;">
@@ -163,12 +194,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     <div class="charts">
       <div class="chart-card">
         <p class="chart-title">Por categoría</p>
-        <div style="position:relative; height:190px;"><canvas id="donutChart" role="img" aria-label="Distribución de gastos por categoría">Cargando...</canvas></div>
+        <div style="position:relative; height:190px;"><canvas id="donutChart"></canvas></div>
         <div class="legend" id="donutLegend"></div>
       </div>
       <div class="chart-card">
         <p class="chart-title">Gastos por fecha</p>
-        <div style="position:relative; height:190px;"><canvas id="barChart" role="img" aria-label="Gastos por fecha del ciclo">Cargando...</canvas></div>
+        <div style="position:relative; height:190px;"><canvas id="barChart"></canvas></div>
       </div>
     </div>
 
@@ -182,16 +213,16 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
   <div id="tabComparativa" style="display:none;">
     <div class="chart-card-full">
       <p class="chart-title">Total de gastos por ciclo</p>
-      <div style="position:relative; height:220px;"><canvas id="compareBarChart" role="img" aria-label="Comparativa de gastos totales por ciclo">Cargando...</canvas></div>
+      <div style="position:relative; height:220px;"><canvas id="compareBarChart"></canvas></div>
     </div>
     <div class="charts">
       <div class="chart-card">
         <p class="chart-title">% gastado del ingreso</p>
-        <div style="position:relative; height:180px;"><canvas id="ratioLineChart" role="img" aria-label="Porcentaje del ingreso gastado por ciclo">Cargando...</canvas></div>
+        <div style="position:relative; height:180px;"><canvas id="ratioLineChart"></canvas></div>
       </div>
       <div class="chart-card">
         <p class="chart-title">Top categorías por ciclo</p>
-        <div style="position:relative; height:180px;"><canvas id="catCompareChart" role="img" aria-label="Comparativa de categorías entre ciclos">Cargando...</canvas></div>
+        <div style="position:relative; height:180px;"><canvas id="catCompareChart"></canvas></div>
         <div class="legend" id="catCompareLegend"></div>
       </div>
     </div>
@@ -215,36 +246,43 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     </div>
   </div>
 
+  <!-- TAB: TARJETAS -->
+  <div id="tabTarjetas" style="display:none;">
+    <div id="tcHero" class="tc-hero"></div>
+    <div id="tcCuotasPendientes"></div>
+    <div id="tcDetalle"></div>
+  </div>
+
 </div>
 
 <script>
 // ─── CONFIGURACIÓN ────────────────────────────────────────────────────────────
-// Cada entrada = un ciclo de cobro (del día 25 del mes anterior al 24 del mes actual).
-// "label" es el nombre que aparece en el dropdown.
-// "cicloDesde" y "cicloHasta" son las fechas exactas del ciclo (inclusive).
-// Ajustá estas fechas y URLs cuando sumes nuevos meses.
 const CICLOS = [
   {
     label: 'Ciclo Junio 2026',
-    cicloDesde: new Date(2026, 4, 25),  // 25 may 2026
-    cicloHasta: new Date(2026, 5, 24),  // 24 jun 2026
+    cicloDesde: new Date(2026, 4, 25),
+    cicloHasta: new Date(2026, 5, 24),
     url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTSR-jEHWGJNTU5Wk2HOm6U5_pQkHudAuzgL46QYnVg5WNv-2K9H8hDsNVGUtFifICuhdcCzBWich3V/pub?gid=1978138079&single=true&output=csv'
   },
   {
     label: 'Ciclo Julio 2026',
-    cicloDesde: new Date(2026, 5, 25),  // 25 jun 2026
-    cicloHasta: new Date(2026, 6, 24),  // 24 jul 2026
+    cicloDesde: new Date(2026, 5, 25),
+    cicloHasta: new Date(2026, 6, 24),
     url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTSR-jEHWGJNTU5Wk2HOm6U5_pQkHudAuzgL46QYnVg5WNv-2K9H8hDsNVGUtFifICuhdcCzBWich3V/pub?gid=815384903&single=true&output=csv'
   }
 ];
 
-const PALETTE = ['#378ADD','#1D9E75','#EF9F27','#7F77DD','#D4537E','#D85A30','#639922','#888780','#185FA5','#5DCAA5','#F09595','#B4B2A9'];
+const URL_TARJETAS = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTSR-jEHWGJNTU5Wk2HOm6U5_pQkHudAuzgL46QYnVg5WNv-2K9H8hDsNVGUtFifICuhdcCzBWich3V/pub?gid=1050964641&single=true&output=csv';
+
+// Paleta de colores por tarjeta (se asigna dinámicamente)
+const PALETTE = ['#378ADD','#1D9E75','#EF9F27','#7F77DD','#D4537E','#D85A30','#639922','#888780'];
 const GRID = 'rgba(255,255,255,0.05)';
 const TICK = '#444';
 
 let cicloActivo = CICLOS.length - 1;
 let tabActivo = 'mes';
 let datosCache = {};
+let tarjetasCache = null;
 let logDatos = [];
 let donutInst = null, barInst = null, compareBarInst = null, ratioLineInst = null, catCompareInst = null;
 
@@ -252,7 +290,9 @@ let donutInst = null, barInst = null, compareBarInst = null, ratioLineInst = nul
 function fmt(n) {
   return '$' + Math.round(n).toLocaleString('es-AR');
 }
-
+function fmtUSD(n) {
+  return 'U$S ' + n.toFixed(2).replace('.', ',');
+}
 function parseMonto(s) {
   if (!s) return 0;
   let str = s.toString().trim().replace(/\$/g, '').replace(/\s/g, '');
@@ -261,22 +301,34 @@ function parseMonto(s) {
   else str = str.replace(/,/g, '');
   return parseFloat(str) || 0;
 }
-
 function parseDate(s) {
   if (!s) return null;
   const p = s.trim().split('/');
   if (p.length === 3) return new Date(parseInt(p[2]), parseInt(p[1])-1, parseInt(p[0]));
   return null;
 }
-
 function formatDateShort(d) {
   if (!d) return '';
   return d.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit' });
 }
-
-// Cantidad de días entre dos fechas (inclusive)
+function formatDateMed(d) {
+  if (!d) return '';
+  return d.toLocaleDateString('es-AR', { day: '2-digit', month: 'short', year: 'numeric' });
+}
 function diasEntre(desde, hasta) {
   return Math.round((hasta - desde) / (1000 * 60 * 60 * 24)) + 1;
+}
+// Retorna "Jun/26", "Jul/26", etc.
+function mesLabel(d) {
+  if (!d) return '';
+  return d.toLocaleDateString('es-AR', { month: 'short', year: '2-digit' })
+          .replace('. ', '/').replace('.', '/');
+}
+// Suma N meses a una fecha
+function addMonths(d, n) {
+  const r = new Date(d);
+  r.setMonth(r.getMonth() + n);
+  return r;
 }
 
 // ─── DROPDOWN ─────────────────────────────────────────────────────────────────
@@ -300,21 +352,18 @@ function buildDropdown() {
   menu.innerHTML = html;
   document.getElementById('dropdownLabel').textContent = CICLOS[cicloActivo].label;
 }
-
 function toggleDropdown() {
   const menu = document.getElementById('dropdownMenu');
   const chev = document.getElementById('dropdownChevron');
   const open = menu.classList.toggle('open');
   chev.classList.toggle('open', open);
 }
-
 document.addEventListener('click', e => {
   if (!document.getElementById('dropdownWrap').contains(e.target)) {
     document.getElementById('dropdownMenu').classList.remove('open');
     document.getElementById('dropdownChevron').classList.remove('open');
   }
 });
-
 function cambiarCiclo(idx) {
   cicloActivo = idx;
   buildDropdown();
@@ -328,17 +377,19 @@ function setTab(tab, el) {
   tabActivo = tab;
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
-  ['tabMes','tabComparativa','tabDetalle'].forEach(id => document.getElementById(id).style.display = 'none');
-  if (tab === 'mes') document.getElementById('tabMes').style.display = 'block';
+  ['tabMes','tabComparativa','tabDetalle','tabTarjetas'].forEach(id => document.getElementById(id).style.display = 'none');
+  if (tab === 'mes')         document.getElementById('tabMes').style.display = 'block';
   if (tab === 'comparativa') { document.getElementById('tabComparativa').style.display = 'block'; renderComparativa(); }
-  if (tab === 'detalle') document.getElementById('tabDetalle').style.display = 'block';
+  if (tab === 'detalle')     document.getElementById('tabDetalle').style.display = 'block';
+  if (tab === 'tarjetas')    { document.getElementById('tabTarjetas').style.display = 'block'; renderTarjetas(); }
 }
 
 // ─── CARGA DE DATOS ───────────────────────────────────────────────────────────
 function loadData() {
   document.getElementById('loadingBox').style.display = 'block';
   document.getElementById('errorBox').style.display = 'none';
-  ['tabMes','tabComparativa','tabDetalle'].forEach(id => document.getElementById(id).style.display = 'none');
+  ['tabMes','tabComparativa','tabDetalle','tabTarjetas'].forEach(id => document.getElementById(id).style.display = 'none');
+  tarjetasCache = null;
 
   const fetchCiclo = (c, i) => new Promise((resolve, reject) => {
     if (datosCache[i]) { resolve(datosCache[i]); return; }
@@ -349,44 +400,80 @@ function loadData() {
     });
   });
 
-  Promise.all(CICLOS.map((c, i) => fetchCiclo(c, i).catch(() => null)))
-    .then(results => {
-      results.forEach((r, i) => { if (r) datosCache[i] = r; });
-      if (!datosCache[cicloActivo]) {
-        document.getElementById('loadingBox').style.display = 'none';
-        document.getElementById('errorBox').textContent = 'No se pudo cargar el ciclo seleccionado. Verificá que el sheet esté publicado.';
-        document.getElementById('errorBox').style.display = 'block';
-        return;
-      }
-      buildDashboard(datosCache[cicloActivo]);
+  const fetchTarjetas = new Promise((resolve) => {
+    Papa.parse(URL_TARJETAS, {
+      download: true, header: true, skipEmptyLines: true,
+      complete: r => { tarjetasCache = r.data; resolve(r.data); },
+      error: () => resolve([])
     });
+  });
+
+  Promise.all([
+    ...CICLOS.map((c, i) => fetchCiclo(c, i).catch(() => null)),
+    fetchTarjetas
+  ]).then(results => {
+    results.slice(0, CICLOS.length).forEach((r, i) => { if (r) datosCache[i] = r; });
+    if (!datosCache[cicloActivo]) {
+      document.getElementById('loadingBox').style.display = 'none';
+      document.getElementById('errorBox').textContent = 'No se pudo cargar el ciclo seleccionado.';
+      document.getElementById('errorBox').style.display = 'block';
+      return;
+    }
+    buildDashboard(datosCache[cicloActivo]);
+  });
 }
 
-// ─── PARSEO DE FILAS ──────────────────────────────────────────────────────────
+// ─── PARSEO DE GASTOS ────────────────────────────────────────────────────────
 function parsearCiclo(rows) {
   if (!rows || rows.length === 0) return null;
   const cols = Object.keys(rows[0]);
   const colFecha = cols[0], colDetalle = cols[1], colCat = cols[2], colMonto = cols[3], colQuien = cols[4];
   let ingresosLucas = 0, ingresosMari = 0;
   const datos = [];
-
   rows.forEach(r => {
-    const fecha = r[colFecha] ? r[colFecha].trim() : '';
-    const cat   = r[colCat]   ? r[colCat].trim()   : '';
-    const monto = parseMonto(r[colMonto]);
-    const det   = r[colDetalle] ? r[colDetalle].trim() : '';
-    const quien = r[colQuien]   ? r[colQuien].trim()   : 'Desconocido';
+    const fecha  = r[colFecha]   ? r[colFecha].trim()   : '';
+    const cat    = r[colCat]     ? r[colCat].trim()     : '';
+    const monto  = parseMonto(r[colMonto]);
+    const det    = r[colDetalle] ? r[colDetalle].trim() : '';
+    const quien  = r[colQuien]   ? r[colQuien].trim()   : 'Desconocido';
     const dL = det.toLowerCase();
-
     if (dL.includes('ingres. lucas'))   { ingresosLucas = monto; return; }
     if (dL.includes('ingres. mariana')) { ingresosMari  = monto; return; }
     if (!fecha || !cat || monto <= 0) return;
     datos.push({ fecha, detalle: det, categoria: cat, monto, quien });
   });
-
-  if (ingresosLucas === 0) ingresosLucas = 3600000;
-  if (ingresosMari  === 0) ingresosMari  = 3600000;
+  // Sin fallback: si no hay ingresos cargados, queda en 0
   return { datos, ingresosLucas, ingresosMari };
+}
+
+// ─── PARSEO DE TARJETAS ──────────────────────────────────────────────────────
+function parsearTarjetas(rows) {
+  if (!rows || rows.length === 0) return [];
+  const cols = Object.keys(rows[0]);
+  // Columnas esperadas: Fecha | Tarjeta | Detalle | Cuota | Monto ARS | Monto USD | Vencimiento
+  const [cFecha, cTarjeta, cDetalle, cCuota, cARS, cUSD, cVenc] = cols;
+  const datos = [];
+  rows.forEach(r => {
+    const fecha     = r[cFecha]   ? r[cFecha].trim()   : '';
+    const tarjeta   = r[cTarjeta] ? r[cTarjeta].trim() : '';
+    const detalle   = r[cDetalle] ? r[cDetalle].trim() : '';
+    const cuota     = r[cCuota]   ? r[cCuota].trim()   : '';
+    const montoARS  = parseMonto(r[cARS]);
+    const montoUSD  = parseMonto(r[cUSD]);
+    const vencStr   = r[cVenc]    ? r[cVenc].trim()    : '';
+    if (!fecha || !tarjeta) return;
+    const fechaDate = parseDate(fecha);
+    const vencDate  = parseDate(vencStr);
+    // Parsear cuota "X/Y"
+    let cuotaActual = 0, cuotaTotal = 0;
+    if (cuota && cuota.includes('/')) {
+      const parts = cuota.split('/');
+      cuotaActual = parseInt(parts[0]) || 0;
+      cuotaTotal  = parseInt(parts[1]) || 0;
+    }
+    datos.push({ fecha, fechaDate, tarjeta, detalle, cuota, cuotaActual, cuotaTotal, montoARS, montoUSD, vencStr, vencDate });
+  });
+  return datos;
 }
 
 // ─── CONSTRUCCIÓN DEL DASHBOARD ───────────────────────────────────────────────
@@ -411,63 +498,41 @@ function buildDashboard(rows) {
   const totalGastos   = datos.reduce((s, r) => s + r.monto, 0);
   const totalIngresos = ingresosLucas + ingresosMari;
   const resto         = totalIngresos - totalGastos;
-  const pctGastado    = ((totalGastos / totalIngresos) * 100).toFixed(1);
+  const pctGastado    = totalIngresos > 0 ? ((totalGastos / totalIngresos) * 100).toFixed(1) : '0.0';
 
-  // Badge del ciclo en el header
-  document.getElementById('cicloBadge').textContent =
-    `${formatDateShort(desde)} – ${formatDateShort(hasta)}`;
+  document.getElementById('cicloBadge').textContent = `${formatDateShort(desde)} – ${formatDateShort(hasta)}`;
+  document.getElementById('dashSub').textContent = `${datos.length} movimientos · ${ciclo.label}`;
 
-  document.getElementById('dashSub').textContent =
-    `${datos.length} movimientos · ${ciclo.label}`;
-
-  // ── Barra de progreso del ciclo ──
-  const pctGastadoNum = (totalGastos / totalIngresos) * 100;
+  // Barra progreso
+  const pctGastadoNum = totalIngresos > 0 ? (totalGastos / totalIngresos) * 100 : 0;
   document.getElementById('progressTiempo').style.width = pctTiempo.toFixed(1) + '%';
   document.getElementById('progressGastos').style.width = Math.min(100, pctGastadoNum).toFixed(1) + '%';
-  document.getElementById('cicloProgressPct').textContent =
-    `Día ${diasTranscurridos} de ${totalDiasCiclo}`;
+  document.getElementById('cicloProgressPct').textContent = `Día ${diasTranscurridos} de ${totalDiasCiclo}`;
   document.getElementById('cicloLegendText').innerHTML =
     `<span style="color:#E24B4A">■</span> Gastos: ${pctGastado}% del ingreso &nbsp;·&nbsp; `+
     `<span style="color:#378ADD">▏</span> Tiempo transcurrido: ${pctTiempo.toFixed(0)}%`;
   document.getElementById('cicloProgressWrap').style.display = esCicloActual || hoy > hasta ? 'block' : 'none';
 
-  // ── Proyección de ahorro (solo si el ciclo está en curso) ──
+  // Proyección de ahorro
   const banner = document.getElementById('projBanner');
-  if (esCicloActual && diasTranscurridos > 0 && totalGastos > 0) {
-    const promDiario     = totalGastos / diasTranscurridos;
-    const gastoProy      = promDiario * totalDiasCiclo;
-    const ahorroProy     = totalIngresos - gastoProy;
-    const pctAhorroProy  = ((ahorroProy / totalIngresos) * 100).toFixed(1);
-    const diasRestan     = totalDiasCiclo - diasTranscurridos;
-
-    // Definir tono según ahorro proyectado
+  if (esCicloActual && diasTranscurridos > 0 && totalGastos > 0 && totalIngresos > 0) {
+    const promDiario    = totalGastos / diasTranscurridos;
+    const gastoProy     = promDiario * totalDiasCiclo;
+    const ahorroProy    = totalIngresos - gastoProy;
+    const pctAhorroProy = ((ahorroProy / totalIngresos) * 100).toFixed(1);
+    const diasRestan    = totalDiasCiclo - diasTranscurridos;
     let tono, titulo, texto;
     if (ahorroProy >= totalIngresos * 0.20) {
-      // Ahorro ≥ 20% → muy bien
-      tono  = 'saving';
-      titulo = 'Van muy bien 🎯';
-      texto  = `Al ritmo actual (<strong>${fmt(Math.round(promDiario))}/día</strong>), ` +
-               `cerrarían el ciclo ahorrando <strong>${fmt(Math.round(ahorroProy))}</strong> ` +
-               `— el <strong>${pctAhorroProy}%</strong> del ingreso. ` +
-               `Quedan ${diasRestan} días: si mantienen el ritmo, ese ahorro está asegurado.`;
+      tono = 'saving'; titulo = 'Van muy bien 🎯';
+      texto = `Al ritmo actual (<strong>${fmt(Math.round(promDiario))}/día</strong>), cerrarían el ciclo ahorrando <strong>${fmt(Math.round(ahorroProy))}</strong> — el <strong>${pctAhorroProy}%</strong> del ingreso. Quedan ${diasRestan} días: si mantienen el ritmo, ese ahorro está asegurado.`;
     } else if (ahorroProy > 0) {
-      // Ahorro positivo pero menor al 20%
-      tono  = 'warning';
-      titulo = 'Ahorro proyectado ajustado';
-      texto  = `Al ritmo actual (<strong>${fmt(Math.round(promDiario))}/día</strong>), ` +
-               `cerrarían ahorrando <strong>${fmt(Math.round(ahorroProy))}</strong> ` +
-               `(<strong>${pctAhorroProy}%</strong> del ingreso). ` +
-               `Quedan ${diasRestan} días para ampliar ese margen.`;
+      tono = 'warning'; titulo = 'Ahorro proyectado ajustado';
+      texto = `Al ritmo actual (<strong>${fmt(Math.round(promDiario))}/día</strong>), cerrarían ahorrando <strong>${fmt(Math.round(ahorroProy))}</strong> (<strong>${pctAhorroProy}%</strong> del ingreso). Quedan ${diasRestan} días para ampliar ese margen.`;
     } else {
-      // Proyección negativa → gastarían más de lo que ingresa
       const deficit = Math.abs(ahorroProy);
-      tono  = 'danger';
-      titulo = 'Ritmo por encima del ingreso';
-      texto  = `Al ritmo actual (<strong>${fmt(Math.round(promDiario))}/día</strong>), ` +
-               `el ciclo cerraría con un déficit de <strong>${fmt(Math.round(deficit))}</strong>. ` +
-               `Quedan ${diasRestan} días para revertirlo.`;
+      tono = 'danger'; titulo = 'Ritmo por encima del ingreso';
+      texto = `Al ritmo actual (<strong>${fmt(Math.round(promDiario))}/día</strong>), el ciclo cerraría con un déficit de <strong>${fmt(Math.round(deficit))}</strong>. Quedan ${diasRestan} días para revertirlo.`;
     }
-
     banner.className = `proj-banner ${tono}`;
     document.getElementById('projBannerTitle').textContent = titulo;
     document.getElementById('projText').innerHTML = texto;
@@ -476,17 +541,17 @@ function buildDashboard(rows) {
     banner.style.display = 'none';
   }
 
-  // ── Métricas ──
+  // Métricas
   document.getElementById('metricsBox').innerHTML = `
     <div class="metric"><p class="metric-label">Lucas</p><p class="metric-value">${fmt(ingresosLucas)}</p></div>
     <div class="metric"><p class="metric-label">Mariana</p><p class="metric-value">${fmt(ingresosMari)}</p></div>
     <div class="metric"><p class="metric-label">Total ingresos</p><p class="metric-value">${fmt(totalIngresos)}</p></div>
     <div class="metric"><p class="metric-label">Total gastos</p><p class="metric-value danger">${fmt(totalGastos)}</p></div>
-    <div class="metric"><p class="metric-label">Saldo</p><p class="metric-value success">${fmt(resto)}</p></div>
+    <div class="metric"><p class="metric-label">Saldo</p><p class="metric-value ${resto >= 0 ? 'success' : 'danger'}">${fmt(resto)}</p></div>
     <div class="metric"><p class="metric-label">% gastado</p><p class="metric-value">${pctGastado}%</p></div>
   `;
 
-  // ── Gráfico de fechas ──
+  // Gráfico fechas
   const fechasSorted = [...new Set(datos.map(r => r.fecha))].sort((a,b) => {
     const da = parseDate(a), db = parseDate(b);
     return (!da || !db) ? 0 : da - db;
@@ -495,59 +560,33 @@ function buildDashboard(rows) {
     datos.filter(r => r.fecha === f).reduce((s, r) => s + r.monto, 0)
   );
 
-  // ── Categorías ──
+  // Categorías
   const catMap = {};
   datos.forEach(r => { catMap[r.categoria] = (catMap[r.categoria] || 0) + r.monto; });
   const categorias = Object.entries(catMap)
     .sort((a,b) => b[1] - a[1])
     .map(([nombre, monto], i) => ({ nombre, monto, color: PALETTE[i % PALETTE.length] }));
 
-  // ── Donut ──
   if (donutInst) donutInst.destroy();
   donutInst = new Chart(document.getElementById('donutChart'), {
     type: 'doughnut',
-    data: {
-      labels: categorias.map(c => c.nombre),
-      datasets: [{ data: categorias.map(c => c.monto), backgroundColor: categorias.map(c => c.color), borderWidth: 2, borderColor: '#111' }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false, cutout: '65%',
-      plugins: {
-        legend: { display: false },
-        tooltip: { callbacks: { label: ctx => ` ${fmt(ctx.raw)} (${((ctx.raw/totalGastos)*100).toFixed(1)}%)` } }
-      }
-    }
+    data: { labels: categorias.map(c => c.nombre), datasets: [{ data: categorias.map(c => c.monto), backgroundColor: categorias.map(c => c.color), borderWidth: 2, borderColor: '#111' }] },
+    options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${fmt(ctx.raw)} (${totalGastos > 0 ? ((ctx.raw/totalGastos)*100).toFixed(1) : 0}%)` } } } }
   });
   document.getElementById('donutLegend').innerHTML = categorias.slice(0, 6).map(c =>
-    `<span class="legend-item"><span class="legend-dot" style="background:${c.color}"></span>${c.nombre.split(' ')[0]} ${((c.monto/totalGastos)*100).toFixed(1)}%</span>`
+    `<span class="legend-item"><span class="legend-dot" style="background:${c.color}"></span>${c.nombre.split(' ')[0]} ${totalGastos > 0 ? ((c.monto/totalGastos)*100).toFixed(1) : 0}%</span>`
   ).join('');
 
-  // ── Bar fechas ──
   if (barInst) barInst.destroy();
   barInst = new Chart(document.getElementById('barChart'), {
     type: 'bar',
-    data: {
-      labels: fechasSorted,
-      datasets: [{ data: montosPorFecha, backgroundColor: '#378ADD33', borderColor: '#378ADD', borderWidth: 1.5, borderRadius: 4 }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { grid: { color: GRID }, ticks: { color: TICK, font: { size: 10 }, maxRotation: 45, autoSkip: true, maxTicksLimit: 8 } },
-        y: { grid: { color: GRID }, ticks: { color: TICK, font: { size: 10 }, callback: v => '$' + (v >= 1000 ? Math.round(v/1000) + 'k' : v) } }
-      }
-    }
+    data: { labels: fechasSorted, datasets: [{ data: montosPorFecha, backgroundColor: '#378ADD33', borderColor: '#378ADD', borderWidth: 1.5, borderRadius: 4 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: GRID }, ticks: { color: TICK, font: { size: 10 }, maxRotation: 45, autoSkip: true, maxTicksLimit: 8 } }, y: { grid: { color: GRID }, ticks: { color: TICK, font: { size: 10 }, callback: v => '$' + (v >= 1000 ? Math.round(v/1000) + 'k' : v) } } } }
   });
 
-  // ── Ranking ──
   document.getElementById('rankingTable').innerHTML = categorias.map((c, i) => {
-    const pct = ((c.monto / totalGastos) * 100).toFixed(1);
-    return `<tr>
-      <td>${i+1}</td>
-      <td>${c.nombre}<div class="bar-bg"><div class="bar-fill" style="width:${pct}%;background:${c.color};"></div></div></td>
-      <td>${fmt(c.monto)}<br><span class="pct-label">${pct}%</span></td>
-    </tr>`;
+    const pct = totalGastos > 0 ? ((c.monto / totalGastos) * 100).toFixed(1) : '0.0';
+    return `<tr><td>${i+1}</td><td>${c.nombre}<div class="bar-bg"><div class="bar-fill" style="width:${pct}%;background:${c.color};"></div></div></td><td>${fmt(c.monto)}<br><span class="pct-label">${pct}%</span></td></tr>`;
   }).join('');
 
   renderLog(logDatos);
@@ -556,16 +595,15 @@ function buildDashboard(rows) {
   document.getElementById('tabMes').style.display = 'block';
   if (tabActivo === 'comparativa') renderComparativa();
   if (tabActivo === 'detalle') document.getElementById('tabDetalle').style.display = 'block';
+  if (tabActivo === 'tarjetas') { document.getElementById('tabTarjetas').style.display = 'block'; renderTarjetas(); }
 }
 
 // ─── LOG / DETALLE ────────────────────────────────────────────────────────────
 function renderLog(datos) {
   document.getElementById('logTable').innerHTML = `
     <thead><tr>
-      <th style="width:15%">Fecha</th>
-      <th style="width:35%">Detalle</th>
-      <th style="width:22%">Categoría</th>
-      <th style="width:15%;text-align:right">Monto</th>
+      <th style="width:15%">Fecha</th><th style="width:35%">Detalle</th>
+      <th style="width:22%">Categoría</th><th style="width:15%;text-align:right">Monto</th>
       <th style="width:13%;text-align:center">Quién</th>
     </tr></thead>
     <tbody>${datos.map(r => {
@@ -582,15 +620,234 @@ function renderLog(datos) {
       </tr>`;
     }).join('')}</tbody>`;
 }
-
 function filtrarLog() {
   const q = document.getElementById('searchInput').value.toLowerCase();
-  const filtrados = logDatos.filter(r =>
-    r.detalle.toLowerCase().includes(q) ||
-    r.categoria.toLowerCase().includes(q) ||
-    r.quien.toLowerCase().includes(q)
-  );
-  renderLog(filtrados);
+  renderLog(logDatos.filter(r =>
+    r.detalle.toLowerCase().includes(q) || r.categoria.toLowerCase().includes(q) || r.quien.toLowerCase().includes(q)
+  ));
+}
+
+// ─── TARJETAS ────────────────────────────────────────────────────────────────
+function renderTarjetas() {
+  const datos = parsearTarjetas(tarjetasCache || []);
+  const hoy = new Date(); hoy.setHours(0,0,0,0);
+
+  if (!datos.length) {
+    document.getElementById('tcHero').innerHTML = '<p style="color:#444;font-size:13px;padding:2rem 0;">No hay datos de tarjetas cargados todavía.</p>';
+    document.getElementById('tcCuotasPendientes').innerHTML = '';
+    document.getElementById('tcDetalle').innerHTML = '';
+    return;
+  }
+
+  // Asignar color por tarjeta
+  const tarjetasUnicas = [...new Set(datos.map(d => d.tarjeta))];
+  const colorMap = {};
+  tarjetasUnicas.forEach((t, i) => { colorMap[t] = PALETTE[i % PALETTE.length]; });
+
+  // ── HERO: agrupar por tarjeta + vencimiento ──
+  // Estructura: { "Visa Galicia|05/06/2026": { tarjeta, vencDate, vencStr, totalARS, totalUSD } }
+  const grupos = {};
+  datos.forEach(d => {
+    const key = `${d.tarjeta}||${d.vencStr || 'sin-venc'}`;
+    if (!grupos[key]) {
+      grupos[key] = { tarjeta: d.tarjeta, vencDate: d.vencDate, vencStr: d.vencStr, totalARS: 0, totalUSD: 0 };
+    }
+    grupos[key].totalARS += d.montoARS;
+    grupos[key].totalUSD += d.montoUSD;
+  });
+
+  // Ordenar por fecha de vencimiento (más próxima primero)
+  const gruposArr = Object.values(grupos).sort((a, b) => {
+    if (!a.vencDate && !b.vencDate) return 0;
+    if (!a.vencDate) return 1;
+    if (!b.vencDate) return -1;
+    return a.vencDate - b.vencDate;
+  });
+
+  // Clasificar urgencia de vencimiento
+  function urgenciaClass(vencDate) {
+    if (!vencDate) return 'ok';
+    const diff = Math.round((vencDate - hoy) / (1000*60*60*24));
+    if (diff <= 3)  return 'urgente';
+    if (diff <= 7)  return 'pronto';
+    return 'ok';
+  }
+  function urgenciaLabel(vencDate) {
+    if (!vencDate) return '—';
+    const diff = Math.round((vencDate - hoy) / (1000*60*60*24));
+    if (diff < 0)  return 'Venció';
+    if (diff === 0) return 'Vence hoy';
+    if (diff === 1) return 'Vence mañana';
+    if (diff <= 7)  return `Vence en ${diff} días`;
+    return `Vence el ${formatDateMed(vencDate)}`;
+  }
+
+  // Render hero cards
+  let heroHTML = '';
+  gruposArr.forEach(g => {
+    const color = colorMap[g.tarjeta];
+    const urg   = urgenciaClass(g.vencDate);
+    const label = urgenciaLabel(g.vencDate);
+    heroHTML += `
+      <div class="tc-venc-group">
+        <div class="tc-venc-header">
+          <span class="tc-venc-nombre">
+            <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${color};margin-right:7px;vertical-align:middle;"></span>
+            ${g.tarjeta}
+          </span>
+          <div class="tc-venc-badge">
+            <span class="tc-venc-label">Vencimiento &nbsp;</span>
+            <span class="tc-venc-fecha ${urg}">${label}</span>
+          </div>
+        </div>
+        <div class="tc-montos">
+          <div class="tc-monto-card">
+            <p class="tc-monto-label">Total en pesos</p>
+            <p class="tc-monto-value ars ${g.totalARS === 0 ? 'zero' : ''}">${g.totalARS > 0 ? fmt(g.totalARS) : '—'}</p>
+          </div>
+          <div class="tc-monto-card">
+            <p class="tc-monto-label">Total en dólares</p>
+            <p class="tc-monto-value usd ${g.totalUSD === 0 ? 'zero' : ''}">${g.totalUSD > 0 ? fmtUSD(g.totalUSD) : '—'}</p>
+          </div>
+        </div>
+      </div>`;
+  });
+  document.getElementById('tcHero').innerHTML = heroHTML;
+
+  // ── CUOTAS PENDIENTES FUTURAS ──
+  // Para cada gasto en cuotas, calcular en qué mes cae cada cuota futura
+  // La fecha del gasto es la fecha de la cuota X/Y que aparece en el resumen.
+  // La cuota 1 cae en: fechaDate - (cuotaActual - 1) meses
+  // Las cuotas futuras: cuotaActual+1 .. cuotaTotal
+
+  // Mapa: "mesKey (YYYY-MM)" -> { labelMes, totalARS, totalUSD, items[] }
+  const cuotasFuturas = {};
+
+  datos.forEach(d => {
+    if (d.cuotaTotal <= 1 || d.cuotaActual === 0 || !d.fechaDate) return;
+    const cuotasPendientes = d.cuotaTotal - d.cuotaActual;
+    if (cuotasPendientes <= 0) return;
+
+    // Monto por cuota = monto de la fila (es el monto de UNA cuota)
+    const montoCuotaARS = d.montoARS;
+    const montoCuotaUSD = d.montoUSD;
+
+    for (let i = 1; i <= cuotasPendientes; i++) {
+      const mesFuturo = addMonths(d.fechaDate, i);
+      const key = `${mesFuturo.getFullYear()}-${String(mesFuturo.getMonth()+1).padStart(2,'0')}`;
+      if (!cuotasFuturas[key]) {
+        cuotasFuturas[key] = { label: mesLabel(mesFuturo), date: mesFuturo, totalARS: 0, totalUSD: 0, items: [] };
+      }
+      cuotasFuturas[key].totalARS += montoCuotaARS;
+      cuotasFuturas[key].totalUSD += montoCuotaUSD;
+      cuotasFuturas[key].items.push({
+        tarjeta: d.tarjeta,
+        detalle: d.detalle,
+        cuotaNum: d.cuotaActual + i,
+        cuotaTotal: d.cuotaTotal,
+        montoARS: montoCuotaARS,
+        montoUSD: montoCuotaUSD,
+        color: colorMap[d.tarjeta]
+      });
+    }
+  });
+
+  const cuotasKeys = Object.keys(cuotasFuturas).sort();
+  let cuotasHTML = '';
+  if (cuotasKeys.length > 0) {
+    const mesActualKey = `${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}`;
+    cuotasHTML += `<p class="tc-seccion-titulo">Cuotas pendientes futuras</p><div class="tc-cuotas-grid">`;
+    cuotasKeys.forEach(key => {
+      const m = cuotasFuturas[key];
+      const esActual = key === mesActualKey;
+      cuotasHTML += `
+        <div class="tc-cuota-mes ${esActual ? 'actual' : ''}">
+          <p class="tc-cuota-mes-label">${m.label}${esActual ? ' · este mes' : ''}</p>
+          <p class="tc-cuota-mes-ars">${m.totalARS > 0 ? fmt(m.totalARS) : '—'}</p>
+          ${m.totalUSD > 0 ? `<p class="tc-cuota-mes-usd">${fmtUSD(m.totalUSD)}</p>` : ''}
+        </div>`;
+    });
+    cuotasHTML += `</div>`;
+
+    // Tabla detalle de cuotas pendientes
+    cuotasHTML += `
+      <div class="table-card" style="margin-top:0;">
+        <p class="chart-title">Detalle de cuotas pendientes</p>
+        <div style="overflow-x:auto;">
+        <table class="ranking-table" style="min-width:500px;">
+          <thead><tr>
+            <th>Mes</th><th>Tarjeta</th><th>Concepto</th>
+            <th style="text-align:center">Cuota</th>
+            <th style="text-align:right">ARS</th>
+            <th style="text-align:right">USD</th>
+          </tr></thead>
+          <tbody>`;
+    cuotasKeys.forEach(key => {
+      const m = cuotasFuturas[key];
+      const esActual = key === `${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2,'0')}`;
+      m.items.forEach(it => {
+        cuotasHTML += `<tr style="${esActual ? 'background:#111;' : ''}">
+          <td style="color:#555;font-size:12px;white-space:nowrap">${m.label}${esActual ? ' ←' : ''}</td>
+          <td><span style="color:${it.color};font-size:12px;font-weight:500;">${it.tarjeta}</span></td>
+          <td style="font-size:12px">${it.detalle}</td>
+          <td style="text-align:center"><span class="cuota-tag ${esActual ? 'en-curso' : ''}">${it.cuotaNum}/${it.cuotaTotal}</span></td>
+          <td style="text-align:right;font-size:12px">${it.montoARS > 0 ? fmt(it.montoARS) : '—'}</td>
+          <td style="text-align:right;font-size:12px;color:#1D9E75">${it.montoUSD > 0 ? fmtUSD(it.montoUSD) : '—'}</td>
+        </tr>`;
+      });
+    });
+    cuotasHTML += `</tbody></table></div></div>`;
+  }
+  document.getElementById('tcCuotasPendientes').innerHTML = cuotasHTML;
+
+  // ── DETALLE DE CONSUMOS ──
+  const detalleOrdenado = [...datos].sort((a,b) => {
+    if (!a.vencDate && !b.vencDate) return 0;
+    if (!a.vencDate) return 1;
+    if (!b.vencDate) return -1;
+    return a.vencDate - b.vencDate || a.tarjeta.localeCompare(b.tarjeta);
+  });
+
+  let detalleHTML = `
+    <p class="tc-seccion-titulo">Todos los consumos</p>
+    <div class="table-card" style="margin-top:0;">
+      <div style="overflow-x:auto;">
+      <table class="ranking-table" style="min-width:540px;">
+        <thead><tr>
+          <th>Fecha</th><th>Tarjeta</th><th>Concepto</th>
+          <th style="text-align:center">Cuota</th>
+          <th style="text-align:right">ARS</th>
+          <th style="text-align:right">USD</th>
+          <th style="text-align:right">Vencimiento</th>
+        </tr></thead>
+        <tbody>`;
+  detalleOrdenado.forEach(d => {
+    const color = colorMap[d.tarjeta];
+    const cuotaTag = d.cuota
+      ? `<span class="cuota-tag en-curso">${d.cuota}</span>`
+      : `<span style="color:#333;font-size:11px;">—</span>`;
+    const urg = urgenciaClass(d.vencDate);
+    detalleHTML += `<tr>
+      <td style="color:#555;font-size:12px;white-space:nowrap">${d.fecha}</td>
+      <td><span style="color:${color};font-size:12px;font-weight:500;">${d.tarjeta}</span></td>
+      <td style="font-size:12px">${d.detalle}</td>
+      <td style="text-align:center">${cuotaTag}</td>
+      <td style="text-align:right;font-size:12px">${d.montoARS > 0 ? fmt(d.montoARS) : '—'}</td>
+      <td style="text-align:right;font-size:12px;color:#1D9E75">${d.montoUSD > 0 ? fmtUSD(d.montoUSD) : '—'}</td>
+      <td style="text-align:right;font-size:12px" class="${urg}">${d.vencStr || '—'}</td>
+    </tr>`;
+  });
+  detalleHTML += `</tbody></table></div></div>`;
+  document.getElementById('tcDetalle').innerHTML = detalleHTML;
+
+  // Helper local para urgencia en detalle (necesita estar disponible)
+  function urgenciaClass(vencDate) {
+    if (!vencDate) return '';
+    const diff = Math.round((vencDate - hoy) / (1000*60*60*24));
+    if (diff <= 3)  return 'tc-venc-fecha urgente';
+    if (diff <= 7)  return 'tc-venc-fecha pronto';
+    return '';
+  }
 }
 
 // ─── COMPARATIVA ──────────────────────────────────────────────────────────────
@@ -601,98 +858,40 @@ function renderComparativa() {
   const labels   = parsed.map(p => p.label.replace('Ciclo ','').replace(' 2026',''));
   const totales  = parsed.map(p => Math.round(p.datos.reduce((s,r) => s + r.monto, 0)));
   const ingresos = parsed.map(p => p.ingresosLucas + p.ingresosMari);
-  const ratios   = parsed.map((p,i) => parseFloat(((totales[i] / ingresos[i]) * 100).toFixed(1)));
+  const ratios   = parsed.map((p,i) => ingresos[i] > 0 ? parseFloat(((totales[i] / ingresos[i]) * 100).toFixed(1)) : 0);
 
-  // ── Bar comparativa ──
   if (compareBarInst) compareBarInst.destroy();
   compareBarInst = new Chart(document.getElementById('compareBarChart'), {
     type: 'bar',
-    data: {
-      labels,
-      datasets: [
-        {
-          label: 'Gastos', data: totales,
-          backgroundColor: labels.map((_, i) => parsed[i].label === CICLOS[cicloActivo].label ? '#378ADD' : '#378ADD44'),
-          borderColor: '#378ADD', borderWidth: 1.5, borderRadius: 6
-        },
-        {
-          label: 'Ingresos', data: ingresos, type: 'line',
-          borderColor: '#1D9E75', backgroundColor: 'transparent',
-          borderWidth: 1.5, borderDash: [4,4], pointRadius: 4, pointBackgroundColor: '#1D9E75', tension: 0.3
-        }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { grid: { color: GRID }, ticks: { color: TICK, font: { size: 11 } } },
-        y: { grid: { color: GRID }, ticks: { color: TICK, font: { size: 10 }, callback: v => '$' + (v >= 1000000 ? Math.round(v/1000000) + 'M' : v >= 1000 ? Math.round(v/1000) + 'k' : v) } }
-      }
-    }
+    data: { labels, datasets: [
+      { label: 'Gastos', data: totales, backgroundColor: labels.map((_, i) => parsed[i].label === CICLOS[cicloActivo].label ? '#378ADD' : '#378ADD44'), borderColor: '#378ADD', borderWidth: 1.5, borderRadius: 6 },
+      { label: 'Ingresos', data: ingresos, type: 'line', borderColor: '#1D9E75', backgroundColor: 'transparent', borderWidth: 1.5, borderDash: [4,4], pointRadius: 4, pointBackgroundColor: '#1D9E75', tension: 0.3 }
+    ]},
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: GRID }, ticks: { color: TICK, font: { size: 11 } } }, y: { grid: { color: GRID }, ticks: { color: TICK, font: { size: 10 }, callback: v => '$' + (v >= 1000000 ? Math.round(v/1000000)+'M' : v >= 1000 ? Math.round(v/1000)+'k' : v) } } } }
   });
 
-  // ── Ratio % ──
   if (ratioLineInst) ratioLineInst.destroy();
   ratioLineInst = new Chart(document.getElementById('ratioLineChart'), {
     type: 'line',
-    data: {
-      labels,
-      datasets: [{
-        label: '% gastado', data: ratios,
-        borderColor: '#EF9F27', backgroundColor: '#EF9F2715',
-        borderWidth: 2, pointRadius: 5, pointBackgroundColor: '#EF9F27', tension: 0.3, fill: true
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => `${ctx.raw}% del ingreso` } } },
-      scales: {
-        x: { grid: { color: GRID }, ticks: { color: TICK, font: { size: 11 } } },
-        y: { grid: { color: GRID }, ticks: { color: TICK, font: { size: 10 }, callback: v => v + '%' }, min: 0, max: 100 }
-      }
-    }
+    data: { labels, datasets: [{ label: '% gastado', data: ratios, borderColor: '#EF9F27', backgroundColor: '#EF9F2715', borderWidth: 2, pointRadius: 5, pointBackgroundColor: '#EF9F27', tension: 0.3, fill: true }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => `${ctx.raw}% del ingreso` } } }, scales: { x: { grid: { color: GRID }, ticks: { color: TICK, font: { size: 11 } } }, y: { grid: { color: GRID }, ticks: { color: TICK, font: { size: 10 }, callback: v => v + '%' }, min: 0, max: 100 } } }
   });
 
-  // ── Categorías comparativa ──
   const allCats = [...new Set(parsed.flatMap(p => p.datos.map(d => d.categoria)))];
-  const topCats = allCats
-    .map(cat => ({ cat, total: parsed.reduce((s,p) => s + p.datos.filter(d => d.categoria === cat).reduce((ss,r) => ss + r.monto, 0), 0) }))
-    .sort((a,b) => b.total - a.total).slice(0, 5).map(x => x.cat);
+  const topCats = allCats.map(cat => ({ cat, total: parsed.reduce((s,p) => s + p.datos.filter(d => d.categoria === cat).reduce((ss,r) => ss + r.monto, 0), 0) })).sort((a,b) => b.total - a.total).slice(0, 5).map(x => x.cat);
 
   if (catCompareInst) catCompareInst.destroy();
   catCompareInst = new Chart(document.getElementById('catCompareChart'), {
     type: 'bar',
-    data: {
-      labels,
-      datasets: topCats.map((cat, i) => ({
-        label: cat,
-        data: parsed.map(p => Math.round(p.datos.filter(d => d.categoria === cat).reduce((s,r) => s + r.monto, 0))),
-        backgroundColor: PALETTE[i] + '88', borderColor: PALETTE[i], borderWidth: 1.5, borderRadius: 4
-      }))
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { stacked: true, grid: { color: GRID }, ticks: { color: TICK, font: { size: 11 } } },
-        y: { stacked: true, grid: { color: GRID }, ticks: { color: TICK, font: { size: 10 }, callback: v => '$' + (v >= 1000 ? Math.round(v/1000) + 'k' : v) } }
-      }
-    }
+    data: { labels, datasets: topCats.map((cat, i) => ({ label: cat, data: parsed.map(p => Math.round(p.datos.filter(d => d.categoria === cat).reduce((s,r) => s + r.monto, 0))), backgroundColor: PALETTE[i] + '88', borderColor: PALETTE[i], borderWidth: 1.5, borderRadius: 4 })) },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { stacked: true, grid: { color: GRID }, ticks: { color: TICK, font: { size: 11 } } }, y: { stacked: true, grid: { color: GRID }, ticks: { color: TICK, font: { size: 10 }, callback: v => '$' + (v >= 1000 ? Math.round(v/1000)+'k' : v) } } } }
   });
-  document.getElementById('catCompareLegend').innerHTML = topCats.slice(0, 5).map((cat, i) =>
+  document.getElementById('catCompareLegend').innerHTML = topCats.slice(0,5).map((cat, i) =>
     `<span class="legend-item"><span class="legend-dot" style="background:${PALETTE[i]}"></span>${cat.split(' ')[0]}</span>`
   ).join('');
 
-  // ── Tabla comparativa ──
   document.getElementById('compareTable').innerHTML = `
-    <thead><tr>
-      <th>Ciclo</th>
-      <th style="text-align:right">Ingresos</th>
-      <th style="text-align:right">Gastos</th>
-      <th style="text-align:right">Saldo</th>
-      <th style="text-align:right">%</th>
-    </tr></thead>
+    <thead><tr><th>Ciclo</th><th style="text-align:right">Ingresos</th><th style="text-align:right">Gastos</th><th style="text-align:right">Saldo</th><th style="text-align:right">%</th></tr></thead>
     <tbody>${parsed.map((p, i) => {
       const t = totales[i], ing = ingresos[i], s = ing - t, r = ratios[i];
       const isCurrent = p.label === CICLOS[cicloActivo].label;
