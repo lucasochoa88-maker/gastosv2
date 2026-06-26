@@ -350,6 +350,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
           <p class="chart-title" style="margin-bottom:4px;">Efecto Cascada: Proyección de Cuotas</p>
           <p style="font-size:11px; color:#444;">Evolución de deudas actuales a futuro (no incluye nuevos gastos)</p>
         </div>
+        <div style="display:flex; gap:6px; flex-wrap:wrap;" id="cascadaControls"></div>
       </div>
       <div style="position:relative; height:260px;"><canvas id="cascadaChart"></canvas></div>
     </div>
@@ -442,6 +443,7 @@ let tarjetasGroups = {};
 let tarjetasLineSelected = [];
 let tarjetasSelectedBanco = null; // null = todos
 let tarjetasSelectedTarjetaTipo = null; // filtro de chip en log
+let cascadaSelected = []; // chips del cascada — vacío = todos
 let donutInst, barInst, compareBarInst, ratioLineInst, catCompareInst, tarjetasLineInst, cascadaInst;
 
 // ─── UTILS ────────────────────────────────────────────────────────────────────
@@ -768,6 +770,7 @@ function loadTarjetasData() {
   tarjetasGroups = {};
   tarjetasSelectedBanco = null;
   tarjetasSelectedTarjetaTipo = null;
+  cascadaSelected = [];
 
   if (!conf || !conf.url) {
     tarjetasDatos = TARJETAS_MOCK;
@@ -962,18 +965,46 @@ function renderTarjetas() {
   totalRow.style.display = 'flex';
 
   // ── CASCADA con meses reales ───────────────────────────────────────────────
-  if (cascadaInst) cascadaInst.destroy();
+  // Construir mapa local → banco para poder filtrar por banco
+  // "local" = primeros 15 chars del detalle; necesitamos saber de qué bancoTipo vienen
+  const localABanco = {};
+  datos.forEach(r => {
+    if (r.cuota && r.cuota.includes('/')) {
+      const k = r.detalle.substring(0,15);
+      if (!localABanco[k]) localABanco[k] = r.banco;
+    }
+  });
+
   const todosLosLocales = [...new Set(proyecciones.flatMap(mes=>Object.keys(mes)))];
-  // Etiquetas reales
+
+  // Init cascadaSelected si está vacío
+  if (!cascadaSelected.length) cascadaSelected = [...bancosArr];
+
+  // Chips de banco para cascada
+  document.getElementById('cascadaControls').innerHTML = bancosArr.map((k,i) => {
+    const color = getBancoColor(k,i);
+    const on = cascadaSelected.includes(k);
+    return `<button class="line-chip" onclick="toggleCascadaBanco('${k}')"
+      style="border-color:${color}55;background:${on?color+'22':'transparent'};color:${on?color:'#444'};">
+      ${k}</button>`;
+  }).join('');
+
+  // Filtrar locales según bancos activos en cascada
+  const localesFiltrados = todosLosLocales.filter(local => {
+    const banco = localABanco[local];
+    return !banco || cascadaSelected.includes(banco);
+  });
+
   const cascadaLabels = proyecciones.map((_, n) => mesRelativo(mesGastoRaw, n + 1));
 
-  const cascadaDatasets = todosLosLocales.map((local,i) => ({
+  const cascadaDatasets = localesFiltrados.map((local,i) => ({
     label: local,
     data: proyecciones.map(mes => mes[local] || 0),
-    backgroundColor: PALETTE[i % PALETTE.length],
+    backgroundColor: PALETTE[todosLosLocales.indexOf(local) % PALETTE.length],
     borderRadius: 4
   }));
 
+  if (cascadaInst) cascadaInst.destroy();
   cascadaInst = new Chart(document.getElementById('cascadaChart'), {
     type: 'bar',
     data: { labels: cascadaLabels, datasets: cascadaDatasets },
@@ -984,9 +1015,21 @@ function renderTarjetas() {
         legend: { display: false },
         tooltip: {
           callbacks: {
-            label: ctx => ` ${ctx.dataset.label}: ${fmt(ctx.raw)}`,
-            footer: items => `Total cuotas: ${fmt(items.reduce((a,e)=>a+e.raw,0))}`
-          }
+            // Solo mostrar items con valor > 0
+            beforeBody: (items) => {
+              // filtramos en afterBody, pero Chart.js no tiene beforeBody filter
+              // usamos un plugin custom en su lugar
+            },
+            label: ctx => {
+              if (ctx.raw === 0) return null; // null oculta el item
+              return ` ${ctx.dataset.label}: ${fmt(ctx.raw)}`;
+            },
+            footer: items => {
+              const total = items.reduce((a,e)=>a+e.raw,0);
+              return total > 0 ? `Total cuotas: ${fmt(total)}` : '';
+            }
+          },
+          filter: item => item.raw > 0  // ← excluye items $0 del tooltip
         }
       },
       scales: {
@@ -1109,6 +1152,16 @@ function selectTarjetaTipo(bt) {
       if (match) el.classList.toggle('active', match[1] === bt);
     }
   });
+}
+
+// ─── TOGGLE BANCO EN CASCADA ─────────────────────────────────────────────────
+function toggleCascadaBanco(key) {
+  if (cascadaSelected.includes(key)) {
+    if (cascadaSelected.length > 1) cascadaSelected = cascadaSelected.filter(k=>k!==key);
+  } else {
+    cascadaSelected.push(key);
+  }
+  renderTarjetas();
 }
 
 function toggleTarjetaLine(key) {
