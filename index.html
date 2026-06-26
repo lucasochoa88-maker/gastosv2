@@ -323,7 +323,9 @@ let tabActivo = 'mes';
 let datosCache = {};
 let logDatos = [];
 let tarjetasDatos = [];
+let tarjetasGroups = {};
 let tarjetasLineSelected = [];
+  tarjetasGroups = {};
 let donutInst, barInst, compareBarInst, ratioLineInst, catCompareInst, tarjetasLineInst;
 
 // ─── UTILS ────────────────────────────────────────────────────────────────────
@@ -631,6 +633,7 @@ function loadTarjetasData() {
   const idx = parseInt(document.getElementById('tarjetasCicloSelect').value);
   const conf = TARJETAS_CICLOS[idx];
   tarjetasLineSelected = [];
+  tarjetasGroups = {};
 
   if (!conf.url) {
     tarjetasDatos = TARJETAS_MOCK;
@@ -686,7 +689,7 @@ function loadTarjetasData() {
       }).filter(r => r.bancoTipo); // excluir filas vacías
 
       // ── Paso 3: enriquecer con totales reales por tarjeta ──
-      tarjetasDatos._groups = tarjetaGroups;
+      tarjetasGroups = tarjetaGroups;
       renderTarjetas();
     },
     error: () => { tarjetasDatos=TARJETAS_MOCK; renderTarjetas(); }
@@ -709,7 +712,7 @@ function getBancoColor(banco, idx) {
 function renderTarjetas() {
   if (!tarjetasDatos||!tarjetasDatos.length) return;
   const datos = tarjetasDatos;
-  const groups = tarjetasDatos._groups || {};
+  const groups = tarjetasGroups;
 
   // ── Mes de gasto (columna B del sheet) ──
   const MES_NOMBRES_MAP = {
@@ -743,11 +746,11 @@ function renderTarjetas() {
     bancoTarjetas[banco].push({ bancoTipo:bt, tipo, totalARS:g.totalARS, totalUSD:g.totalUSD });
   });
 
-  const getTotal = (banco) => tarjetasMoneda==='USD' ? bancoTotalesUSD[banco] : bancoTotalesARS[banco];
+  const getTotal = (banco) => bancoTotalesARS[banco];
   const bancosArr = Object.keys(bancoTotalesARS).sort((a,b)=>getTotal(b)-getTotal(a));
   const totalGralARS = Object.values(bancoTotalesARS).reduce((s,v)=>s+v, 0);
   const totalGralUSD = Object.values(bancoTotalesUSD).reduce((s,v)=>s+v, 0);
-  const totalGral = tarjetasMoneda==='USD' ? totalGralUSD : totalGralARS;
+  const totalGral = totalGralARS;
 
   // ── BLOQUE MACRO: Gran total + desglose por banco ──
   const mesHeaderEl = document.getElementById('tarjetasMesHeader');
@@ -823,7 +826,7 @@ function renderTarjetas() {
     const partes  = bt.split(' ');
     const banco   = partes.slice(1).join(' ') || bt;
     const mesNorm = MES_NOMBRES_MAP[(g.mes||'').toLowerCase()] || g.mes;
-    const total   = tarjetasMoneda==='USD' ? g.totalUSD : g.totalARS;
+    const total   = g.totalARS;
     if (!lineDataByBanco[banco]) lineDataByBanco[banco] = {};
     lineDataByBanco[banco][mesNorm] = (lineDataByBanco[banco][mesNorm]||0) + total;
   });
@@ -856,9 +859,9 @@ function renderTarjetas() {
   });
 
   if (tarjetasLineInst) tarjetasLineInst.destroy();
-  const yFmt = tarjetasMoneda==='USD'
-    ? v=>'U$S '+Math.round(v)
-    : v=>'$'+(v>=1000000?Math.round(v/1000000)+'M':v>=1000?Math.round(v/1000)+'k':v);
+  const yFmt = v=>'$'+(v>=1000000?Math.round(v/1000000)+'M':v>=1000?Math.round(v/1000)+'k':v);
+
+
 
   tarjetasLineInst = new Chart(document.getElementById('tarjetasLineChart'), {
     type: 'line',
@@ -868,7 +871,7 @@ function renderTarjetas() {
       interaction:{mode:'index',intersect:false},
       plugins:{
         legend:{display:false},
-        tooltip:{callbacks:{label:ctx=>` ${ctx.dataset.label}: ${tarjetasMoneda==='USD'?fmtUSD(ctx.raw):fmt(ctx.raw)}`}}
+        tooltip:{callbacks:{label:ctx=>` ${ctx.dataset.label}: ${fmt(ctx.raw)}`}}
       },
       scales:{
         x:{grid:{color:GRID},ticks:{color:TICK,font:{size:11}}},
