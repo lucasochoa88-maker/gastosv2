@@ -232,8 +232,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
     <div class="tarjetas-controls">
       <span class="tarjetas-label">Resumen:</span>
-      <select class="tarjetas-select" id="tarjetasCicloSelect" onchange="loadTarjetasData()"></select>
+      <select class="tarjetas-select" id="tarjetasCicloSelect" onchange="onTarjetasMesChange()"></select>
     </div>
+
+    <div id="tarjetasErrorBox" style="display:none;" class="error-msg"></div>
 
     <!-- Gran total + desglose por banco -->
     <div id="tarjetasTotalBlock" style="display:none; margin-bottom:1.5rem;">
@@ -256,7 +258,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     <!-- Tabla de movimientos -->
     <div class="table-card">
       <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
-        <p class="chart-title" style="margin-bottom:0;">Movimientos</p>
+        <p class="chart-title" style="margin-bottom:0;">Movimientos <span id="tarjetasMovLabel" style="text-transform:none;color:#555;font-weight:400;"></span></p>
         <input type="text" id="tarjetasSearch" placeholder="Buscar..." onkeyup="filtrarTarjetasLog()"
           style="background:#111; border:0.5px solid #2a2a2a; border-radius:6px; padding:6px 10px; font-size:12px; color:#ccc; outline:none; width:160px;">
       </div>
@@ -282,37 +284,19 @@ const CICLOS = [
   // { label: 'Ciclo Agosto 2026', cicloDesde: new Date(2026,6,25), cicloHasta: new Date(2026,7,24), url: '...' }
 ];
 
-// ─── CICLOS TARJETAS ──────────────────────────────────────────────────────────
-// Columnas del sheet: Banco y tipo | Mes | Fecha | Tarjeta | Detalle | Cuota |
-//                    Detalle monto ARS | Detalle monto USD | Vencimiento | Total ARS | Total USD
-// El label se actualiza dinámicamente con el mes real leído del sheet (col. B)
-const TARJETAS_CICLOS = [
-  {
-    label: 'Cargando...',   // se reemplaza con el mes real del sheet al cargar
-    url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTSR-jEHWGJNTU5Wk2HOm6U5_pQkHudAuzgL46QYnVg5WNv-2K9H8hDsNVGUtFifICuhdcCzBWich3V/pub?gid=1050964641&single=true&output=csv'
-  }
-  // Agregar más resúmenes de tarjeta acá cuando estén disponibles:
-  // { label: 'Cargando...', url: '...' }
-];
+// ─── TARJETAS ─────────────────────────────────────────────────────────────────
+// Una sola hoja con TODOS los meses mezclados. Columnas del sheet:
+// A: Banco y tipo | B: Mes | C: Fecha | D: Tarjeta | E: Detalle | F: Cuota |
+// G: Detalle monto ARS | H: Detalle monto USD | I: Vencimiento | J: Total ARS | K: Total USD
+// La separación por mes se hace acá en el código, leyendo la columna B ("Mes").
+// Para sumar un mes nuevo: no hay que tocar nada acá, sólo agregar las filas al sheet.
+const TARJETAS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTSR-jEHWGJNTU5Wk2HOm6U5_pQkHudAuzgL46QYnVg5WNv-2K9H8hDsNVGUtFifICuhdcCzBWich3V/pub?gid=1050964641&single=true&output=csv';
 
-// Datos de ejemplo para tarjetas
-const TARJETAS_MOCK = [
-  { fecha:'25/06/2026', detalle:'Supermercado Jumbo',    banco:'Santander', tarjeta:'VISA Crédito',  tipo:'Crédito', montoARS:45000,  cotizacion:1180, quien:'Lucas'   },
-  { fecha:'26/06/2026', detalle:'Netflix',               banco:'Galicia',   tarjeta:'MC Crédito',    tipo:'Crédito', montoARS:8200,   cotizacion:1180, quien:'Mariana' },
-  { fecha:'27/06/2026', detalle:'SUBE',                  banco:'Santander', tarjeta:'VISA Débito',   tipo:'Débito',  montoARS:3500,   cotizacion:1182, quien:'Lucas'   },
-  { fecha:'28/06/2026', detalle:'Farmacia',              banco:'BBVA',      tarjeta:'MC Débito',     tipo:'Débito',  montoARS:12000,  cotizacion:1182, quien:'Mariana' },
-  { fecha:'29/06/2026', detalle:'Restaurante',           banco:'Galicia',   tarjeta:'MC Crédito',    tipo:'Crédito', montoARS:38000,  cotizacion:1185, quien:'Lucas'   },
-  { fecha:'30/06/2026', detalle:'Combustible',           banco:'Santander', tarjeta:'VISA Crédito',  tipo:'Crédito', montoARS:55000,  cotizacion:1185, quien:'Lucas'   },
-  { fecha:'01/07/2026', detalle:'Spotify',               banco:'Galicia',   tarjeta:'MC Crédito',    tipo:'Crédito', montoARS:4500,   cotizacion:1190, quien:'Mariana' },
-  { fecha:'02/07/2026', detalle:'Almacén',               banco:'BBVA',      tarjeta:'MC Débito',     tipo:'Débito',  montoARS:9800,   cotizacion:1190, quien:'Mariana' },
-  { fecha:'03/07/2026', detalle:'Ropa',                  banco:'Santander', tarjeta:'VISA Crédito',  tipo:'Crédito', montoARS:72000,  cotizacion:1192, quien:'Mariana' },
-  { fecha:'04/07/2026', detalle:'Bar',                   banco:'Galicia',   tarjeta:'MC Crédito',    tipo:'Crédito', montoARS:18000,  cotizacion:1192, quien:'Lucas'   },
-  { fecha:'05/07/2026', detalle:'Peluquería',            banco:'BBVA',      tarjeta:'MC Débito',     tipo:'Débito',  montoARS:11000,  cotizacion:1195, quien:'Mariana' },
-  { fecha:'06/07/2026', detalle:'Amazon',                banco:'Santander', tarjeta:'VISA Crédito',  tipo:'Crédito', montoARS:29000,  cotizacion:1195, quien:'Lucas'   },
-  { fecha:'07/07/2026', detalle:'Supermercado Dia',      banco:'Galicia',   tarjeta:'MC Débito',     tipo:'Débito',  montoARS:22000,  cotizacion:1198, quien:'Mariana' },
-  { fecha:'08/07/2026', detalle:'Cine',                  banco:'BBVA',      tarjeta:'MC Crédito',    tipo:'Crédito', montoARS:14000,  cotizacion:1198, quien:'Lucas'   },
-  { fecha:'09/07/2026', detalle:'Farmacia Plus',         banco:'Santander', tarjeta:'VISA Débito',   tipo:'Débito',  montoARS:7500,   cotizacion:1200, quien:'Mariana' },
-];
+const MES_NOMBRES_MAP = {
+  'enero':'Enero','febrero':'Febrero','marzo':'Marzo','abril':'Abril',
+  'mayo':'Mayo','junio':'Junio','julio':'Julio','agosto':'Agosto',
+  'septiembre':'Sep.','octubre':'Oct.','noviembre':'Nov.','diciembre':'Dic.'
+};
 
 const PALETTE = ['#378ADD','#1D9E75','#EF9F27','#7F77DD','#D4537E','#D85A30','#639922','#888780','#185FA5','#5DCAA5','#F09595','#B4B2A9'];
 const GRID = 'rgba(255,255,255,0.05)';
@@ -322,10 +306,15 @@ let cicloActivo = CICLOS.length - 1;
 let tabActivo = 'mes';
 let datosCache = {};
 let logDatos = [];
-let tarjetasDatos = [];
-let tarjetasGroups = {};
-let tarjetasLineSelected = [];
-  tarjetasGroups = {};
+
+// Tarjetas: datos crudos + estructura agrupada por mes de gasto (col. B del sheet)
+let tarjetasRawRows = null;      // filas crudas del CSV, cacheadas
+let tarjetasPorMes = {};         // { 'Mayo': { movimientos:[...], grupos:{bancoTipo:{totalARS,totalUSD}} }, 'Junio': {...} }
+let tarjetasMesesOrden = [];     // meses en orden de aparición en el sheet (cronológico)
+let tarjetasMesActivo = null;    // mes seleccionado en el dropdown "Resumen"
+let tarjetasMovimientosActuales = []; // movimientos del mes activo (para el buscador)
+let tarjetasLineSelected = [];   // bancos seleccionados en el gráfico de evolución
+
 let donutInst, barInst, compareBarInst, ratioLineInst, catCompareInst, tarjetasLineInst;
 
 // ─── UTILS ────────────────────────────────────────────────────────────────────
@@ -674,76 +663,12 @@ function renderComparativa() {
 
 // ═══════════════════════════════════════════════════════════════════════════
 // ─── TAB TARJETAS ─────────────────────────────────────────────────────────
+// Una sola hoja de Google Sheets con TODOS los meses. Se agrupa acá por la
+// columna "Mes" (col. B) para que cada mes se vea por separado en el
+// desplegable "Resumen", tanto en los totales como en el listado de
+// movimientos. El gráfico de "Evolución por mes" sí usa todos los meses
+// juntos, porque su objetivo es comparar mes a mes.
 // ═══════════════════════════════════════════════════════════════════════════
-
-function initTarjetas() {
-  const sel = document.getElementById('tarjetasCicloSelect');
-  sel.innerHTML = TARJETAS_CICLOS.map((t,i) =>
-    `<option value="${i}">${t.label}</option>`
-  ).join('');
-  sel.value = TARJETAS_CICLOS.length - 1;
-  loadTarjetasData();
-}
-
-function loadTarjetasData() {
-  const idx = parseInt(document.getElementById('tarjetasCicloSelect').value);
-  const conf = TARJETAS_CICLOS[idx];
-  tarjetasLineSelected = [];
-  tarjetasGroups = {};
-
-  if (!conf.url) {
-    tarjetasDatos = TARJETAS_MOCK;
-    renderTarjetas();
-    return;
-  }
-
-  fetchCSV(conf.url).then(rows => {
-      // Columnas: [0]Banco y tipo [1]Mes [2]Fecha [3]Tarjeta [4]Detalle
-      //           [5]Cuota [6]Det.ARS [7]Det.USD [8]Venc. [9]Total ARS [10]Total USD
-      const cols = Object.keys(rows[0]||{});
-
-      // ── Paso 1: agrupar filas por tarjeta (bancoTipo) para obtener el total real ──
-      const tarjetaGroups = {};
-      rows.forEach(row => {
-        const bt = (row[cols[0]]||'').trim();
-        if (!bt) return;
-        if (!tarjetaGroups[bt]) tarjetaGroups[bt] = { rows:[], totalARS:0, totalUSD:0, mes:'' };
-        const tARS = parseMonto(row[cols[9]]);
-        const tUSD = parseMonto(row[cols[10]]);
-        if (tARS > 0) tarjetaGroups[bt].totalARS = tARS;
-        if (tUSD > 0) tarjetaGroups[bt].totalUSD = tUSD;
-        if (row[cols[1]]) tarjetaGroups[bt].mes = (row[cols[1]]||'').trim();
-        tarjetaGroups[bt].rows.push(row);
-      });
-
-      // ── Paso 2: construir array de movimientos individuales ──
-      tarjetasDatos = rows.map(row => {
-        const bancoTipo = (row[cols[0]]||'').trim();
-        const montoARS  = parseMonto(row[cols[6]]);
-        const montoUSD  = parseMonto(row[cols[7]]);
-        const cuota     = (row[cols[5]]||'').trim();
-        const partes    = bancoTipo.split(' ');
-        const tipo      = partes[0] || '';
-        const banco     = partes.slice(1).join(' ') || bancoTipo;
-        const mesGasto  = (row[cols[1]]||'').trim();
-        return {
-          fecha:      (row[cols[2]]||'').trim(),
-          detalle:    (row[cols[4]]||'').trim(),
-          banco, tipo, bancoTipo,
-          tarjeta:    (row[cols[3]]||'').trim(),
-          mes:        mesGasto,
-          cuota,
-          montoARS,
-          montoUSD,
-          vencimiento:(row[cols[8]]||'').trim(),
-          totalARSGrupo: tarjetaGroups[bancoTipo]?.totalARS || 0,
-        };
-      }).filter(r => r.bancoTipo);
-
-      tarjetasGroups = tarjetaGroups;
-      renderTarjetas();
-  }).catch(() => { tarjetasDatos = TARJETAS_MOCK; renderTarjetas(); });
-}
 
 // Paleta fija por banco para consistencia visual
 const BANCO_COLORS = {
@@ -758,34 +683,103 @@ function getBancoColor(banco, idx) {
   return BANCO_COLORS[banco] || PALETTE[idx % PALETTE.length];
 }
 
-function renderTarjetas() {
-  if (!tarjetasDatos||!tarjetasDatos.length) return;
-  const datos = tarjetasDatos;
-  const groups = tarjetasGroups;
+function initTarjetas() {
+  tarjetasLineSelected = [];
+  loadTarjetasData();
+}
 
-  // ── Mes de gasto (columna B del sheet) ──
-  const MES_NOMBRES_MAP = {
-    'enero':'Enero','febrero':'Febrero','marzo':'Marzo','abril':'Abril',
-    'mayo':'Mayo','junio':'Junio','julio':'Julio','agosto':'Agosto',
-    'septiembre':'Sep.','octubre':'Oct.','noviembre':'Nov.','diciembre':'Dic.'
-  };
-  const mesGastoRaw = datos.find(r=>r.mes)?.mes || '';
-  const mesGasto    = MES_NOMBRES_MAP[mesGastoRaw.toLowerCase()] || mesGastoRaw;
-  const anioVenc    = datos.find(r=>r.vencimiento)?.vencimiento?.split('/')?.[2] || '';
-  const mesLabel    = mesGasto && anioVenc ? `${mesGasto} ${anioVenc}` : mesGasto;
+function loadTarjetasData() {
+  if (tarjetasRawRows) { procesarYRenderTarjetas(); return; }
 
-  // ── Actualizar label del select con el mes real del sheet ──
-  const selIdx = parseInt(document.getElementById('tarjetasCicloSelect').value);
-  if (mesLabel) {
-    const opt = document.getElementById('tarjetasCicloSelect').options[selIdx];
-    if (opt && (opt.text === 'Cargando...' || !opt.text.includes(mesGasto))) {
-      opt.text = `Gastos de ${mesLabel}`;
-    }
+  document.getElementById('tarjetasErrorBox').style.display = 'none';
+
+  fetchCSV(TARJETAS_URL).then(rows => {
+    tarjetasRawRows = rows;
+    procesarYRenderTarjetas();
+  }).catch(err => {
+    console.error('fetchTarjetas error', err);
+    document.getElementById('tarjetasErrorBox').innerHTML =
+      'No se pudo cargar el sheet de tarjetas. Verificá que esté publicado correctamente.';
+    document.getElementById('tarjetasErrorBox').style.display = 'block';
+    document.getElementById('tarjetasTotalBlock').style.display = 'none';
+  });
+}
+
+// Agrupa las filas crudas del sheet por mes (col. B) y, dentro de cada mes,
+// por "Banco y tipo" (col. A) para sacar los totales reales (col. J/K).
+function parseTarjetasRows(rows) {
+  const cols = Object.keys(rows[0]||{});
+  const [cBancoTipo,cMes,cFecha,cTarjeta,cDetalle,cCuota,cARS,cUSD,cVenc,cTotalARS,cTotalUSD] = cols;
+
+  const porMes = {};      // mes -> { movimientos:[...], grupos:{ bancoTipo:{totalARS,totalUSD} } }
+  const mesesOrden = [];  // orden de aparición en el sheet == orden cronológico
+
+  rows.forEach(row => {
+    const bancoTipo = (row[cBancoTipo]||'').trim();
+    if (!bancoTipo) return;
+
+    const mesRaw = (row[cMes]||'').trim();
+    const mes = MES_NOMBRES_MAP[mesRaw.toLowerCase()] || mesRaw || 'Sin mes';
+
+    if (!porMes[mes]) { porMes[mes] = { movimientos: [], grupos: {} }; mesesOrden.push(mes); }
+    if (!porMes[mes].grupos[bancoTipo]) porMes[mes].grupos[bancoTipo] = { totalARS: 0, totalUSD: 0 };
+
+    const tARS = parseMonto(row[cTotalARS]);
+    const tUSD = parseMonto(row[cTotalUSD]);
+    if (tARS > 0) porMes[mes].grupos[bancoTipo].totalARS = tARS;
+    if (tUSD > 0) porMes[mes].grupos[bancoTipo].totalUSD = tUSD;
+
+    const partes = bancoTipo.split(' ');
+    const tipo  = partes[0] || '';
+    const banco = partes.slice(1).join(' ') || bancoTipo;
+
+    porMes[mes].movimientos.push({
+      fecha:       (row[cFecha]||'').trim(),
+      detalle:     (row[cDetalle]||'').trim(),
+      banco, tipo, bancoTipo, mes,
+      tarjeta:     (row[cTarjeta]||'').trim(),
+      cuota:       (row[cCuota]||'').trim(),
+      montoARS:    parseMonto(row[cARS]),
+      montoUSD:    parseMonto(row[cUSD]),
+      vencimiento: (row[cVenc]||'').trim(),
+    });
+  });
+
+  return { porMes, mesesOrden };
+}
+
+function procesarYRenderTarjetas() {
+  const { porMes, mesesOrden } = parseTarjetasRows(tarjetasRawRows);
+  tarjetasPorMes = porMes;
+  tarjetasMesesOrden = mesesOrden;
+
+  // Dropdown "Resumen": más reciente primero, seleccionado por defecto
+  const sel = document.getElementById('tarjetasCicloSelect');
+  const mesesDesc = [...mesesOrden].reverse();
+  sel.innerHTML = mesesDesc.map(m => `<option value="${m}">Gastos de ${m}</option>`).join('');
+
+  if (!tarjetasMesActivo || !mesesOrden.includes(tarjetasMesActivo)) {
+    tarjetasMesActivo = mesesOrden[mesesOrden.length - 1]; // el más reciente
   }
+  sel.value = tarjetasMesActivo;
 
-  // ── Totales reales por banco ──
+  renderTarjetas();
+}
+
+function onTarjetasMesChange() {
+  tarjetasMesActivo = document.getElementById('tarjetasCicloSelect').value;
+  tarjetasLineSelected = []; // reset de selección de bancos al cambiar de mes
+  renderTarjetas();
+}
+
+function renderTarjetas() {
+  const mes = tarjetasMesActivo;
+  const dataMes = tarjetasPorMes[mes];
+  if (!dataMes) return;
+
+  // ── Totales por banco, sólo del mes activo ──
   const bancoTotalesARS = {}, bancoTotalesUSD = {}, bancoTarjetas = {};
-  Object.entries(groups).forEach(([bt, g]) => {
+  Object.entries(dataMes.grupos).forEach(([bt, g]) => {
     const partes = bt.split(' ');
     const banco  = partes.slice(1).join(' ') || bt;
     const tipo   = partes[0];
@@ -795,20 +789,13 @@ function renderTarjetas() {
     bancoTarjetas[banco].push({ bancoTipo:bt, tipo, totalARS:g.totalARS, totalUSD:g.totalUSD });
   });
 
-  const getTotal = (banco) => bancoTotalesARS[banco];
-  const bancosArr = Object.keys(bancoTotalesARS).sort((a,b)=>getTotal(b)-getTotal(a));
+  const bancosArr = Object.keys(bancoTotalesARS).sort((a,b)=>bancoTotalesARS[b]-bancoTotalesARS[a]);
   const totalGralARS = Object.values(bancoTotalesARS).reduce((s,v)=>s+v, 0);
   const totalGralUSD = Object.values(bancoTotalesUSD).reduce((s,v)=>s+v, 0);
-  const totalGral = totalGralARS;
 
-  // ── BLOQUE MACRO: Gran total + desglose por banco ──
-  const mesHeaderEl = document.getElementById('tarjetasMesHeader');
-  if (mesHeaderEl) mesHeaderEl.style.display = 'none';
-
-  const totalBlock = document.getElementById('tarjetasTotalBlock');
+  // ── BLOQUE MACRO: Gran total + desglose por banco (mes activo) ──
   const totalInner = document.getElementById('tarjetasTotalInner');
   if (totalInner) {
-    // Filas de banco: cada una con barra, montos y desglose Visa/Master
     const bancoRows = bancosArr.map((banco, i) => {
       const tARS  = bancoTotalesARS[banco];
       const tUSD  = bancoTotalesUSD[banco];
@@ -842,7 +829,6 @@ function renderTarjetas() {
       </div>`;
     }).join('');
 
-    // Totales grandes: ARS y USD al mismo tamaño (28px cada uno)
     const usdTotalHtml = totalGralUSD > 0
       ? `<div style="display:flex;align-items:baseline;gap:6px;padding-left:24px;border-left:0.5px solid #222;">
           <span style="font-size:28px;font-weight:500;color:#5DCAA5;letter-spacing:-0.5px;">U$S ${totalGralUSD.toFixed(2)}</span>
@@ -851,7 +837,7 @@ function renderTarjetas() {
 
     totalInner.innerHTML = `
       <div style="background:#1a1a1a;border:0.5px solid #2a2a2a;border-radius:12px;padding:22px 24px;">
-        <p style="font-size:10px;color:#444;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:18px;">Total tarjetas · ${mesLabel}</p>
+        <p style="font-size:10px;color:#444;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:18px;">Total tarjetas · ${mes}</p>
         <div style="display:flex;align-items:baseline;gap:0;flex-wrap:wrap;margin-bottom:22px;padding-bottom:20px;border-bottom:0.5px solid #222;">
           <div style="display:flex;align-items:baseline;gap:6px;padding-right:24px;">
             <span style="font-size:28px;font-weight:500;color:#e8e8e8;letter-spacing:-0.5px;">${fmt(totalGralARS)}</span>
@@ -861,32 +847,29 @@ function renderTarjetas() {
         </div>
         <div>${bancoRows}</div>
       </div>`;
-    totalBlock.style.display = 'block';
+    document.getElementById('tarjetasTotalBlock').style.display = 'block';
   }
 
-  // Cards grid ya no se usa — ocultar
-  const cardsEl = document.getElementById('tarjetaCards');
-  if (cardsEl) cardsEl.style.display = 'none';
-
-  // ── GRÁFICO DE LÍNEA: por mes de gasto ──
-  const mesOrden = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Oct.','Nov.','Dic.'];
+  // ── GRÁFICO DE LÍNEA: evolución por mes, con TODOS los meses cargados ──
   const lineDataByBanco = {};
-  Object.entries(groups).forEach(([bt, g]) => {
-    const partes  = bt.split(' ');
-    const banco   = partes.slice(1).join(' ') || bt;
-    const mesNorm = MES_NOMBRES_MAP[(g.mes||'').toLowerCase()] || g.mes;
-    const total   = g.totalARS;
-    if (!lineDataByBanco[banco]) lineDataByBanco[banco] = {};
-    lineDataByBanco[banco][mesNorm] = (lineDataByBanco[banco][mesNorm]||0) + total;
+  tarjetasMesesOrden.forEach(m => {
+    Object.entries(tarjetasPorMes[m].grupos).forEach(([bt, g]) => {
+      const partes = bt.split(' ');
+      const banco  = partes.slice(1).join(' ') || bt;
+      if (!lineDataByBanco[banco]) lineDataByBanco[banco] = {};
+      lineDataByBanco[banco][m] = (lineDataByBanco[banco][m]||0) + g.totalARS;
+    });
   });
+  const bancosGlobalArr = Object.keys(lineDataByBanco).sort((a,b)=>{
+    const sumA = Object.values(lineDataByBanco[a]).reduce((s,v)=>s+v,0);
+    const sumB = Object.values(lineDataByBanco[b]).reduce((s,v)=>s+v,0);
+    return sumB - sumA;
+  });
+  const allMeses = tarjetasMesesOrden; // ya en orden cronológico de aparición
 
-  const allMeses = [...new Set(
-    Object.values(lineDataByBanco).flatMap(m=>Object.keys(m))
-  )].sort((a,b)=>mesOrden.indexOf(a)-mesOrden.indexOf(b));
+  if (!tarjetasLineSelected.length) tarjetasLineSelected = [...bancosGlobalArr];
 
-  if (!tarjetasLineSelected.length) tarjetasLineSelected = [...bancosArr];
-
-  document.getElementById('tarjetasLineControls').innerHTML = bancosArr.map((k, i) => {
+  document.getElementById('tarjetasLineControls').innerHTML = bancosGlobalArr.map((k, i) => {
     const color = getBancoColor(k, i);
     const on = tarjetasLineSelected.includes(k);
     return `<button class="line-chip" onclick="toggleTarjetaLine('${k}')"
@@ -895,8 +878,8 @@ function renderTarjetas() {
     </button>`;
   }).join('');
 
-  const lineDatasets = bancosArr.filter(k=>tarjetasLineSelected.includes(k)).map((banco) => {
-    const color = getBancoColor(banco, bancosArr.indexOf(banco));
+  const lineDatasets = bancosGlobalArr.filter(k=>tarjetasLineSelected.includes(k)).map((banco) => {
+    const color = getBancoColor(banco, bancosGlobalArr.indexOf(banco));
     const bData = lineDataByBanco[banco] || {};
     return {
       label: banco,
@@ -910,11 +893,9 @@ function renderTarjetas() {
   if (tarjetasLineInst) tarjetasLineInst.destroy();
   const yFmt = v=>'$'+(v>=1000000?Math.round(v/1000000)+'M':v>=1000?Math.round(v/1000)+'k':v);
 
-
-
   tarjetasLineInst = new Chart(document.getElementById('tarjetasLineChart'), {
     type: 'line',
-    data: { labels: allMeses.length ? allMeses : [mesLabel||'Sin datos'], datasets: lineDatasets },
+    data: { labels: allMeses.length ? allMeses : ['Sin datos'], datasets: lineDatasets },
     options: {
       responsive:true, maintainAspectRatio:false,
       interaction:{mode:'index',intersect:false},
@@ -929,14 +910,21 @@ function renderTarjetas() {
     }
   });
 
-  document.getElementById('tarjetasLineLegend').innerHTML = bancosArr
+  document.getElementById('tarjetasLineLegend').innerHTML = bancosGlobalArr
     .filter(k=>tarjetasLineSelected.includes(k))
     .map(k=>{
-      const color=getBancoColor(k,bancosArr.indexOf(k));
+      const color=getBancoColor(k,bancosGlobalArr.indexOf(k));
       return `<span class="legend-item"><span class="legend-dot" style="background:${color}"></span>${k}</span>`;
     }).join('');
 
-  renderTarjetasLog(datos);
+  // ── Movimientos: sólo del mes activo (evita que la lista crezca sin fin) ──
+  tarjetasMovimientosActuales = [...dataMes.movimientos].sort((a,b)=>{
+    const da=parseDate(a.fecha), db=parseDate(b.fecha);
+    return (!da||!db)?0:db-da;
+  });
+  document.getElementById('tarjetasMovLabel').textContent = `· ${mes}`;
+  document.getElementById('tarjetasSearch').value = '';
+  renderTarjetasLog(tarjetasMovimientosActuales);
 }
 
 function toggleTarjetaLine(key) {
@@ -991,7 +979,7 @@ function renderTarjetasLog(datos) {
 
 function filtrarTarjetasLog() {
   const q=document.getElementById('tarjetasSearch').value.toLowerCase();
-  renderTarjetasLog(tarjetasDatos.filter(r=>
+  renderTarjetasLog(tarjetasMovimientosActuales.filter(r=>
     r.detalle.toLowerCase().includes(q)||
     (r.bancoTipo||'').toLowerCase().includes(q)||
     r.banco.toLowerCase().includes(q)||
