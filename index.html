@@ -247,7 +247,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       <div style="display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
         <div>
           <p class="chart-title" style="margin-bottom:4px;">Evolución por mes de gasto</p>
-          <p style="font-size:11px; color:#444;">Total por banco · seleccioná para comparar</p>
+          <p style="font-size:11px; color:#444;">Total por banco y mes · seleccioná para comparar</p>
         </div>
         <div style="display:flex; gap:6px; flex-wrap:wrap;" id="tarjetasLineControls"></div>
       </div>
@@ -878,34 +878,61 @@ function renderTarjetas() {
     </button>`;
   }).join('');
 
-  const lineDatasets = bancosGlobalArr.filter(k=>tarjetasLineSelected.includes(k)).map((banco) => {
+  const barDatasets = bancosGlobalArr.filter(k=>tarjetasLineSelected.includes(k)).map((banco) => {
     const color = getBancoColor(banco, bancosGlobalArr.indexOf(banco));
     const bData = lineDataByBanco[banco] || {};
     return {
       label: banco,
       data: allMeses.map(m=>bData[m]||0),
-      borderColor: color, backgroundColor: color+'18',
-      borderWidth: 2.5, pointRadius: 6, pointBackgroundColor: color,
-      tension: 0.3, fill: false
+      backgroundColor: color+'99',
+      borderColor: color,
+      borderWidth: 1.5,
+      borderRadius: 5,
+      maxBarThickness: 46
     };
   });
 
   if (tarjetasLineInst) tarjetasLineInst.destroy();
   const yFmt = v=>'$'+(v>=1000000?Math.round(v/1000000)+'M':v>=1000?Math.round(v/1000)+'k':v);
 
+  // Plugin liviano para mostrar el monto arriba de cada barra
+  const barValueLabels = {
+    id: 'barValueLabels',
+    afterDatasetsDraw(chart) {
+      const { ctx } = chart;
+      chart.data.datasets.forEach((dataset, dsIndex) => {
+        const meta = chart.getDatasetMeta(dsIndex);
+        if (meta.hidden) return;
+        meta.data.forEach((bar, i) => {
+          const value = dataset.data[i];
+          if (!value) return;
+          ctx.save();
+          ctx.fillStyle = dataset.borderColor || '#ccc';
+          ctx.font = '600 10px -apple-system, BlinkMacSystemFont, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'bottom';
+          ctx.fillText(yFmt(value), bar.x, bar.y - 6);
+          ctx.restore();
+        });
+      });
+    }
+  };
+
   tarjetasLineInst = new Chart(document.getElementById('tarjetasLineChart'), {
-    type: 'line',
-    data: { labels: allMeses.length ? allMeses : ['Sin datos'], datasets: lineDatasets },
+    type: 'bar',
+    data: { labels: allMeses.length ? allMeses : ['Sin datos'], datasets: barDatasets },
+    plugins: [barValueLabels],
     options: {
       responsive:true, maintainAspectRatio:false,
       interaction:{mode:'index',intersect:false},
+      layout:{ padding:{ top: 18 } },
       plugins:{
         legend:{display:false},
         tooltip:{callbacks:{label:ctx=>` ${ctx.dataset.label}: ${fmt(ctx.raw)}`}}
       },
       scales:{
-        x:{grid:{color:GRID},ticks:{color:TICK,font:{size:11}}},
-        y:{grid:{color:GRID},ticks:{color:TICK,font:{size:10},callback:yFmt},beginAtZero:true}
+        x:{grid:{display:false},ticks:{color:TICK,font:{size:11}}},
+        y:{grid:{color:GRID},ticks:{color:TICK,font:{size:10},callback:yFmt},beginAtZero:true,grace:'12%'}
       }
     }
   });
