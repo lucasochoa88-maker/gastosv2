@@ -244,16 +244,18 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
     <!-- Gráfico de línea comparativo mes a mes -->
     <div class="chart-card-full">
-      <div style="display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
+      <div style="display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
         <div>
           <p class="chart-title" style="margin-bottom:4px;">Evolución por mes de gasto</p>
           <p style="font-size:11px; color:#444;">Total por banco y mes · seleccioná para comparar</p>
         </div>
-        <div style="display:flex; gap:6px; flex-wrap:wrap;" id="tarjetasLineControls"></div>
+        <div class="tarjetas-toggle-group" id="tarjetasRangoControls"></div>
       </div>
+      <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px;" id="tarjetasLineControls"></div>
       <div style="position:relative; height:240px;"><canvas id="tarjetasLineChart"></canvas></div>
       <div class="legend" id="tarjetasLineLegend"></div>
     </div>
+
 
     <!-- Tabla de movimientos -->
     <div class="table-card">
@@ -314,6 +316,7 @@ let tarjetasMesesOrden = [];     // meses en orden de aparición en el sheet (cr
 let tarjetasMesActivo = null;    // mes seleccionado en el dropdown "Resumen"
 let tarjetasMovimientosActuales = []; // movimientos del mes activo (para el buscador)
 let tarjetasLineSelected = [];   // bancos seleccionados en el gráfico de evolución
+let tarjetasRangoMeses = 3;      // cuántos de los últimos meses se muestran en el gráfico de evolución
 
 let donutInst, barInst, compareBarInst, ratioLineInst, catCompareInst, tarjetasLineInst;
 
@@ -766,6 +769,11 @@ function procesarYRenderTarjetas() {
   renderTarjetas();
 }
 
+function cambiarRangoTarjetas(n) {
+  tarjetasRangoMeses = n;
+  renderTarjetas();
+}
+
 function onTarjetasMesChange() {
   tarjetasMesActivo = document.getElementById('tarjetasCicloSelect').value;
   tarjetasLineSelected = []; // reset de selección de bancos al cambiar de mes
@@ -850,9 +858,20 @@ function renderTarjetas() {
     document.getElementById('tarjetasTotalBlock').style.display = 'block';
   }
 
-  // ── GRÁFICO DE LÍNEA: evolución por mes, con TODOS los meses cargados ──
+  // ── GRÁFICO DE LÍNEA: evolución de los últimos N meses (selector 2M-6M) ──
+  const rangosDisponibles = [2,3,4,5,6].filter(n => n <= tarjetasMesesOrden.length);
+  if (!rangosDisponibles.includes(tarjetasRangoMeses)) {
+    tarjetasRangoMeses = rangosDisponibles[rangosDisponibles.length-1] || tarjetasMesesOrden.length;
+  }
+  document.getElementById('tarjetasRangoControls').innerHTML = rangosDisponibles.map(n => {
+    const active = n === tarjetasRangoMeses;
+    return `<button class="tarjetas-toggle ${active?'active':''}" onclick="cambiarRangoTarjetas(${n})">${n}M</button>`;
+  }).join('');
+
+  const allMeses = tarjetasMesesOrden.slice(-tarjetasRangoMeses); // últimos N meses, en orden cronológico
+
   const lineDataByBanco = {};
-  tarjetasMesesOrden.forEach(m => {
+  allMeses.forEach(m => {
     Object.entries(tarjetasPorMes[m].grupos).forEach(([bt, g]) => {
       const partes = bt.split(' ');
       const banco  = partes.slice(1).join(' ') || bt;
@@ -865,7 +884,6 @@ function renderTarjetas() {
     const sumB = Object.values(lineDataByBanco[b]).reduce((s,v)=>s+v,0);
     return sumB - sumA;
   });
-  const allMeses = tarjetasMesesOrden; // ya en orden cronológico de aparición
 
   if (!tarjetasLineSelected.length) tarjetasLineSelected = [...bancosGlobalArr];
 
@@ -888,33 +906,40 @@ function renderTarjetas() {
       borderColor: color,
       borderWidth: 1.5,
       borderRadius: 5,
-      maxBarThickness: 46
+      maxBarThickness: 64
     };
   });
 
   if (tarjetasLineInst) tarjetasLineInst.destroy();
   const yFmt = v=>'$'+(v>=1000000?Math.round(v/1000000)+'M':v>=1000?Math.round(v/1000)+'k':v);
 
-  // Plugin liviano para mostrar el monto arriba de cada barra
+  // Plugin liviano: un solo label con el TOTAL arriba de cada barra apilada
   const barValueLabels = {
     id: 'barValueLabels',
     afterDatasetsDraw(chart) {
       const { ctx } = chart;
-      chart.data.datasets.forEach((dataset, dsIndex) => {
-        const meta = chart.getDatasetMeta(dsIndex);
-        if (meta.hidden) return;
-        meta.data.forEach((bar, i) => {
+      const labelCount = chart.data.labels.length;
+      for (let i = 0; i < labelCount; i++) {
+        let total = 0, topBar = null;
+        chart.data.datasets.forEach((dataset, dsIndex) => {
+          const meta = chart.getDatasetMeta(dsIndex);
+          if (meta.hidden) return;
           const value = dataset.data[i];
-          if (!value) return;
-          ctx.save();
-          ctx.fillStyle = dataset.borderColor || '#ccc';
-          ctx.font = '600 10px -apple-system, BlinkMacSystemFont, sans-serif';
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'bottom';
-          ctx.fillText(yFmt(value), bar.x, bar.y - 6);
-          ctx.restore();
+          if (value) {
+            total += value;
+            const bar = meta.data[i];
+            if (bar && (!topBar || bar.y < topBar.y)) topBar = bar;
+          }
         });
-      });
+        if (!topBar || !total) continue;
+        ctx.save();
+        ctx.fillStyle = '#e8e8e8';
+        ctx.font = '600 11px -apple-system, BlinkMacSystemFont, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+        ctx.fillText(yFmt(total), topBar.x, topBar.y - 6);
+        ctx.restore();
+      }
     }
   };
 
@@ -931,8 +956,8 @@ function renderTarjetas() {
         tooltip:{callbacks:{label:ctx=>` ${ctx.dataset.label}: ${fmt(ctx.raw)}`}}
       },
       scales:{
-        x:{grid:{display:false},ticks:{color:TICK,font:{size:11}}},
-        y:{grid:{color:GRID},ticks:{color:TICK,font:{size:10},callback:yFmt},beginAtZero:true,grace:'12%'}
+        x:{stacked:true,grid:{display:false},ticks:{color:TICK,font:{size:11}}},
+        y:{stacked:true,grid:{color:GRID},ticks:{color:TICK,font:{size:10},callback:yFmt},beginAtZero:true,grace:'12%'}
       }
     }
   });
