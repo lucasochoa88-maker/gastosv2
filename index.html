@@ -39,12 +39,26 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .tab:hover { color: #aaa; }
 .tab.active { color: #fff; background: #2a2a2a; }
 
-.metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
+.metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 10px; }
 .metric { background: #1a1a1a; border: 0.5px solid #222; border-radius: 8px; padding: 14px 16px; }
 .metric-label { font-size: 10px; color: #444; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
 .metric-value { font-size: 17px; font-weight: 500; color: #e8e8e8; }
 .metric-value.danger { color: #E24B4A; }
 .metric-value.success { color: #639922; }
+
+.summary-strip { background: #1a1a1a; border: 0.5px solid #222; border-radius: 8px; padding: 14px 18px; margin-bottom: 1.5rem; display: flex; align-items: center; flex-wrap: wrap; gap: 0; }
+.summary-item { display: flex; flex-direction: column; gap: 4px; padding: 4px 22px; border-right: 0.5px solid #242424; flex: 1; min-width: 130px; }
+.summary-item:first-child { padding-left: 4px; }
+.summary-item:last-child { border-right: none; }
+.summary-label { font-size: 10px; color: #444; text-transform: uppercase; letter-spacing: 0.05em; }
+.summary-value { font-size: 16px; font-weight: 500; color: #e8e8e8; white-space: nowrap; }
+.summary-value.danger { color: #E24B4A; }
+.summary-value.success { color: #639922; }
+
+@media (max-width: 600px) {
+  .summary-strip { padding: 10px 14px; }
+  .summary-item { flex: 1 1 40%; border-right: none; padding: 8px 4px; }
+}
 
 .proj-banner { background: #1a1a1a; border: 0.5px solid #2a2a2a; border-left: 2px solid #EF9F27; border-radius: 8px; padding: 12px 16px; margin-bottom: 1.5rem; display: flex; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
 .proj-banner-content { flex: 1; }
@@ -171,6 +185,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     </div>
 
     <div class="metrics" id="metricsBox"></div>
+    <div class="summary-strip" id="summaryStrip"></div>
 
     <div class="charts">
       <div class="chart-card">
@@ -240,6 +255,23 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     <!-- Gran total + desglose por banco -->
     <div id="tarjetasTotalBlock" style="display:none; margin-bottom:1.5rem;">
       <div id="tarjetasTotalInner"></div>
+    </div>
+
+    <!-- Compromisos futuros por cuotas -->
+    <div class="chart-card-full" id="cuotasBlock" style="display:none;">
+      <div style="display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:4px;">
+        <div>
+          <p class="chart-title" style="margin-bottom:4px;">Compromisos futuros por cuotas</p>
+          <p style="font-size:11px; color:#444;">Lo que ya está comprometido en próximos resúmenes por cuotas en curso</p>
+        </div>
+      </div>
+      <p id="cuotasResumen" style="font-size:13px; color:#888; margin-bottom:14px; line-height:1.6;"></p>
+      <div style="position:relative; height:200px;"><canvas id="cuotasChart"></canvas></div>
+      <div class="legend" id="cuotasLegend"></div>
+      <div style="overflow-x:auto; margin-top:16px;">
+        <table class="ranking-table" id="cuotasTable" style="width:100%; min-width:520px;"></table>
+      </div>
+      <p style="font-size:10px; color:#3a3a3a; margin-top:12px;">* Proyección asumiendo cuotas de igual valor, según el último resumen disponible de cada tarjeta.</p>
     </div>
 
     <!-- Gráfico de línea comparativo mes a mes -->
@@ -318,7 +350,7 @@ let tarjetasMovimientosActuales = []; // movimientos del mes activo (para el bus
 let tarjetasLineSelected = [];   // bancos seleccionados en el gráfico de evolución
 let tarjetasRangoMeses = 3;      // cuántos de los últimos meses se muestran en el gráfico de evolución
 
-let donutInst, barInst, compareBarInst, ratioLineInst, catCompareInst, tarjetasLineInst;
+let donutInst, barInst, compareBarInst, ratioLineInst, catCompareInst, tarjetasLineInst, cuotasChartInst;
 
 // ─── UTILS ────────────────────────────────────────────────────────────────────
 const fmt    = n => '$' + Math.round(n).toLocaleString('es-AR');
@@ -541,7 +573,7 @@ function buildDashboard(rows) {
       </div>
     </div>`;
 
-  // Métricas
+  // Métricas: fila 1 = por persona (cards con desglose), fila 2 = resumen del ciclo (franja compacta)
   document.getElementById('metricsBox').innerHTML=`
     <div class="metric">
       <p class="metric-label">Lucas</p>
@@ -553,10 +585,12 @@ function buildDashboard(rows) {
       <p class="metric-value">${ingresosMari > 0 ? fmt(ingresosMari) : '<span style="font-size:13px;color:#444;">—</span>'}</p>
       ${ingresosMari > 0 ? subRow(gastosMari, saldoMari, pctMari) : ''}
     </div>
-    <div class="metric"><p class="metric-label">Total ingresos</p><p class="metric-value">${fmt(totalIngresos)}</p></div>
-    <div class="metric"><p class="metric-label">Total gastos</p><p class="metric-value danger">${fmt(totalGastos)}</p></div>
-    <div class="metric"><p class="metric-label">Saldo total</p><p class="metric-value success">${fmt(resto)}</p></div>
-    <div class="metric"><p class="metric-label">% gastado</p><p class="metric-value">${pctGastado}%</p></div>
+  `;
+  document.getElementById('summaryStrip').innerHTML=`
+    <div class="summary-item"><span class="summary-label">Total ingresos</span><span class="summary-value">${fmt(totalIngresos)}</span></div>
+    <div class="summary-item"><span class="summary-label">Total gastos</span><span class="summary-value danger">${fmt(totalGastos)}</span></div>
+    <div class="summary-item"><span class="summary-label">Saldo total</span><span class="summary-value success">${fmt(resto)}</span></div>
+    <div class="summary-item"><span class="summary-label">% gastado</span><span class="summary-value">${pctGastado}%</span></div>
   `;
 
   // Fechas
@@ -977,6 +1011,169 @@ function renderTarjetas() {
   document.getElementById('tarjetasMovLabel').textContent = `· ${mes}`;
   document.getElementById('tarjetasSearch').value = '';
   renderTarjetasLog(tarjetasMovimientosActuales);
+
+  renderCompromisos();
+}
+
+// ─── COMPROMISOS FUTUROS POR CUOTAS ──────────────────────────────────────────
+// Para cada tarjeta toma su ÚLTIMO resumen disponible (evita duplicar planes
+// que también figuran en meses anteriores) y proyecta las cuotas restantes
+// hacia los meses siguientes, asumiendo cuotas de igual valor.
+const MES_CAL_NOMBRES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Sep.','Oct.','Nov.','Dic.'];
+const MES_CAL_INDEX = Object.fromEntries(MES_CAL_NOMBRES.map((m,i)=>[m,i]));
+
+function renderCompromisos() {
+  const block = document.getElementById('cuotasBlock');
+
+  // Último mes en que aparece cada tarjeta (bancoTipo)
+  const ultimoMesPorTarjeta = {};
+  tarjetasMesesOrden.forEach(m => {
+    Object.keys(tarjetasPorMes[m].grupos).forEach(bt => { ultimoMesPorTarjeta[bt] = m; });
+  });
+
+  const planes = [];
+  const futuros = {};   // absIdx (mes calendario, puede pasar de 11 al año sig.) -> { banco: monto }
+  let minAbs = Infinity, maxAbs = -Infinity;
+
+  Object.entries(ultimoMesPorTarjeta).forEach(([bt, mesBase]) => {
+    const baseIdx = MES_CAL_INDEX[mesBase];
+    if (baseIdx === undefined) return;
+    tarjetasPorMes[mesBase].movimientos.forEach(r => {
+      if (r.bancoTipo !== bt) return;
+      const m = (r.cuota||'').match(/^(\d+)\s*\/\s*(\d+)$/);
+      if (!m) return;
+      const c = parseInt(m[1]), t = parseInt(m[2]);
+      if (!(t > c) || r.montoARS <= 0) return;
+      const restantes = t - c;
+      planes.push({
+        detalle: r.detalle, bancoTipo: bt, banco: r.banco,
+        cuotaActual: c, cuotaTotal: t, restantes,
+        montoCuota: r.montoARS, totalRestante: r.montoARS * restantes
+      });
+      for (let k = 1; k <= restantes; k++) {
+        const abs = baseIdx + k;
+        if (!futuros[abs]) futuros[abs] = {};
+        futuros[abs][r.banco] = (futuros[abs][r.banco]||0) + r.montoARS;
+        if (abs < minAbs) minAbs = abs;
+        if (abs > maxAbs) maxAbs = abs;
+      }
+    });
+  });
+
+  if (!planes.length) {
+    block.style.display = 'none';
+    return;
+  }
+  block.style.display = 'block';
+
+  const totalComprometido = planes.reduce((s,p)=>s+p.totalRestante,0);
+  const mesesHorizonte = maxAbs - minAbs + 1;
+
+  // Labels de meses futuros (agrega ' (sig. año)' si pasa de diciembre)
+  const labels = [], absList = [];
+  for (let abs = minAbs; abs <= maxAbs; abs++) {
+    labels.push(MES_CAL_NOMBRES[abs % 12] + (abs > 11 ? ' *' : ''));
+    absList.push(abs);
+  }
+
+  // Bancos presentes en la proyección, ordenados por total comprometido
+  const bancosFut = [...new Set(Object.values(futuros).flatMap(o=>Object.keys(o)))]
+    .sort((a,b)=>{
+      const sA = absList.reduce((s,abs)=>s+(futuros[abs]?.[a]||0),0);
+      const sB = absList.reduce((s,abs)=>s+(futuros[abs]?.[b]||0),0);
+      return sB - sA;
+    });
+
+  document.getElementById('cuotasResumen').innerHTML =
+    `Tenés <strong style="color:#e8e8e8;">${fmt(totalComprometido)}</strong> comprometidos en `+
+    `<strong style="color:#e8e8e8;">${planes.length}</strong> plan${planes.length!==1?'es':''} de cuotas, `+
+    `repartidos en los próximos <strong style="color:#e8e8e8;">${mesesHorizonte}</strong> mes${mesesHorizonte!==1?'es':''}.`;
+
+  const yFmtC = v=>'$'+(v>=1000000?Math.round(v/1000000)+'M':v>=1000?Math.round(v/1000)+'k':v);
+
+  const cuotasDatasets = bancosFut.map((banco,i)=>({
+    label: banco,
+    data: absList.map(abs=>futuros[abs]?.[banco]||0),
+    backgroundColor: getBancoColor(banco,i)+'99',
+    borderColor: getBancoColor(banco,i),
+    borderWidth: 1.5, borderRadius: 5, maxBarThickness: 64
+  }));
+
+  const cuotasTotalLabels = {
+    id: 'cuotasTotalLabels',
+    afterDatasetsDraw(chart) {
+      const { ctx } = chart;
+      for (let i = 0; i < chart.data.labels.length; i++) {
+        let total = 0, topBar = null;
+        chart.data.datasets.forEach((ds, di) => {
+          const meta = chart.getDatasetMeta(di);
+          if (meta.hidden) return;
+          const v = ds.data[i];
+          if (v) {
+            total += v;
+            const bar = meta.data[i];
+            if (bar && (!topBar || bar.y < topBar.y)) topBar = bar;
+          }
+        });
+        if (!topBar || !total) continue;
+        ctx.save();
+        ctx.fillStyle = '#e8e8e8';
+        ctx.font = '600 11px -apple-system, BlinkMacSystemFont, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+        ctx.fillText(yFmtC(total), topBar.x, topBar.y - 6);
+        ctx.restore();
+      }
+    }
+  };
+
+  if (cuotasChartInst) cuotasChartInst.destroy();
+  cuotasChartInst = new Chart(document.getElementById('cuotasChart'), {
+    type: 'bar',
+    data: { labels, datasets: cuotasDatasets },
+    plugins: [cuotasTotalLabels],
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      layout:{ padding:{ top: 18 } },
+      plugins:{
+        legend:{display:false},
+        tooltip:{callbacks:{label:ctx=>` ${ctx.dataset.label}: ${fmt(ctx.raw)}`}}
+      },
+      scales:{
+        x:{stacked:true,grid:{display:false},ticks:{color:TICK,font:{size:11}}},
+        y:{stacked:true,grid:{color:GRID},ticks:{color:TICK,font:{size:10},callback:yFmtC},beginAtZero:true,grace:'12%'}
+      }
+    }
+  });
+
+  document.getElementById('cuotasLegend').innerHTML = bancosFut.map((b,i)=>
+    `<span class="legend-item"><span class="legend-dot" style="background:${getBancoColor(b,i)}"></span>${b}</span>`
+  ).join('');
+
+  // Tabla de planes activos, ordenados por lo que falta pagar
+  const planesOrdenados = [...planes].sort((a,b)=>b.totalRestante-a.totalRestante);
+  document.getElementById('cuotasTable').innerHTML = `
+    <thead><tr>
+      <th style="width:32%">Detalle</th>
+      <th style="width:20%">Tarjeta</th>
+      <th style="width:12%;text-align:center">Cuota</th>
+      <th style="width:18%;text-align:right">Por cuota</th>
+      <th style="width:18%;text-align:right">Falta pagar</th>
+    </tr></thead>
+    <tbody>${planesOrdenados.map(p=>{
+      const color = getBancoColor(p.banco, 0);
+      const pctPagado = ((p.cuotaActual/p.cuotaTotal)*100).toFixed(0);
+      return `<tr>
+        <td style="font-weight:500;font-size:12px">${p.detalle}
+          <div class="bar-bg"><div class="bar-fill" style="width:${pctPagado}%;background:${color};"></div></div>
+        </td>
+        <td><span style="font-size:11px;color:#aaa">${p.bancoTipo}</span></td>
+        <td style="text-align:center;font-size:11px;color:#888">${p.cuotaActual}/${p.cuotaTotal}</td>
+        <td style="text-align:right;font-size:12px;color:#888">${fmt(p.montoCuota)}</td>
+        <td style="text-align:right;font-weight:500">${fmt(p.totalRestante)}<br><span class="pct-label">${p.restantes} cuota${p.restantes!==1?'s':''}</span></td>
+      </tr>`;
+    }).join('')}</tbody>`;
 }
 
 function toggleTarjetaLine(key) {
