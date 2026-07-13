@@ -10,10 +10,10 @@
 /* ─── TEMA ─── Dark por defecto. Grises subidos para mejor contraste. */
 :root {
   --bg:#0F0F0F; --card:#1A1A1A; --input:#141414; --soft:#222222; --softer:#1E1E1E;
-  --divider:var(--divider); --border:#2A2A2A; --active:#2E2E2E;
+  --divider:#262626; --border:#2A2A2A; --active:#2E2E2E;
   --t-fff:#FFFFFF; --t-e8:#EDEDED; --t-ccc:#D6D6D6; --t-aaa:#C0C0C0; --t-888:#ABABAB;
   --t-666:#9C9C9C; --t-555:#8F8F8F; --t-444:#8A8A8A; --t-333:#616161; --t-3a:#6E6E6E;
-  --shadow:var(--shadow);
+  --shadow:rgba(0, 0, 0, 0.5);
 }
 body.light {
   --bg:#F4F4F1; --card:#FFFFFF; --input:#F1F1EE; --soft:#E9E9E4; --softer:#F0F0EC;
@@ -1300,36 +1300,65 @@ function renderTarjetasLog(datos) {
     btColorMap[bt] = getBancoColor(banco, i);
   });
 
-  document.getElementById('tarjetasLogTable').innerHTML=`
-    <thead><tr>
-      <th style="width:10%">Fecha</th>
-      <th style="width:28%">Detalle</th>
-      <th style="width:18%">Tarjeta</th>
-      <th style="width:10%">Cuota</th>
-      <th style="width:11%">Vence</th>
-      <th style="width:12%;text-align:right">ARS</th>
-      <th style="width:11%;text-align:right">USD</th>
-    </tr></thead>
-    <tbody>${datos.map(r=>{
+  // Agrupar por tarjeta; grupos ordenados por subtotal desc, filas por fecha desc
+  const grupos = {};
+  datos.forEach(r => { (grupos[r.bancoTipo] = grupos[r.bancoTipo]||[]).push(r); });
+  const ordenTarjetas = Object.keys(grupos).sort((a,b)=>{
+    const sA = grupos[a].reduce((s,r)=>s+r.montoARS,0);
+    const sB = grupos[b].reduce((s,r)=>s+r.montoARS,0);
+    return sB - sA;
+  });
+  ordenTarjetas.forEach(bt => grupos[bt].sort((a,b)=>{
+    const da=parseDate(a.fecha), db=parseDate(b.fecha);
+    return (!da||!db)?0:db-da;
+  }));
+
+  const bodyHtml = ordenTarjetas.map(bt => {
+    const rows  = grupos[bt];
+    const color = btColorMap[bt] || 'var(--t-555)';
+    const subARS = rows.reduce((s,r)=>s+r.montoARS,0);
+    const subUSD = rows.reduce((s,r)=>s+r.montoUSD,0);
+
+    const headerRow = `<tr>
+      <td colspan="6" style="padding:14px 4px 7px;">
+        <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;">
+          <span style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0;align-self:center;"></span>
+          <span style="font-size:12px;font-weight:600;color:var(--t-e8);">${bt}</span>
+          <span style="font-size:11px;color:var(--t-555);">${rows.length} mov.</span>
+          <span style="margin-left:auto;font-size:12px;font-weight:500;color:var(--t-ccc);">
+            ${subARS>0?fmt(subARS):''}${subUSD>0?`<span style="color:#5DCAA5;margin-left:8px;">U$S ${subUSD.toFixed(2)}</span>`:''}
+          </span>
+        </div>
+      </td>
+    </tr>`;
+
+    const dataRows = rows.map(r=>{
       const arsStr = r.montoARS > 0 ? fmt(r.montoARS) : '—';
       const usdStr = r.montoUSD > 0 ? fmtUSD(r.montoUSD) : '—';
-      const color  = btColorMap[r.bancoTipo] || 'var(--t-555)';
       const venc   = r.vencimiento ? r.vencimiento.replace('/2026','') : '—';
       return `<tr style="border-left:2px solid ${color}33;">
-        <td style="color:var(--t-555);font-size:12px;padding-left:8px">${r.fecha}</td>
+        <td style="color:var(--t-555);font-size:12px;padding-left:16px">${r.fecha}</td>
         <td style="font-weight:500;font-size:12px">${r.detalle}</td>
-        <td>
-          <span style="display:inline-flex;align-items:center;gap:5px;">
-            <span style="width:7px;height:7px;border-radius:50%;background:${color};flex-shrink:0;display:inline-block;"></span>
-            <span style="font-size:11px;color:var(--t-aaa)">${r.bancoTipo}</span>
-          </span>
-        </td>
         <td style="font-size:11px;color:var(--t-666)">${r.cuota||'—'}</td>
         <td style="font-size:11px;color:var(--t-555)">${venc}</td>
         <td style="text-align:right;font-weight:500">${arsStr}</td>
         <td style="text-align:right;color:${r.montoUSD>0?'#5DCAA5':'var(--t-444)'};font-size:12px">${usdStr}</td>
       </tr>`;
-    }).join('')}</tbody>`;
+    }).join('');
+
+    return headerRow + dataRows;
+  }).join('');
+
+  document.getElementById('tarjetasLogTable').innerHTML=`
+    <thead><tr>
+      <th style="width:13%">Fecha</th>
+      <th style="width:41%">Detalle</th>
+      <th style="width:11%">Cuota</th>
+      <th style="width:12%">Vence</th>
+      <th style="width:13%;text-align:right">ARS</th>
+      <th style="width:10%;text-align:right">USD</th>
+    </tr></thead>
+    <tbody>${bodyHtml}</tbody>`;
 }
 
 function filtrarTarjetasLog() {
