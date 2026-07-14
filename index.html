@@ -276,6 +276,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       <div id="tarjetasTotalInner"></div>
     </div>
 
+    <!-- Débitos fijos recurrentes del resumen -->
+    <div class="chart-card-full" id="tarjetasFijosBlock" style="display:none;"></div>
+
     <!-- Compromisos futuros por cuotas -->
     <div class="chart-card-full" id="cuotasBlock" style="display:none;">
       <div style="display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:4px;">
@@ -290,7 +293,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       <div style="overflow-x:auto; margin-top:16px;">
         <table class="ranking-table" id="cuotasTable" style="width:100%; min-width:520px;"></table>
       </div>
-      <p style="font-size:10px; color:var(--t-3a); margin-top:12px;">* Proyección asumiendo cuotas de igual valor, según el último resumen disponible de cada tarjeta.</p>
+      <p style="font-size:10px; color:var(--t-3a); margin-top:12px;">* Proyección asumiendo cuotas de igual valor, según el último resumen disponible de cada tarjeta. Los débitos fijos recurrentes no se incluyen: están en su propia sección.</p>
     </div>
 
     <!-- Gráfico de línea comparativo mes a mes -->
@@ -362,6 +365,26 @@ const esCategoriaFija = cat => {
   const c = (cat||'').toLowerCase();
   return CATEGORIAS_FIJAS_KEYWORDS.some(k => c.includes(k));
 };
+
+// ─── FIJOS DE TARJETA ─────────────────────────────────────────────────────────
+// Débitos recurrentes que aparecen todos los meses en los resúmenes.
+// Un movimiento cuenta como fijo si su "Detalle" (en minúsculas) contiene `match`.
+// Si un mes no aparece, se lista como "sin aparecer" (¿baja? ¿falta cargar?).
+// Para sumar uno nuevo: agregar una línea acá.
+const TARJETAS_FIJOS = [
+  { nombre:'Telesmart',                match:'telesmart' },
+  { nombre:'DirecTV',                  match:'directv' },
+  { nombre:'Mapfre',                   match:'mapfre' },
+  { nombre:'PedidosYa Plus',           match:'pedid' },
+  { nombre:'HBO Max',                  match:'hbomax' },
+  { nombre:'Netflix',                  match:'netflix' },
+  { nombre:'Smiles',                   match:'smiles' },
+  { nombre:'Apple',                    match:'apple' },
+  { nombre:'Spotify',                  match:'spotify' },
+  { nombre:'River Plate',              match:'riverpla' },
+  { nombre:'Cuota social CAR',         match:'cuota social' },
+  { nombre:'Comisión adm. de cuenta',  match:'comis' },
+];
 
 const PALETTE = ['#378ADD','#1D9E75','#EF9F27','#7F77DD','#D4537E','#D85A30','#639922','#888780','#185FA5','#5DCAA5','#F09595','#B4B2A9'];
 // Colores de charts (canvas no lee variables CSS, se actualizan al cambiar de tema)
@@ -1118,7 +1141,81 @@ function renderTarjetas() {
   document.getElementById('tarjetasSearch').value = '';
   renderTarjetasLog(tarjetasMovimientosActuales);
 
+  renderTarjetasFijos(dataMes, mes);
   renderCompromisos();
+}
+
+// ─── DÉBITOS FIJOS RECURRENTES (por mes de resumen) ──────────────────────────
+function renderTarjetasFijos(dataMes, mes) {
+  const block = document.getElementById('tarjetasFijosBlock');
+  if (!dataMes || !TARJETAS_FIJOS.length) { block.style.display='none'; return; }
+
+  const detectados = [];
+  const ausentes = [];
+
+  TARJETAS_FIJOS.forEach(f => {
+    const matches = dataMes.movimientos.filter(r =>
+      r.detalle.toLowerCase().includes(f.match.toLowerCase()));
+    if (!matches.length) { ausentes.push(f); return; }
+    const totARS = matches.reduce((s,r)=>s+r.montoARS,0);
+    const totUSD = matches.reduce((s,r)=>s+r.montoUSD,0);
+    const tarjetas = [...new Set(matches.map(r=>r.bancoTipo))];
+    detectados.push({ ...f, totARS, totUSD, tarjetas, cant: matches.length });
+  });
+
+  const totalARS = detectados.reduce((s,d)=>s+d.totARS,0);
+  const totalUSD = detectados.reduce((s,d)=>s+d.totUSD,0);
+  detectados.sort((a,b)=>b.totARS-a.totARS);
+
+  const filas = detectados.map(d => {
+    const color = getBancoColor(d.tarjetas[0]?.split(' ').slice(1).join(' ') || '', 0);
+    const montoStr = [
+      d.totARS>0 ? fmt(d.totARS) : '',
+      d.totUSD>0 ? `<span style="color:#5DCAA5;">U$S ${d.totUSD.toFixed(2)}</span>` : ''
+    ].filter(Boolean).join(' · ') || '—';
+    return `<tr>
+      <td style="font-weight:500;font-size:12px;">${d.nombre}${d.cant>1?` <span class="pct-label">×${d.cant}</span>`:''}</td>
+      <td><span style="font-size:11px;color:var(--t-aaa);">${d.tarjetas.join(' · ')}</span></td>
+      <td style="text-align:right;font-weight:500;">${montoStr}</td>
+    </tr>`;
+  }).join('');
+
+  const ausentesHtml = ausentes.length
+    ? `<div style="margin-top:14px;padding-top:12px;border-top:0.5px solid var(--softer);">
+        <span style="font-size:10px;color:var(--t-444);text-transform:uppercase;letter-spacing:0.05em;">Sin aparecer en este resumen:</span>
+        <span style="display:inline-flex;gap:6px;flex-wrap:wrap;margin-left:6px;">
+          ${ausentes.map(f=>`<span class="cat-tag" style="opacity:0.65;">${f.nombre}</span>`).join('')}
+        </span>
+      </div>`
+    : '';
+
+  const totalStr = [
+    totalARS>0 ? `<strong style="color:var(--t-e8);">${fmt(totalARS)}</strong>` : '',
+    totalUSD>0 ? `<strong style="color:#5DCAA5;">U$S ${totalUSD.toFixed(2)}</strong>` : ''
+  ].filter(Boolean).join(' + ');
+
+  block.innerHTML = `
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:4px;">
+      <div>
+        <p class="chart-title" style="margin-bottom:4px;">Débitos fijos del resumen · ${mes}</p>
+        <p style="font-size:11px;color:var(--t-444);">Suscripciones y cargos recurrentes detectados en las tarjetas</p>
+      </div>
+    </div>
+    ${detectados.length
+      ? `<p style="font-size:13px;color:var(--t-888);margin-bottom:12px;line-height:1.6;">
+          ${detectados.length} fijos este mes por ${totalStr}.
+        </p>
+        <table class="ranking-table">
+          <thead><tr>
+            <th style="width:38%">Fijo</th>
+            <th style="width:37%">Tarjeta</th>
+            <th style="width:25%;text-align:right">Monto</th>
+          </tr></thead>
+          <tbody>${filas}</tbody>
+        </table>`
+      : `<p style="font-size:12px;color:var(--t-666);">Ningún fijo detectado en este resumen.</p>`}
+    ${ausentesHtml}`;
+  block.style.display='block';
 }
 
 // ─── COMPROMISOS FUTUROS POR CUOTAS ──────────────────────────────────────────
@@ -1146,6 +1243,10 @@ function renderCompromisos() {
     if (baseIdx === undefined) return;
     tarjetasPorMes[mesBase].movimientos.forEach(r => {
       if (r.bancoTipo !== bt) return;
+      // Los fijos recurrentes (cuota social, suscripciones, etc.) no son deuda
+      // finita: se excluyen de la proyección y viven en "Débitos fijos".
+      const dL = r.detalle.toLowerCase();
+      if (TARJETAS_FIJOS.some(f => dL.includes(f.match.toLowerCase()))) return;
       const m = (r.cuota||'').match(/^(\d+)\s*\/\s*(\d+)$/);
       if (!m) return;
       const c = parseInt(m[1]), t = parseInt(m[2]);
@@ -1257,29 +1358,55 @@ function renderCompromisos() {
     `<span class="legend-item"><span class="legend-dot" style="background:${getBancoColor(b,i)}"></span>${b}</span>`
   ).join('');
 
-  // Tabla de planes activos, ordenados por lo que falta pagar
-  const planesOrdenados = [...planes].sort((a,b)=>b.totalRestante-a.totalRestante);
-  document.getElementById('cuotasTable').innerHTML = `
-    <thead><tr>
-      <th style="width:32%">Detalle</th>
-      <th style="width:20%">Tarjeta</th>
-      <th style="width:12%;text-align:center">Cuota</th>
-      <th style="width:18%;text-align:right">Por cuota</th>
-      <th style="width:18%;text-align:right">Falta pagar</th>
-    </tr></thead>
-    <tbody>${planesOrdenados.map(p=>{
-      const color = getBancoColor(p.banco, 0);
+  // Tabla de planes activos, agrupados por tarjeta (subtotal de lo que falta pagar)
+  const gruposPlanes = {};
+  planes.forEach(p => { (gruposPlanes[p.bancoTipo] = gruposPlanes[p.bancoTipo]||[]).push(p); });
+  const ordenTarjetasPlanes = Object.keys(gruposPlanes).sort((a,b)=>{
+    const sA = gruposPlanes[a].reduce((s,p)=>s+p.totalRestante,0);
+    const sB = gruposPlanes[b].reduce((s,p)=>s+p.totalRestante,0);
+    return sB - sA;
+  });
+
+  const cuerpoPlanes = ordenTarjetasPlanes.map((bt, gi) => {
+    const grupo = [...gruposPlanes[bt]].sort((a,b)=>b.totalRestante-a.totalRestante);
+    const banco = bt.split(' ').slice(1).join(' ') || bt;
+    const color = getBancoColor(banco, gi);
+    const subRestante = grupo.reduce((s,p)=>s+p.totalRestante,0);
+
+    const headerRow = `<tr>
+      <td colspan="4" style="padding:14px 4px 7px;">
+        <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;">
+          <span style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0;align-self:center;"></span>
+          <span style="font-size:12px;font-weight:600;color:var(--t-e8);">${bt}</span>
+          <span style="font-size:11px;color:var(--t-555);">${grupo.length} plan${grupo.length!==1?'es':''}</span>
+          <span style="margin-left:auto;font-size:12px;font-weight:500;color:var(--t-ccc);">${fmt(subRestante)} restantes</span>
+        </div>
+      </td>
+    </tr>`;
+
+    const dataRows = grupo.map(p=>{
       const pctPagado = ((p.cuotaActual/p.cuotaTotal)*100).toFixed(0);
-      return `<tr>
-        <td style="font-weight:500;font-size:12px">${p.detalle}
+      return `<tr style="border-left:2px solid ${color}33;">
+        <td style="font-weight:500;font-size:12px;padding-left:16px;">${p.detalle}
           <div class="bar-bg"><div class="bar-fill" style="width:${pctPagado}%;background:${color};"></div></div>
         </td>
-        <td><span style="font-size:11px;color:var(--t-aaa)">${p.bancoTipo}</span></td>
         <td style="text-align:center;font-size:11px;color:var(--t-888)">${p.cuotaActual}/${p.cuotaTotal}</td>
         <td style="text-align:right;font-size:12px;color:var(--t-888)">${fmt(p.montoCuota)}</td>
         <td style="text-align:right;font-weight:500">${fmt(p.totalRestante)}<br><span class="pct-label">${p.restantes} cuota${p.restantes!==1?'s':''}</span></td>
       </tr>`;
-    }).join('')}</tbody>`;
+    }).join('');
+
+    return headerRow + dataRows;
+  }).join('');
+
+  document.getElementById('cuotasTable').innerHTML = `
+    <thead><tr>
+      <th style="width:44%">Detalle</th>
+      <th style="width:14%;text-align:center">Cuota</th>
+      <th style="width:21%;text-align:right">Por cuota</th>
+      <th style="width:21%;text-align:right">Falta pagar</th>
+    </tr></thead>
+    <tbody>${cuerpoPlanes}</tbody>`;
 }
 
 function toggleTarjetaLine(key) {
