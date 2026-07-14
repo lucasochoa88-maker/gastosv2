@@ -368,23 +368,29 @@ const esCategoriaFija = cat => {
 
 // ─── FIJOS DE TARJETA ─────────────────────────────────────────────────────────
 // Débitos recurrentes que aparecen todos los meses en los resúmenes.
-// Un movimiento cuenta como fijo si su "Detalle" (en minúsculas) contiene `match`.
+// Un movimiento cuenta como fijo si su "Detalle" (en minúsculas) contiene
+// ALGUNO de los textos de `match`. Usar textos específicos de la suscripción:
+// ej. 'pedidosyaplus' y NO 'pedidosya', para no confundir con pedidos comunes.
 // Si un mes no aparece, se lista como "sin aparecer" (¿baja? ¿falta cargar?).
 // Para sumar uno nuevo: agregar una línea acá.
 const TARJETAS_FIJOS = [
-  { nombre:'Telesmart',                match:'telesmart' },
-  { nombre:'DirecTV',                  match:'directv' },
-  { nombre:'Mapfre',                   match:'mapfre' },
-  { nombre:'PedidosYa Plus',           match:'pedid' },
-  { nombre:'HBO Max',                  match:'hbomax' },
-  { nombre:'Netflix',                  match:'netflix' },
-  { nombre:'Smiles',                   match:'smiles' },
-  { nombre:'Apple',                    match:'apple' },
-  { nombre:'Spotify',                  match:'spotify' },
-  { nombre:'River Plate',              match:'riverpla' },
-  { nombre:'Cuota social CAR',         match:'cuota social' },
-  { nombre:'Comisión adm. de cuenta',  match:'comis' },
+  { nombre:'Telesmart',                match:['telesmart'] },
+  { nombre:'DirecTV',                  match:['directv'] },
+  { nombre:'Mapfre',                   match:['mapfre'] },
+  { nombre:'PedidosYa Plus',           match:['pedidosyaplus','pedidisyaplus','pedidosya plus'] },
+  { nombre:'HBO Max',                  match:['hbomax.com'] },
+  { nombre:'Netflix',                  match:['netflix.com'] },
+  { nombre:'Smiles',                   match:['smilesfidelidade'] },
+  { nombre:'Apple',                    match:['apple.com'] },
+  { nombre:'Spotify',                  match:['spotify'] },
+  { nombre:'River Plate',              match:['riverpla'] },
+  { nombre:'Cuota social CAR',         match:['cuota social car'] },
+  { nombre:'Comisión adm. de cuenta',  match:['mensual administ'] },
 ];
+const esMovimientoFijo = detalle => {
+  const d = (detalle||'').toLowerCase();
+  return TARJETAS_FIJOS.some(f => f.match.some(k => d.includes(k)));
+};
 
 const PALETTE = ['#378ADD','#1D9E75','#EF9F27','#7F77DD','#D4537E','#D85A30','#639922','#888780','#185FA5','#5DCAA5','#F09595','#B4B2A9'];
 // Colores de charts (canvas no lee variables CSS, se actualizan al cambiar de tema)
@@ -1154,8 +1160,10 @@ function renderTarjetasFijos(dataMes, mes) {
   const ausentes = [];
 
   TARJETAS_FIJOS.forEach(f => {
-    const matches = dataMes.movimientos.filter(r =>
-      r.detalle.toLowerCase().includes(f.match.toLowerCase()));
+    const matches = dataMes.movimientos.filter(r => {
+      const d = r.detalle.toLowerCase();
+      return f.match.some(k => d.includes(k));
+    });
     if (!matches.length) { ausentes.push(f); return; }
     const totARS = matches.reduce((s,r)=>s+r.montoARS,0);
     const totUSD = matches.reduce((s,r)=>s+r.montoUSD,0);
@@ -1245,8 +1253,7 @@ function renderCompromisos() {
       if (r.bancoTipo !== bt) return;
       // Los fijos recurrentes (cuota social, suscripciones, etc.) no son deuda
       // finita: se excluyen de la proyección y viven en "Débitos fijos".
-      const dL = r.detalle.toLowerCase();
-      if (TARJETAS_FIJOS.some(f => dL.includes(f.match.toLowerCase()))) return;
+      if (esMovimientoFijo(r.detalle)) return;
       const m = (r.cuota||'').match(/^(\d+)\s*\/\s*(\d+)$/);
       if (!m) return;
       const c = parseInt(m[1]), t = parseInt(m[2]);
