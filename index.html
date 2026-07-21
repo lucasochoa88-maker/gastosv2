@@ -384,7 +384,7 @@ const TARJETAS_FIJOS = [
   { nombre:'Apple',                    match:['apple.com'] },
   { nombre:'Spotify',                  match:['spotify'] },
   { nombre:'River Plate',              match:['riverpla'] },
-  { nombre:'Cuota social CAR',         match:['cuota social car'] },
+  { nombre:'Cuota social CAR',         match:['cuota social car','cuota social'] },
   { nombre:'Comisión adm. de cuenta',  match:['mensual administ'] },
 ];
 const esMovimientoFijo = detalle => {
@@ -413,8 +413,9 @@ let logDatos = [];
 
 // Tarjetas: datos crudos + estructura agrupada por mes de gasto (col. B del sheet)
 let tarjetasRawRows = null;      // filas crudas del CSV, cacheadas
-let tarjetasPorMes = {};         // { 'Mayo': { movimientos:[...], grupos:{bancoTipo:{totalARS,totalUSD}} }, 'Junio': {...} }
-let tarjetasMesesOrden = [];     // meses en orden de aparición en el sheet (cronológico)
+let tarjetasPorMes = {};         // { 'Mayo 2026': { movimientos:[...], grupos:{bancoTipo:{totalARS,totalUSD}} }, ... }
+let tarjetasMesMeta = {};        // { 'Mayo 2026': { nombre:'Mayo', year:2026, mIdx:4, sortKey } }
+let tarjetasMesesOrden = [];     // meses ordenados CRONOLÓGICAMENTE (por año + mes)
 let tarjetasMesActivo = null;    // mes seleccionado en el dropdown "Resumen"
 let tarjetasMovimientosActuales = []; // movimientos del mes activo (para el buscador)
 let tarjetasLineSelected = [];   // bancos seleccionados en el gráfico de evolución
@@ -879,36 +880,62 @@ function loadTarjetasData() {
 
 // Agrupa las filas crudas del sheet por mes (col. B) y, dentro de cada mes,
 // por "Banco y tipo" (col. A) para sacar los totales reales (col. J/K).
+// La columna B puede venir como "Mayo", "Mayo 2026", "mayo 2026", etc.
+// Si no trae año, se infiere del vencimiento (col. I). Los meses se ordenan
+// SIEMPRE cronológicamente (año + mes), sin importar el orden de las filas.
 function parseTarjetasRows(rows) {
   const cols = Object.keys(rows[0]||{});
   const [cBancoTipo,cMes,cFecha,cTarjeta,cDetalle,cCuota,cARS,cUSD,cVenc,cTotalARS,cTotalUSD] = cols;
 
-  const porMes = {};      // mes -> { movimientos:[...], grupos:{ bancoTipo:{totalARS,totalUSD} } }
-  const mesesOrden = [];  // orden de aparición en el sheet == orden cronológico
+  const porMes = {};   // mesKey -> { movimientos:[...], grupos:{ bancoTipo:{totalARS,totalUSD} } }
+  const meta = {};     // mesKey -> { nombre, year, mIdx, sortKey }
 
   rows.forEach(row => {
     const bancoTipo = (row[cBancoTipo]||'').trim();
     if (!bancoTipo) return;
 
+    // ── Parsear mes + año de la col. B ──
     const mesRaw = (row[cMes]||'').trim();
-    const mes = MES_NOMBRES_MAP[mesRaw.toLowerCase()] || mesRaw || 'Sin mes';
+    const yMatch = mesRaw.match(/(\d{4})/);
+    let year = yMatch ? parseInt(yMatch[1]) : null;
+    const nombreRaw = mesRaw.replace(/\d{4}/,'').replace(/[\/\-.,]/g,' ').trim().toLowerCase();
+    const nombre = MES_NOMBRES_MAP[nombreRaw] ||
+      (nombreRaw ? nombreRaw.charAt(0).toUpperCase()+nombreRaw.slice(1) : 'Sin mes');
+    const mIdx = MES_CAL_INDEX[nombre] !== undefined ? MES_CAL_INDEX[nombre] : null;
 
-    if (!porMes[mes]) { porMes[mes] = { movimientos: [], grupos: {} }; mesesOrden.push(mes); }
-    if (!porMes[mes].grupos[bancoTipo]) porMes[mes].grupos[bancoTipo] = { totalARS: 0, totalUSD: 0 };
+    // Si no vino el año, inferirlo del vencimiento (que suele caer el mes siguiente:
+    // gasto Dic 2026 vence Ene 2027 → año del gasto = año venc. - 1)
+    if (year === null) {
+      const vParts = (row[cVenc]||'').trim().split('/');
+      if (vParts.length === 3 && mIdx !== null) {
+        const vy = parseInt(vParts[2]), vm = parseInt(vParts[1]) - 1;
+        year = mIdx > vm ? vy - 1 : vy;
+      } else {
+        year = new Date().getFullYear();
+      }
+    }
+
+    const mesKey = mIdx !== null ? `${nombre} ${year}` : nombre;
+    if (!porMes[mesKey]) {
+      porMes[mesKey] = { movimientos: [], grupos: {} };
+      meta[mesKey] = { nombre, year, mIdx,
+        sortKey: mIdx !== null ? year*12 + mIdx : Number.MAX_SAFE_INTEGER };
+    }
+    if (!porMes[mesKey].grupos[bancoTipo]) porMes[mesKey].grupos[bancoTipo] = { totalARS: 0, totalUSD: 0 };
 
     const tARS = parseMonto(row[cTotalARS]);
     const tUSD = parseMonto(row[cTotalUSD]);
-    if (tARS > 0) porMes[mes].grupos[bancoTipo].totalARS = tARS;
-    if (tUSD > 0) porMes[mes].grupos[bancoTipo].totalUSD = tUSD;
+    if (tARS > 0) porMes[mesKey].grupos[bancoTipo].totalARS = tARS;
+    if (tUSD > 0) porMes[mesKey].grupos[bancoTipo].totalUSD = tUSD;
 
     const partes = bancoTipo.split(' ');
     const tipo  = partes[0] || '';
     const banco = partes.slice(1).join(' ') || bancoTipo;
 
-    porMes[mes].movimientos.push({
+    porMes[mesKey].movimientos.push({
       fecha:       (row[cFecha]||'').trim(),
       detalle:     (row[cDetalle]||'').trim(),
-      banco, tipo, bancoTipo, mes,
+      banco, tipo, bancoTipo, mes: mesKey,
       tarjeta:     (row[cTarjeta]||'').trim(),
       cuota:       (row[cCuota]||'').trim(),
       montoARS:    parseMonto(row[cARS]),
@@ -917,13 +944,22 @@ function parseTarjetasRows(rows) {
     });
   });
 
-  return { porMes, mesesOrden };
+  const mesesOrden = Object.keys(porMes).sort((a,b)=>meta[a].sortKey - meta[b].sortKey);
+  return { porMes, mesesOrden, meta };
+}
+
+// Label corto para ejes de gráficos: "Mayo '26"
+function mesCorto(mesKey) {
+  const m = tarjetasMesMeta[mesKey];
+  if (!m || m.mIdx === null) return mesKey;
+  return `${m.nombre} '${String(m.year).slice(2)}`;
 }
 
 function procesarYRenderTarjetas() {
-  const { porMes, mesesOrden } = parseTarjetasRows(tarjetasRawRows);
+  const { porMes, mesesOrden, meta } = parseTarjetasRows(tarjetasRawRows);
   tarjetasPorMes = porMes;
   tarjetasMesesOrden = mesesOrden;
+  tarjetasMesMeta = meta;
 
   // Dropdown "Resumen": más reciente primero, seleccionado por defecto
   const sel = document.getElementById('tarjetasCicloSelect');
@@ -1114,7 +1150,7 @@ function renderTarjetas() {
 
   tarjetasLineInst = new Chart(document.getElementById('tarjetasLineChart'), {
     type: 'bar',
-    data: { labels: allMeses.length ? allMeses : ['Sin datos'], datasets: barDatasets },
+    data: { labels: allMeses.length ? allMeses.map(mesCorto) : ['Sin datos'], datasets: barDatasets },
     plugins: [barValueLabels],
     options: {
       responsive:true, maintainAspectRatio:false,
@@ -1247,8 +1283,9 @@ function renderCompromisos() {
   let minAbs = Infinity, maxAbs = -Infinity;
 
   Object.entries(ultimoMesPorTarjeta).forEach(([bt, mesBase]) => {
-    const baseIdx = MES_CAL_INDEX[mesBase];
-    if (baseIdx === undefined) return;
+    const metaBase = tarjetasMesMeta[mesBase];
+    if (!metaBase || metaBase.mIdx === null) return;
+    const baseIdx = metaBase.year*12 + metaBase.mIdx; // índice absoluto (año incluido)
     tarjetasPorMes[mesBase].movimientos.forEach(r => {
       if (r.bancoTipo !== bt) return;
       // Los fijos recurrentes (cuota social, suscripciones, etc.) no son deuda
@@ -1283,10 +1320,15 @@ function renderCompromisos() {
   const totalComprometido = planes.reduce((s,p)=>s+p.totalRestante,0);
   const mesesHorizonte = maxAbs - minAbs + 1;
 
-  // Labels de meses futuros (agrega ' (sig. año)' si pasa de diciembre)
+  // Labels de meses futuros; el año ('26, '27...) se muestra sólo si la
+  // proyección cruza de un año a otro
   const labels = [], absList = [];
+  const aniosSpan = new Set();
+  for (let abs = minAbs; abs <= maxAbs; abs++) aniosSpan.add(Math.floor(abs/12));
+  const multiAnio = aniosSpan.size > 1;
   for (let abs = minAbs; abs <= maxAbs; abs++) {
-    labels.push(MES_CAL_NOMBRES[abs % 12] + (abs > 11 ? ' *' : ''));
+    const anio = Math.floor(abs/12);
+    labels.push(MES_CAL_NOMBRES[abs % 12] + (multiAnio ? ` '${String(anio).slice(2)}` : ''));
     absList.push(abs);
   }
 
