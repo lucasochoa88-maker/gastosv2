@@ -328,17 +328,24 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
 <script>
 // ─── CICLOS PRINCIPALES ───────────────────────────────────────────────────────
-// Solo Julio 2026. Agregar más ciclos acá cuando corresponda.
-const CICLOS = [
-  {
-    label: 'Ciclo Julio 2026',
-    cicloDesde: new Date(2026, 5, 25),  // 25 jun 2026
-    cicloHasta: new Date(2026, 6, 24),  // 24 jul 2026
-    url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTSR-jEHWGJNTU5Wk2HOm6U5_pQkHudAuzgL46QYnVg5WNv-2K9H8hDsNVGUtFifICuhdcCzBWich3V/pub?gid=815384903&single=true&output=csv'
-  }
-  // Para agregar el próximo mes:
-  // { label: 'Ciclo Agosto 2026', cicloDesde: new Date(2026,6,25), cicloHasta: new Date(2026,7,24), url: '...' }
+// Un ciclo por hoja del Google Sheet. Para sumar un mes nuevo: agregar UNA
+// línea en CICLOS_CONFIG con su gid. El gid es el número que aparece en la
+// URL del navegador al hacer clic en la pestaña de esa hoja (#gid=123456789).
+// Si el gid está vacío, ese ciclo se ignora (no rompe el dashboard).
+const SHEET_BASE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTSR-jEHWGJNTU5Wk2HOm6U5_pQkHudAuzgL46QYnVg5WNv-2K9H8hDsNVGUtFifICuhdcCzBWich3V/pub';
+
+const CICLOS_CONFIG = [
+  // { label, desde:[año, mes-1, día], hasta:[año, mes-1, día], gid }
+  { label:'Ciclo Julio 2026',  desde:[2026,5,25], hasta:[2026,6,24], gid:'815384903' },
+  { label:'Ciclo Agosto 2026', desde:[2026,6,25], hasta:[2026,7,24], gid:'' }, // ← pegá acá el gid de la hoja Agosto_2026
 ];
+
+const CICLOS = CICLOS_CONFIG.filter(c => c.gid).map(c => ({
+  label: c.label,
+  cicloDesde: new Date(c.desde[0], c.desde[1], c.desde[2]),
+  cicloHasta: new Date(c.hasta[0], c.hasta[1], c.hasta[2]),
+  url: `${SHEET_BASE}?gid=${c.gid}&single=true&output=csv`
+}));
 
 // ─── TARJETAS ─────────────────────────────────────────────────────────────────
 // Una sola hoja con TODOS los meses mezclados. Columnas del sheet:
