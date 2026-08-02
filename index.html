@@ -293,7 +293,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       <div style="overflow-x:auto; margin-top:16px;">
         <table class="ranking-table" id="cuotasTable" style="width:100%; min-width:520px;"></table>
       </div>
-      <p style="font-size:10px; color:var(--t-3a); margin-top:12px;">* Proyección asumiendo cuotas de igual valor, según el último resumen disponible de cada tarjeta. Los débitos fijos recurrentes no se incluyen: están en su propia sección.</p>
+      <p style="font-size:10px; color:var(--t-3a); margin-top:12px;">* Proyección desde el mes calendario actual, asumiendo cuotas de igual valor según el último resumen disponible de cada tarjeta. Los débitos fijos recurrentes y las cuotas de meses ya transcurridos no se incluyen.</p>
     </div>
 
     <!-- Gráfico de línea comparativo mes a mes -->
@@ -1287,6 +1287,11 @@ function renderCompromisos() {
   const futuros = {};   // absIdx (mes calendario, puede pasar de 11 al año sig.) -> { banco: monto }
   let minAbs = Infinity, maxAbs = -Infinity;
 
+  // Ancla: el gráfico arranca en el mes calendario ACTUAL, no en el mes
+  // siguiente al último resumen cargado de cada tarjeta.
+  const hoyD = new Date();
+  const hoyAbs = hoyD.getFullYear()*12 + hoyD.getMonth();
+
   Object.entries(ultimoMesPorTarjeta).forEach(([bt, mesBase]) => {
     const metaBase = tarjetasMesMeta[mesBase];
     if (!metaBase || metaBase.mIdx === null) return;
@@ -1301,12 +1306,17 @@ function renderCompromisos() {
       const c = parseInt(m[1]), t = parseInt(m[2]);
       if (!(t > c) || r.montoARS <= 0) return;
       const restantes = t - c;
+      // Cuotas que caerían en meses ANTERIORES al mes calendario actual
+      // (resúmenes viejos sin cargar) no son futuro: se descartan.
+      const pasadas  = Math.min(restantes, Math.max(0, hoyAbs - baseIdx - 1));
+      const visibles = restantes - pasadas;
+      if (visibles <= 0) return;
       planes.push({
         detalle: r.detalle, bancoTipo: bt, banco: r.banco,
-        cuotaActual: c, cuotaTotal: t, restantes,
-        montoCuota: r.montoARS, totalRestante: r.montoARS * restantes
+        cuotaActual: c, cuotaTotal: t, restantes: visibles,
+        montoCuota: r.montoARS, totalRestante: r.montoARS * visibles
       });
-      for (let k = 1; k <= restantes; k++) {
+      for (let k = pasadas + 1; k <= restantes; k++) {
         const abs = baseIdx + k;
         if (!futuros[abs]) futuros[abs] = {};
         futuros[abs][r.banco] = (futuros[abs][r.banco]||0) + r.montoARS;
