@@ -1163,7 +1163,7 @@ function renderTarjetas() {
       layout:{ padding:{ top: 18 } },
       plugins:{
         legend:{display:false},
-        tooltip:{callbacks:{label:ctx=>` ${ctx.dataset.label}: ${fmt(ctx.raw)}`}}
+        tooltip:{filter:item=>item.raw>0,callbacks:{label:ctx=>` ${ctx.dataset.label}: ${fmt(ctx.raw)}`}}
       },
       scales:{
         x:{stacked:true,grid:{display:false},ticks:{color:TICK,font:{size:11}}},
@@ -1399,7 +1399,7 @@ function renderCompromisos() {
       layout:{ padding:{ top: 18 } },
       plugins:{
         legend:{display:false},
-        tooltip:{callbacks:{label:ctx=>` ${ctx.dataset.label}: ${fmt(ctx.raw)}`}}
+        tooltip:{filter:item=>item.raw>0,callbacks:{label:ctx=>` ${ctx.dataset.label}: ${fmt(ctx.raw)}`}}
       },
       scales:{
         x:{stacked:true,grid:{display:false},ticks:{color:TICK,font:{size:11}}},
