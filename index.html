@@ -336,8 +336,12 @@ const SHEET_BASE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTSR-jEHWGJN
 
 const CICLOS_CONFIG = [
   // { label, desde:[año, mes-1, día], hasta:[año, mes-1, día], gid }
-  { label:'Ciclo Julio 2026',  desde:[2026,5,25], hasta:[2026,6,24], gid:'815384903' },
-  { label:'Ciclo Agosto 2026', desde:[2026,6,25], hasta:[2026,7,24], gid:'1998751189' },
+  { label:'Ciclo Julio 2026',      desde:[2026,5,25],  hasta:[2026,6,24],  gid:'815384903' },
+  { label:'Ciclo Agosto 2026',     desde:[2026,6,25],  hasta:[2026,7,24],  gid:'1998751189' },
+  { label:'Ciclo Septiembre 2026', desde:[2026,7,25],  hasta:[2026,8,24],  gid:'882340647' },
+  { label:'Ciclo Octubre 2026',    desde:[2026,8,25],  hasta:[2026,9,24],  gid:'2127509515' },
+  { label:'Ciclo Noviembre 2026',  desde:[2026,9,25],  hasta:[2026,10,24], gid:'2047631978' },
+  { label:'Ciclo Diciembre 2026',  desde:[2026,10,25], hasta:[2026,11,24], gid:'1463613036' },
 ];
 
 const CICLOS = CICLOS_CONFIG.filter(c => c.gid).map(c => ({
@@ -413,7 +417,13 @@ function applyChartTheme() {
   CHART_CARD = l ? '#FFFFFF' : '#1A1A1A';
 }
 
-let cicloActivo = CICLOS.length - 1;
+// Por defecto arranca en el ciclo que contiene la fecha de HOY; si hoy no cae
+// en ningún ciclo configurado, usa el último de la lista.
+let cicloActivo = (() => {
+  const hoy = new Date(); hoy.setHours(0,0,0,0);
+  const idx = CICLOS.findIndex(c => hoy >= c.cicloDesde && hoy <= c.cicloHasta);
+  return idx !== -1 ? idx : CICLOS.length - 1;
+})();
 let tabActivo = 'mes';
 let datosCache = {};
 let logDatos = [];
@@ -535,6 +545,16 @@ function loadData(forzar) {
     .then(results => {
       results.forEach((r,i) => { if(r) datosCache[i]=r; });
       if (!datosCache[cicloActivo]) {
+        // Fallback: si el ciclo por defecto todavía no está publicado en el
+        // sheet (p. ej. pestaña nueva sin publicar), caer al último ciclo
+        // que SÍ cargó en vez de mostrar un error.
+        const disponibles = Object.keys(datosCache).map(Number).filter(i => datosCache[i]);
+        if (disponibles.length) {
+          cicloActivo = Math.max(...disponibles);
+          buildDropdown();
+          buildDashboard(datosCache[cicloActivo]);
+          return;
+        }
         document.getElementById('loadingBox').style.display='none';
         document.getElementById('errorBox').innerHTML =
           'No se pudo cargar el sheet. ' +
