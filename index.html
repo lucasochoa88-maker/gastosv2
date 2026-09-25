@@ -389,6 +389,7 @@ let GRID = 'rgba(255,255,255,0.05)';
 let TICK = '#8A8A8A';
 let VAL_LABEL = '#E8E8E8';
 let CHART_CARD = '#1A1A1A';
+
 function applyChartTheme() {
   const l = document.body.classList.contains('light');
   GRID = l ? 'rgba(0,0,0,0.07)' : 'rgba(255,255,255,0.05)';
@@ -531,10 +532,7 @@ function loadData(forzar) {
         }
         document.getElementById('loadingBox').style.display='none';
         document.getElementById('errorBox').innerHTML =
-          'No se pudo cargar el sheet. ' +
-          'Si estás abriendo el archivo desde tu computadora (file://), ' +
-          'subilo a <strong>SharePoint</strong> para que funcione. ' +
-          'El sheet de Google está publicado correctamente.';
+          'No se pudo cargar el sheet. Verificá la conexión y publicación de los datos.';
         document.getElementById('errorBox').style.display='block';
         return;
       }
@@ -542,23 +540,36 @@ function loadData(forzar) {
     });
 }
 
-// ─── PARSEO ───────────────────────────────────────────────────────────────────
+// ─── PARSEO AJUSTADO CON CLASIFICACIÓN FLEXIBLE DE INGRESOS ───────────────────
 function parsearCiclo(rows) {
   if (!rows || !rows.length) return { datos: [], ingresosLucas: 0, ingresosMari: 0 };
   const cols = Object.keys(rows[0]);
   const [cFecha,cDet,cCat,cMonto,cQuien] = cols;
   let ingresosLucas=0, ingresosMari=0;
   const datos=[];
+  
   rows.forEach(r => {
     const fecha=(r[cFecha]||'').trim(), cat=(r[cCat]||'').trim();
     const monto=parseMonto(r[cMonto]), det=(r[cDet]||'').trim();
     const quien=(r[cQuien]||'Desconocido').trim();
     const dL=det.toLowerCase();
-    if (dL.includes('ingres. lucas'))   { ingresosLucas=monto; return; }
-    if (dL.includes('ingres. mariana')) { ingresosMari=monto; return; }
+    const cL=cat.toLowerCase();
+
+    // Detección inteligente de ingresos (evita sumarse como gasto)
+    if (dL.includes('ingres') || cL.includes('ingres') || dL.includes('sueldo') || cL.includes('sueldo') || dL.includes('honorario') || cL.includes('honorario')) {
+      const qLower = quien.toLowerCase();
+      if (qLower.includes('mari')) {
+        ingresosMari += monto;
+      } else {
+        ingresosLucas += monto;
+      }
+      return; 
+    }
+
     if (!fecha||!cat||monto<=0) return;
     datos.push({fecha,detalle:det,categoria:cat,monto,quien});
   });
+
   if (!ingresosLucas) ingresosLucas=3600000;
   return {datos,ingresosLucas,ingresosMari};
 }
@@ -587,6 +598,7 @@ function buildDashboard(rows) {
   document.getElementById('cicloBadge').textContent=`${formatDateShort(desde)} – ${formatDateShort(hasta)}`;
   document.getElementById('dashSub').textContent=`${datos.length} movimientos · ${ciclo.label}`;
 
+  // Progreso
   const pctG=totalIngresos>0?(totalGastos/totalIngresos)*100:0;
   document.getElementById('progressTiempo').style.width=pctTiempo.toFixed(1)+'%';
   document.getElementById('progressGastos').style.width=Math.min(100,pctG).toFixed(1)+'%';
@@ -596,6 +608,7 @@ function buildDashboard(rows) {
     `<span style="color:#378ADD">▏</span> Tiempo transcurrido: ${pctTiempo.toFixed(0)}%`;
   document.getElementById('cicloProgressWrap').style.display=(esCicloActual||hoy>hasta)?'block':'none';
 
+  // Proyección
   if (esCicloActual && diasTrans>0 && totalGastos>0) {
     const prom=totalGastos/diasTrans, proy=prom*totalDias;
     const pctProy=totalIngresos>0?((proy/totalIngresos)*100).toFixed(1):'—', restan=totalDias-diasTrans;
@@ -610,6 +623,7 @@ function buildDashboard(rows) {
     document.getElementById('projBanner').style.display='none';
   }
 
+  // Gastos por persona
   const gastosLucas   = datos.filter(r=>['lucas'].includes(r.quien.toLowerCase())).reduce((s,r)=>s+r.monto,0);
   const gastosMari    = datos.filter(r=>['mariana','mari'].includes(r.quien.toLowerCase())).reduce((s,r)=>s+r.monto,0);
   const saldoLucas    = ingresosLucas - gastosLucas;
@@ -715,8 +729,6 @@ function renderFijosVsVariables(datos, totalGastos, totalIngresos) {
       <p class="chart-title" style="margin-bottom:8px;">Fijos vs variables</p>
       <p style="font-size:12px;color:var(--t-666);line-height:1.6;">
         Ninguna categoría de este ciclo coincide con la lista de gastos fijos.
-        Editá <code style="background:var(--soft);padding:2px 6px;border-radius:4px;font-size:11px;">CATEGORIAS_FIJAS_KEYWORDS</code>
-        en el código para definir qué categorías cuentan como fijas.
       </p>`;
     block.style.display='block';
     return;
@@ -751,8 +763,7 @@ function renderFijosVsVariables(datos, totalGastos, totalIngresos) {
       </div>
     </div>
     <p style="font-size:12px;color:var(--t-888);line-height:1.6;margin-bottom:10px;">
-      Tu margen de maniobra real (ingreso − fijos) es <strong style="color:var(--t-e8);font-weight:500;">${fmt(margenVariable)}</strong>:
-      de ahí salen los gastos variables y el ahorro.
+      Tu margen de maniobra real (ingreso − fijos) es <strong style="color:var(--t-e8);font-weight:500;">${fmt(margenVariable)}</strong>.
     </p>
     <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
       <span style="font-size:10px;color:var(--t-444);text-transform:uppercase;letter-spacing:0.05em;">Categorías fijas detectadas:</span>
@@ -793,7 +804,7 @@ function renderComparativa() {
     {label:'Ingresos',data:ingresos,type:'line',borderColor:'#1D9E75',backgroundColor:'transparent',borderWidth:1.5,borderDash:[4,4],pointRadius:4,pointBackgroundColor:'#1D9E75',tension:0.3}
   ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{
     x:{grid:{color:GRID},ticks:{color:TICK,font:{size:11}}},
-    y:{grid:{color:GRID},ticks:{color:TICK,font:{size:10},callback:v=>'$'+(v>=1000000?Math.round(v/1000000)+'M':v>=1000?Math.round(v/1000)+'k':v)}}
+    y:{grid:{color:GRID},ticks:{color:TICK,font:{size:10},callback:v=>'$'+(v>=1000000?(v/1000000).toFixed(2)+'M':v>=1000?Math.round(v/1000)+'k':v)}}
   }}});
 
   if (ratioLineInst) ratioLineInst.destroy();
@@ -818,10 +829,7 @@ function renderComparativa() {
     }).join('')}</tbody>`;
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// ─── TAB TARJETAS ─────────────────────────────────────────────────────────
-// ═══════════════════════════════════════════════════════════════════════════
-
+// ─── TAB TARJETAS ─────────────────────────────────────────────────────────────
 const BANCO_COLORS = {
   'Galicia':        '#378ADD',
   'Cencopay':       '#1D9E75',
@@ -841,7 +849,6 @@ function initTarjetas() {
 
 function loadTarjetasData() {
   if (tarjetasRawRows) { procesarYRenderTarjetas(); return; }
-
   document.getElementById('tarjetasErrorBox').style.display = 'none';
 
   fetchCSV(TARJETAS_URL).then(rows => {
@@ -849,15 +856,10 @@ function loadTarjetasData() {
     procesarYRenderTarjetas();
   }).catch(err => {
     console.error('fetchTarjetas error', err);
-    document.getElementById('tarjetasErrorBox').innerHTML =
-      'No se pudo cargar el sheet de tarjetas. Verificá que esté publicado correctamente.';
+    document.getElementById('tarjetasErrorBox').innerHTML = 'No se pudo cargar el sheet de tarjetas.';
     document.getElementById('tarjetasErrorBox').style.display = 'block';
-    document.getElementById('tarjetasTotalBlock').style.display = 'none';
   });
 }
-
-const MES_CAL_NOMBRES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Sep.','Oct.','Nov.','Dic.'];
-const MES_CAL_INDEX = Object.fromEntries(MES_CAL_NOMBRES.map((m,i)=>[m,i]));
 
 function parseTarjetasRows(rows) {
   const cols = Object.keys(rows[0]||{});
@@ -976,6 +978,24 @@ function renderTarjetas() {
   const totalGralARS = Object.values(bancoTotalesARS).reduce((s,v)=>s+v, 0);
   const totalGralUSD = Object.values(bancoTotalesUSD).reduce((s,v)=>s+v, 0);
 
+  // Variación respecto al mes anterior
+  const idxActual = tarjetasMesesOrden.indexOf(mes);
+  let varMesHtml = '';
+  if (idxActual > 0) {
+    const mesPrev = tarjetasMesesOrden[idxActual - 1];
+    const dataPrev = tarjetasPorMes[mesPrev];
+    if (dataPrev) {
+      const totPrevARS = Object.values(dataPrev.grupos).reduce((s, g) => s + g.totalARS, 0);
+      if (totPrevARS > 0) {
+        const diffPct = (((totalGralARS - totPrevARS) / totPrevARS) * 100).toFixed(1);
+        const isUp = diffPct > 0;
+        const colorVar = isUp ? '#E24B4A' : '#639922';
+        const arrow = isUp ? '▲' : '▼';
+        varMesHtml = `<span style="font-size:12px;color:${colorVar};margin-left:10px;font-weight:500;">${arrow} ${Math.abs(diffPct)}% vs ${mesCorto(mesPrev)}</span>`;
+      }
+    }
+  }
+
   const totalInner = document.getElementById('tarjetasTotalInner');
   if (totalInner) {
     const bancoRows = bancosArr.map((banco, i) => {
@@ -1024,6 +1044,7 @@ function renderTarjetas() {
           <div style="display:flex;align-items:baseline;gap:6px;padding-right:24px;">
             <span style="font-size:28px;font-weight:500;color:var(--t-e8);letter-spacing:-0.5px;">${fmt(totalGralARS)}</span>
             <span style="font-size:11px;color:var(--t-444);">ARS</span>
+            ${varMesHtml}
           </div>
           ${usdTotalHtml}
         </div>
@@ -1084,7 +1105,7 @@ function renderTarjetas() {
   });
 
   if (tarjetasLineInst) tarjetasLineInst.destroy();
-  const yFmt = v=>'$'+(v>=1000000?Math.round(v/1000000)+'M':v>=1000?Math.round(v/1000)+'k':v);
+  const yFmt = v => '$' + (v >= 1000000 ? (v / 1000000).toFixed(2) + 'M' : v >= 1000 ? Math.round(v / 1000) + 'k' : v);
 
   const barValueLabels = {
     id: 'barValueLabels',
@@ -1153,7 +1174,18 @@ function renderTarjetas() {
   renderCompromisos();
 }
 
-// ─── DÉBITOS FIJOS RECURRENTES (por mes de resumen) ──────────────────────────
+function toggleTarjetaLine(banco) {
+  if (tarjetasLineSelected.includes(banco)) {
+    if (tarjetasLineSelected.length > 1) {
+      tarjetasLineSelected = tarjetasLineSelected.filter(b => b !== banco);
+    }
+  } else {
+    tarjetasLineSelected.push(banco);
+  }
+  renderTarjetas();
+}
+
+// ─── DÉBITOS FIJOS RECURRENTES ────────────────────────────────────────────────
 function renderTarjetasFijos(dataMes, mes) {
   const block = document.getElementById('tarjetasFijosBlock');
   if (!dataMes || !TARJETAS_FIJOS.length) { block.style.display='none'; return; }
@@ -1228,6 +1260,9 @@ function renderTarjetasFijos(dataMes, mes) {
 }
 
 // ─── COMPROMISOS FUTUROS POR CUOTAS ──────────────────────────────────────────
+const MES_CAL_NOMBRES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Sep.','Oct.','Nov.','Dic.'];
+const MES_CAL_INDEX = Object.fromEntries(MES_CAL_NOMBRES.map((m,i)=>[m,i]));
+
 function renderCompromisos() {
   const block = document.getElementById('cuotasBlock');
 
@@ -1304,7 +1339,7 @@ function renderCompromisos() {
     `<strong style="color:var(--t-e8);">${planes.length}</strong> plan${planes.length!==1?'es':''} de cuotas, `+
     `repartidos en los próximos <strong style="color:var(--t-e8);">${mesesHorizonte}</strong> mes${mesesHorizonte!==1?'es':''}.`;
 
-  const yFmtC = v=>'$'+(v>=1000000?Math.round(v/1000000)+'M':v>=1000?Math.round(v/1000)+'k':v);
+  const yFmtC = v => '$' + (v >= 1000000 ? (v / 1000000).toFixed(2) + 'M' : v >= 1000 ? Math.round(v / 1000) + 'k' : v);
 
   const cuotasDatasets = bancosFut.map((banco,i)=>({
     label: banco,
@@ -1399,7 +1434,7 @@ function renderCompromisos() {
         </td>
         <td style="text-align:center;font-size:11px;color:var(--t-888)">${p.cuotaActual}/${p.cuotaTotal}</td>
         <td style="text-align:right;font-size:12px;color:var(--t-888)">${fmt(p.montoCuota)}</td>
-        <td style="text-align:right;font-weight:500">${fmt(p.totalRestante)}<br><span class="pct-label">${p.restantes} cuota${p.restantes!==1?'s':''}</span></td>
+        <td style="text-align:right;font-weight:500">${fmt(p.totalRestante)}<br><span class="pct-label">${pctPagado}% pagado</span></td>
       </tr>`;
     }).join('');
 
@@ -1408,116 +1443,64 @@ function renderCompromisos() {
 
   document.getElementById('cuotasTable').innerHTML = `
     <thead><tr>
-      <th style="width:44%">Detalle</th>
-      <th style="width:14%;text-align:center">Cuota</th>
-      <th style="width:21%;text-align:right">Por cuota</th>
-      <th style="width:21%;text-align:right">Falta pagar</th>
+      <th style="width:45%;padding-left:16px;">Detalle / Plan</th>
+      <th style="width:15%;text-align:center;">Cuota</th>
+      <th style="width:20%;text-align:right;">Monto Cuota</th>
+      <th style="width:20%;text-align:right;">Restante</th>
     </tr></thead>
     <tbody>${cuerpoPlanes}</tbody>`;
 }
 
-function toggleTarjetaLine(key) {
-  if (tarjetasLineSelected.includes(key)) {
-    if (tarjetasLineSelected.length>1) tarjetasLineSelected=tarjetasLineSelected.filter(k=>k!==key);
-  } else {
-    tarjetasLineSelected.push(key);
-  }
-  renderTarjetas();
-}
-
-function renderTarjetasLog(datos) {
-  const allBancoTipos = [...new Set(datos.map(r=>r.bancoTipo))];
-  const btColorMap = {};
-  allBancoTipos.forEach((bt,i)=>{
-    const partes=bt.split(' '); const banco=partes.slice(1).join(' ')||bt;
-    btColorMap[bt] = getBancoColor(banco, i);
-  });
-
-  const grupos = {};
-  datos.forEach(r => { (grupos[r.bancoTipo] = grupos[r.bancoTipo]||[]).push(r); });
-  const ordenTarjetas = Object.keys(grupos).sort((a,b)=>{
-    const sA = grupos[a].reduce((s,r)=>s+r.montoARS,0);
-    const sB = grupos[b].reduce((s,r)=>s+r.montoARS,0);
-    return sB - sA;
-  });
-  ordenTarjetas.forEach(bt => grupos[bt].sort((a,b)=>{
-    const da=parseDate(a.fecha), db=parseDate(b.fecha);
-    return (!da||!db)?0:db-da;
-  }));
-
-  const bodyHtml = ordenTarjetas.map(bt => {
-    const rows  = grupos[bt];
-    const color = btColorMap[bt] || 'var(--t-555)';
-    const subARS = rows.reduce((s,r)=>s+r.montoARS,0);
-    const subUSD = rows.reduce((s,r)=>s+r.montoUSD,0);
-
-    const headerRow = `<tr>
-      <td colspan="6" style="padding:14px 4px 7px;">
-        <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;">
-          <span style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0;align-self:center;"></span>
-          <span style="font-size:12px;font-weight:600;color:var(--t-e8);">${bt}</span>
-          <span style="font-size:11px;color:var(--t-555);">${rows.length} mov.</span>
-          <span style="margin-left:auto;font-size:12px;font-weight:500;color:var(--t-ccc);">
-            ${subARS>0?fmt(subARS):''}${subUSD>0?`<span style="color:#5DCAA5;margin-left:8px;">U$S ${subUSD.toFixed(2)}</span>`:''}
-          </span>
-        </div>
-      </td>
-    </tr>`;
-
-    const dataRows = rows.map(r=>{
-      const arsStr = r.montoARS > 0 ? fmt(r.montoARS) : '—';
-      const usdStr = r.montoUSD > 0 ? fmtUSD(r.montoUSD) : '—';
-      const venc   = r.vencimiento ? r.vencimiento.replace('/2026','') : '—';
-      return `<tr style="border-left:2px solid ${color}33;">
-        <td style="color:var(--t-555);font-size:12px">${r.fecha}</td>
-        <td style="font-weight:500">${r.detalle}</td>
-        <td style="text-align:center;font-size:11px;color:var(--t-888)">${r.cuota||'—'}</td>
-        <td style="text-align:center;font-size:11px;color:var(--t-555)">${venc}</td>
-        <td style="text-align:right;font-weight:500">${arsStr}</td>
-        <td style="text-align:right;color:#5DCAA5">${usdStr}</td>
-      </tr>`;
-    }).join('');
-
-    return headerRow + dataRows;
-  }).join('');
-
+// ─── FILTRAR TARJETAS ─────────────────────────────────────────────────────────
+function renderTarjetasLog(movs) {
   document.getElementById('tarjetasLogTable').innerHTML = `
     <thead><tr>
-      <th style="width:14%">Fecha</th>
+      <th style="width:12%">Fecha</th>
+      <th style="width:20%">Tarjeta</th>
       <th style="width:36%">Detalle</th>
       <th style="width:12%;text-align:center">Cuota</th>
-      <th style="width:12%;text-align:center">Venc.</th>
-      <th style="width:13%;text-align:right">ARS</th>
-      <th style="width:13%;text-align:right">USD</th>
+      <th style="width:20%;text-align:right">Monto</th>
     </tr></thead>
-    <tbody>${bodyHtml}</tbody>`;
+    <tbody>${movs.map(r => {
+      const color = getBancoColor(r.banco, 0);
+      const montoStr = [
+        r.montoARS > 0 ? fmt(r.montoARS) : '',
+        r.montoUSD > 0 ? `<span style="color:#5DCAA5;">U$S ${r.montoUSD.toFixed(2)}</span>` : ''
+      ].filter(Boolean).join(' · ') || '$0';
+      return `<tr>
+        <td style="color:var(--t-555);font-size:12px">${r.fecha}</td>
+        <td><span style="font-weight:500;color:${color}">${r.bancoTipo}</span></td>
+        <td style="font-weight:500">${r.detalle}</td>
+        <td style="text-align:center;font-size:11px;color:var(--t-888)">${r.cuota || '—'}</td>
+        <td style="text-align:right;font-weight:500">${montoStr}</td>
+      </tr>`;
+    }).join('')}</tbody>`;
 }
 
 function filtrarTarjetasLog() {
   const q = document.getElementById('tarjetasSearch').value.toLowerCase();
-  const filtrados = tarjetasMovimientosActuales.filter(r =>
+  renderTarjetasLog(tarjetasMovimientosActuales.filter(r =>
     r.detalle.toLowerCase().includes(q) ||
     r.bancoTipo.toLowerCase().includes(q) ||
-    (r.cuota && r.cuota.toLowerCase().includes(q))
-  );
-  renderTarjetasLog(filtrados);
+    r.cuota.toLowerCase().includes(q)
+  ));
 }
 
+// ─── MODO CLARO / OSCURO ──────────────────────────────────────────────────────
 function toggleTheme() {
   document.body.classList.toggle('light');
   const isLight = document.body.classList.contains('light');
   document.getElementById('themeBtn').textContent = isLight ? '☀' : '☾';
   applyChartTheme();
-  if (datosCache[cicloActivo]) {
-    if (tabActivo === 'mes') buildDashboard(datosCache[cicloActivo]);
-    else if (tabActivo === 'comparativa') renderComparativa();
-    else if (tabActivo === 'tarjetas') renderTarjetas();
-  }
+  if (datosCache[cicloActivo]) buildDashboard(datosCache[cicloActivo]);
 }
 
-// Inicialización
-buildDropdown();
-loadData();
+// ─── INICIALIZACIÓN ───────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  buildDropdown();
+  applyChartTheme();
+  loadData();
+});
 </script>
 </body>
 </html>
