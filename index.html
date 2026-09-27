@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -1114,6 +1115,7 @@ function renderTarjetas() {
 
   if (tarjetasLineInst) tarjetasLineInst.destroy();
   const yFmt = v=>'$'+(v>=1000000?Math.round(v/1000000)+'M':v>=1000?Math.round(v/1000)+'k':v);
+  const barValueFmt = v => fmt(v);
 
   const barValueLabels = {
     id: 'barValueLabels',
@@ -1138,7 +1140,7 @@ function renderTarjetas() {
         ctx.font = '600 11px -apple-system, BlinkMacSystemFont, sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'bottom';
-        ctx.fillText(yFmt(total), topBar.x, topBar.y - 6);
+        ctx.fillText(barValueFmt(total), topBar.x, topBar.y - 6);
         ctx.restore();
       }
     }
@@ -1577,3 +1579,4 @@ loadData();
 </script>
 </body>
 </html>
+
