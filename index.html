@@ -280,34 +280,22 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     <!-- Débitos fijos recurrentes del resumen -->
     <div class="chart-card-full" id="tarjetasFijosBlock" style="display:none;"></div>
 
-    <!-- Foto del próximo mes + compromisos futuros -->
+    <!-- Compromisos futuros por cuotas -->
     <div class="chart-card-full" id="cuotasBlock" style="display:none;">
       <div style="display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:4px;">
         <div>
-          <p class="chart-title" style="margin-bottom:4px;">Foto del próximo mes</p>
-          <p style="font-size:11px; color:var(--t-444);">Estimación parcial con los últimos resúmenes disponibles: fijos recurrentes + cuotas ya comprometidas</p>
+          <p class="chart-title" style="margin-bottom:4px;">Cuotas comprometidas en los próximos meses</p>
+          <p style="font-size:11px; color:var(--t-444);">Total estimado por mes: cuotas ya registradas + débitos fijos + gasto variable estimado</p>
         </div>
       </div>
-
+      <div id="cuotasTotalMes" style="margin:14px 0 16px;padding-bottom:14px;border-bottom:0.5px solid var(--soft);"></div>
       <p id="cuotasResumen" style="font-size:13px; color:var(--t-888); margin-bottom:14px; line-height:1.6;"></p>
-
-      <div id="cuotasProyeccion" style="margin-bottom:18px;"></div>
-
-      <div style="margin-top:8px; margin-bottom:8px;">
-        <p class="chart-title" style="margin-bottom:4px;">Cuotas comprometidas en los próximos meses</p>
-        <p style="font-size:11px; color:var(--t-444);">Solo incluye consumos en cuotas ya registrados; no supone nuevas compras.</p>
-      </div>
-
       <div style="position:relative; height:200px;"><canvas id="cuotasChart"></canvas></div>
       <div class="legend" id="cuotasLegend"></div>
-
       <div style="overflow-x:auto; margin-top:16px;">
         <table class="ranking-table" id="cuotasTable" style="width:100%; min-width:520px;"></table>
       </div>
-
-      <p style="font-size:10px; color:var(--t-3a); margin-top:12px;">
-        * La foto del próximo mes es una estimación, no un cierre. Mantiene los débitos fijos detectados en el último resumen disponible de cada tarjeta y suma las cuotas que, según la numeración registrada, caerían en el próximo mes. No incluye nuevas compras ni gastos variables no financiados que todavía no existen.
-      </p>
+      <p style="font-size:10px; color:var(--t-3a); margin-top:12px;">* Cuotas: proyección desde el mes calendario actual, asumiendo cuotas de igual valor según el último resumen disponible de cada tarjeta. Débitos fijos: tomados del último resumen de cada tarjeta. Variable estimado: promedio de consumos en 1 pago (sin fijos ni cuotas) de los últimos 3 resúmenes.</p>
     </div>
 
     <!-- Gráfico de línea comparativo mes a mes -->
@@ -1128,7 +1116,6 @@ function renderTarjetas() {
 
   if (tarjetasLineInst) tarjetasLineInst.destroy();
   const yFmt = v=>'$'+(v>=1000000?Math.round(v/1000000)+'M':v>=1000?Math.round(v/1000)+'k':v);
-  const barValueFmt = v => fmt(v);
 
   const barValueLabels = {
     id: 'barValueLabels',
@@ -1153,7 +1140,7 @@ function renderTarjetas() {
         ctx.font = '600 11px -apple-system, BlinkMacSystemFont, sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'bottom';
-        ctx.fillText(barValueFmt(total), topBar.x, topBar.y - 6);
+        ctx.fillText(yFmt(total), topBar.x, topBar.y - 6);
         ctx.restore();
       }
     }
@@ -1278,334 +1265,140 @@ const MES_CAL_INDEX = Object.fromEntries(MES_CAL_NOMBRES.map((m,i)=>[m,i]));
 
 function renderCompromisos() {
   const block = document.getElementById('cuotasBlock');
-  const forecastBlock = document.getElementById('cuotasProyeccion');
 
   const ultimoMesPorTarjeta = {};
   tarjetasMesesOrden.forEach(m => {
-    Object.keys(tarjetasPorMes[m].grupos).forEach(bt => {
-      ultimoMesPorTarjeta[bt] = m;
-    });
+    Object.keys(tarjetasPorMes[m].grupos).forEach(bt => { ultimoMesPorTarjeta[bt] = m; });
   });
-
-  const metasValidas = tarjetasMesesOrden
-    .map(m => tarjetasMesMeta[m])
-    .filter(m => m && m.mIdx !== null);
-
-  if (!metasValidas.length || !Object.keys(ultimoMesPorTarjeta).length) {
-    block.style.display = 'none';
-    return;
-  }
-
-  // El "próximo mes" se define como el mes posterior al último resumen
-  // disponible en los datos, no simplemente el mes de la fecha del navegador.
-  const ultimoAbsGlobal = Math.max(...metasValidas.map(m => m.year * 12 + m.mIdx));
-  const proximoAbs = ultimoAbsGlobal + 1;
-  const proximoAnio = Math.floor(proximoAbs / 12);
-  const proximoMesIdx = proximoAbs % 12;
-  const proximoMesLabel = `${MES_CAL_NOMBRES[proximoMesIdx]} '${String(proximoAnio).slice(2)}`;
 
   const planes = [];
   const futuros = {};
   let minAbs = Infinity, maxAbs = -Infinity;
 
-  // Datos para la foto parcial del próximo resumen.
-  const forecastPorTarjeta = {};
-  const forecastDetalle = [];
+  const hoyD = new Date();
+  const hoyAbs = hoyD.getFullYear()*12 + hoyD.getMonth();
 
   Object.entries(ultimoMesPorTarjeta).forEach(([bt, mesBase]) => {
     const metaBase = tarjetasMesMeta[mesBase];
     if (!metaBase || metaBase.mIdx === null) return;
-
-    const baseIdx = metaBase.year * 12 + metaBase.mIdx;
-    const mesesHastaObjetivo = proximoAbs - baseIdx;
-    const movimientos = tarjetasPorMes[mesBase].movimientos.filter(r => r.bancoTipo === bt);
-
-    if (!forecastPorTarjeta[bt]) {
-      forecastPorTarjeta[bt] = {
-        banco: movimientos[0]?.banco || (bt.split(' ').slice(1).join(' ') || bt),
-        fijosARS: 0,
-        fijosUSD: 0,
-        cuotasARS: 0,
-        cuotasUSD: 0,
-        fijos: [],
-        cuotas: [],
-        mesBase
-      };
-    }
-
-    const tarjetaForecast = forecastPorTarjeta[bt];
-
-    movimientos.forEach(r => {
-      // ── FIJOS ────────────────────────────────────────────────────────────
-      // Se arrastra el importe observado en el último resumen de esa tarjeta.
-      if (esMovimientoFijo(r.detalle)) {
-        const tieneMonto = r.montoARS > 0 || r.montoUSD > 0;
-        if (!tieneMonto) return;
-
-        tarjetaForecast.fijosARS += r.montoARS;
-        tarjetaForecast.fijosUSD += r.montoUSD;
-        tarjetaForecast.fijos.push(r);
-
-        forecastDetalle.push({
-          bt,
-          banco: tarjetaForecast.banco,
-          tipo: 'Fijo',
-          detalle: r.detalle,
-          cuota: 'Recurrente',
-          montoARS: r.montoARS,
-          montoUSD: r.montoUSD
-        });
-        return;
-      }
-
-      // ── CUOTAS ───────────────────────────────────────────────────────────
-      const m = (r.cuota || '').match(/^(\d+)\s*\/\s*(\d+)$/);
+    const baseIdx = metaBase.year*12 + metaBase.mIdx;
+    tarjetasPorMes[mesBase].movimientos.forEach(r => {
+      if (r.bancoTipo !== bt) return;
+      if (esMovimientoFijo(r.detalle)) return;
+      const m = (r.cuota||'').match(/^(\d+)\s*\/\s*(\d+)$/);
       if (!m) return;
-
-      const c = parseInt(m[1]);
-      const t = parseInt(m[2]);
-      if (!(t > c)) return;
-      if (!(r.montoARS > 0 || r.montoUSD > 0)) return;
-
+      const c = parseInt(m[1]), t = parseInt(m[2]);
+      if (!(t > c) || r.montoARS <= 0) return;
       const restantes = t - c;
-
-      // Próxima cuota que caería exactamente en el próximo resumen global.
-      if (mesesHastaObjetivo >= 1 && mesesHastaObjetivo <= restantes) {
-        const cuotaProyectada = c + mesesHastaObjetivo;
-
-        tarjetaForecast.cuotasARS += r.montoARS;
-        tarjetaForecast.cuotasUSD += r.montoUSD;
-        tarjetaForecast.cuotas.push({
-          ...r,
-          cuotaProyectada,
-          totalCuotas: t
-        });
-
-        forecastDetalle.push({
-          bt,
-          banco: tarjetaForecast.banco,
-          tipo: 'Cuota',
-          detalle: r.detalle,
-          cuota: `${cuotaProyectada}/${t}`,
-          montoARS: r.montoARS,
-          montoUSD: r.montoUSD
-        });
-      }
-
-      // Proyección de todas las cuotas futuras, solo en ARS para el gráfico
-      // histórico de compromisos (el dashboard existente trabaja en ARS).
-      for (let k = 1; k <= restantes; k++) {
+      const pasadas  = Math.min(restantes, Math.max(0, hoyAbs - baseIdx - 1));
+      const visibles = restantes - pasadas;
+      if (visibles <= 0) return;
+      planes.push({
+        detalle: r.detalle, bancoTipo: bt, banco: r.banco,
+        cuotaActual: c, cuotaTotal: t, restantes: visibles,
+        montoCuota: r.montoARS, totalRestante: r.montoARS * visibles
+      });
+      for (let k = pasadas + 1; k <= restantes; k++) {
         const abs = baseIdx + k;
-        if (abs < proximoAbs || r.montoARS <= 0) continue;
-
         if (!futuros[abs]) futuros[abs] = {};
-        futuros[abs][r.banco] = (futuros[abs][r.banco] || 0) + r.montoARS;
-
+        futuros[abs][r.banco] = (futuros[abs][r.banco]||0) + r.montoARS;
         if (abs < minAbs) minAbs = abs;
         if (abs > maxAbs) maxAbs = abs;
       }
-
-      // Plan completo para la tabla de cuotas pendientes.
-      planes.push({
-        detalle: r.detalle,
-        bancoTipo: bt,
-        banco: r.banco,
-        cuotaActual: c,
-        cuotaTotal: t,
-        restantes,
-        montoCuota: r.montoARS,
-        montoCuotaUSD: r.montoUSD,
-        totalRestante: r.montoARS * restantes,
-        totalRestanteUSD: r.montoUSD * restantes
-      });
     });
   });
 
-  const tarjetasForecast = Object.entries(forecastPorTarjeta)
-    .filter(([, d]) =>
-      d.fijosARS > 0 || d.fijosUSD > 0 ||
-      d.cuotasARS > 0 || d.cuotasUSD > 0
-    )
-    .sort((a,b) => {
-      const ta = a[1].fijosARS + a[1].cuotasARS;
-      const tb = b[1].fijosARS + b[1].cuotasARS;
-      return tb - ta;
-    });
-
-  const totalForecastARS = tarjetasForecast.reduce(
-    (s,[,d]) => s + d.fijosARS + d.cuotasARS, 0
-  );
-  const totalForecastUSD = tarjetasForecast.reduce(
-    (s,[,d]) => s + d.fijosUSD + d.cuotasUSD, 0
-  );
-  const totalFijosARS = tarjetasForecast.reduce((s,[,d]) => s + d.fijosARS, 0);
-  const totalCuotasARS = tarjetasForecast.reduce((s,[,d]) => s + d.cuotasARS, 0);
-  const totalFijosUSD = tarjetasForecast.reduce((s,[,d]) => s + d.fijosUSD, 0);
-  const totalCuotasUSD = tarjetasForecast.reduce((s,[,d]) => s + d.cuotasUSD, 0);
-
-  if (!tarjetasForecast.length && !planes.length) {
+  if (!planes.length) {
     block.style.display = 'none';
     return;
   }
-
   block.style.display = 'block';
 
-  // ── CABECERA / RESUMEN ──────────────────────────────────────────────────
-  const totalStr = [
-    totalForecastARS > 0 ? `<strong style="color:var(--t-e8);">${fmt(totalForecastARS)}</strong>` : '',
-    totalForecastUSD > 0 ? `<strong style="color:#5DCAA5;">U$S ${totalForecastUSD.toFixed(2)}</strong>` : ''
-  ].filter(Boolean).join(' + ');
+  // ── Débitos fijos mensuales (último resumen de cada tarjeta) ──
+  let gastoFijoMensual = 0;
+  Object.entries(ultimoMesPorTarjeta).forEach(([bt, mesBase]) => {
+    tarjetasPorMes[mesBase].movimientos.forEach(r => {
+      if (r.bancoTipo === bt && esMovimientoFijo(r.detalle)) gastoFijoMensual += r.montoARS;
+    });
+  });
 
-  document.getElementById('cuotasResumen').innerHTML =
-    `Para <strong style="color:var(--t-e8);">${proximoMesLabel}</strong> ya tenés aproximadamente ` +
-    `${totalStr || '<strong style="color:var(--t-e8);">$0</strong>'} ` +
-    `identificados en los últimos resúmenes. ` +
-    `La estimación combina <strong style="color:var(--t-e8);">${fmt(totalFijosARS)}</strong> de fijos ` +
-    `y <strong style="color:var(--t-e8);">${fmt(totalCuotasARS)}</strong> de cuotas.` +
-    (totalForecastUSD > 0
-      ? ` En USD: <strong style="color:#5DCAA5;">U$S ${totalForecastUSD.toFixed(2)}</strong>.`
-      : '');
+  // ── Gasto variable estimado: promedio de consumos en 1 pago de los últimos 3 resúmenes ──
+  const esCuotaEnPlan = r => {
+    const mm = (r.cuota||'').match(/^(\d+)\s*\/\s*(\d+)$/);
+    return mm && parseInt(mm[2]) > 1;
+  };
+  const mesesVar = tarjetasMesesOrden.filter(m => tarjetasMesMeta[m]?.mIdx !== null).slice(-3);
+  const gastoVariableMensual = mesesVar.length
+    ? mesesVar.reduce((s, m) => s + tarjetasPorMes[m].movimientos
+        .filter(r => !esMovimientoFijo(r.detalle) && !esCuotaEnPlan(r))
+        .reduce((a, r) => a + r.montoARS, 0), 0) / mesesVar.length
+    : 0;
 
-  // ── FOTO POR TARJETA ────────────────────────────────────────────────────
-  const filasForecast = tarjetasForecast.map(([bt, d]) => {
-    const color = getBancoColor(d.banco, 0);
-    const totalARS = d.fijosARS + d.cuotasARS;
-    const totalUSD = d.fijosUSD + d.cuotasUSD;
-
-    const detalleFijos = d.fijos
-      .map(r => `${r.detalle}: ${r.montoARS > 0 ? fmt(r.montoARS) : `U$S ${r.montoUSD.toFixed(2)}`}`)
-      .join(' · ');
-
-    const detalleCuotas = d.cuotas
-      .map(r => `${r.detalle} (${r.cuotaProyectada}/${r.totalCuotas}): ${r.montoARS > 0 ? fmt(r.montoARS) : `U$S ${r.montoUSD.toFixed(2)}`}`)
-      .join(' · ');
-
-    const totalStrTarjeta = [
-      totalARS > 0 ? fmt(totalARS) : '',
-      totalUSD > 0 ? `<span style="color:#5DCAA5;">U$S ${totalUSD.toFixed(2)}</span>` : ''
-    ].filter(Boolean).join(' · ');
-
-    return `<tr style="border-left:2px solid ${color}55;">
-      <td style="font-weight:600;font-size:12px;">
-        ${bt}
-        <div style="font-size:10px;color:var(--t-444);font-weight:400;margin-top:3px;">
-          Base: ${d.mesBase}
-        </div>
-      </td>
-      <td style="text-align:right;font-size:12px;">
-        ${d.fijosARS > 0 ? fmt(d.fijosARS) : '—'}
-        ${d.fijosUSD > 0 ? `<div style="color:#5DCAA5;font-size:10px;">U$S ${d.fijosUSD.toFixed(2)}</div>` : ''}
-      </td>
-      <td style="text-align:right;font-size:12px;">
-        ${d.cuotasARS > 0 ? fmt(d.cuotasARS) : '—'}
-        ${d.cuotasUSD > 0 ? `<div style="color:#5DCAA5;font-size:10px;">U$S ${d.cuotasUSD.toFixed(2)}</div>` : ''}
-      </td>
-      <td style="text-align:right;font-weight:600;font-size:12px;">
-        ${totalStrTarjeta || '—'}
-      </td>
-    </tr>
-    <tr>
-      <td colspan="4" style="padding:2px 4px 10px 16px;border-top:0;">
-        <div style="font-size:10px;color:var(--t-555);line-height:1.55;">
-          ${detalleFijos ? `<span style="color:var(--t-666);">Fijos:</span> ${detalleFijos}` : ''}
-          ${detalleFijos && detalleCuotas ? '<br>' : ''}
-          ${detalleCuotas ? `<span style="color:var(--t-666);">Cuotas:</span> ${detalleCuotas}` : ''}
-        </div>
-      </td>
-    </tr>`;
-  }).join('');
-
-  forecastBlock.innerHTML = `
-    <div style="padding:14px 16px;border:0.5px solid var(--border);border-radius:10px;background:var(--input);">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px;">
-        <div>
-          <div style="font-size:10px;color:var(--t-555);text-transform:uppercase;letter-spacing:.06em;">Estimación parcial · ${proximoMesLabel}</div>
-          <div style="font-size:24px;font-weight:650;color:var(--t-e8);margin-top:3px;">
-            ${totalForecastARS > 0 ? fmt(totalForecastARS) : '$0'}
-            ${totalForecastUSD > 0 ? `<span style="font-size:13px;color:#5DCAA5;margin-left:7px;">+ U$S ${totalForecastUSD.toFixed(2)}</span>` : ''}
-          </div>
-          <div style="font-size:11px;color:var(--t-555);margin-top:4px;">
-            Ya comprometido según los últimos resúmenes disponibles
-          </div>
-        </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <span class="cat-tag">Fijos ${totalFijosARS > 0 ? fmt(totalFijosARS) : '$0'}</span>
-          <span class="cat-tag">Cuotas ${totalCuotasARS > 0 ? fmt(totalCuotasARS) : '$0'}</span>
-        </div>
-      </div>
-
-      <div style="overflow-x:auto;">
-        <table class="ranking-table" style="width:100%;min-width:650px;">
-          <thead><tr>
-            <th style="width:34%">Tarjeta</th>
-            <th style="width:20%;text-align:right">Fijos</th>
-            <th style="width:20%;text-align:right">Cuotas</th>
-            <th style="width:26%;text-align:right">Total estimado</th>
-          </tr></thead>
-          <tbody>${filasForecast}</tbody>
-        </table>
-      </div>
-    </div>
-  `;
-
-  // ── GRÁFICO DE CUOTAS FUTURAS ────────────────────────────────────────────
-  if (minAbs === Infinity || maxAbs === -Infinity) {
-    if (cuotasChartInst) {
-      cuotasChartInst.destroy();
-      cuotasChartInst = null;
-    }
-    document.getElementById('cuotasChart').parentElement.style.display = 'none';
-    document.getElementById('cuotasLegend').style.display = 'none';
-    document.getElementById('cuotasTable').style.display = 'none';
-    return;
-  }
-
-  document.getElementById('cuotasChart').parentElement.style.display = 'block';
-  document.getElementById('cuotasLegend').style.display = 'flex';
-  document.getElementById('cuotasTable').style.display = 'table';
+  const totalComprometido = planes.reduce((s,p)=>s+p.totalRestante,0);
+  const mesesHorizonte = maxAbs - minAbs + 1;
 
   const labels = [], absList = [];
   const aniosSpan = new Set();
-
-  for (let abs = proximoAbs; abs <= maxAbs; abs++) {
-    aniosSpan.add(Math.floor(abs / 12));
+  for (let abs = minAbs; abs <= maxAbs; abs++) aniosSpan.add(Math.floor(abs/12));
+  const multiAnio = aniosSpan.size > 1;
+  for (let abs = minAbs; abs <= maxAbs; abs++) {
+    const anio = Math.floor(abs/12);
+    labels.push(MES_CAL_NOMBRES[abs % 12] + (multiAnio ? ` '${String(anio).slice(2)}` : ''));
     absList.push(abs);
   }
 
-  const multiAnio = aniosSpan.size > 1;
-  absList.forEach(abs => {
-    const anio = Math.floor(abs / 12);
-    labels.push(
-      MES_CAL_NOMBRES[abs % 12] +
-      (multiAnio ? ` '${String(anio).slice(2)}` : '')
-    );
-  });
+  const bancosFut = [...new Set(Object.values(futuros).flatMap(o=>Object.keys(o)))]
+    .sort((a,b)=>{
+      const sA = absList.reduce((s,abs)=>s+(futuros[abs]?.[a]||0),0);
+      const sB = absList.reduce((s,abs)=>s+(futuros[abs]?.[b]||0),0);
+      return sB - sA;
+    });
 
-  const bancosFut = [...new Set(
-    Object.values(futuros).flatMap(o => Object.keys(o))
-  )].sort((a,b) => {
-    const sA = absList.reduce((s,abs) => s + (futuros[abs]?.[a] || 0), 0);
-    const sB = absList.reduce((s,abs) => s + (futuros[abs]?.[b] || 0), 0);
-    return sB - sA;
-  });
+  document.getElementById('cuotasResumen').innerHTML =
+    `Tenés <strong style="color:var(--t-e8);">${fmt(totalComprometido)}</strong> comprometidos en `+
+    `<strong style="color:var(--t-e8);">${planes.length}</strong> plan${planes.length!==1?'es':''} de cuotas, `+
+    `repartidos en los próximos <strong style="color:var(--t-e8);">${mesesHorizonte}</strong> mes${mesesHorizonte!==1?'es':''}. `+
+    `A eso se suman <strong style="color:var(--t-e8);">${fmt(gastoFijoMensual)}</strong> de débitos fijos y `+
+    `~<strong style="color:var(--t-e8);">${fmt(gastoVariableMensual)}</strong> de gasto variable estimado por mes.`;
 
-  const totalComprometido = planes.reduce((s,p) => s + p.totalRestante, 0);
+  const cuotasPorMes = absList.map(abs => Object.values(futuros[abs]||{}).reduce((s,v)=>s+v,0));
+  const totalMesEstimado = cuotasPorMes.map(c => c + gastoFijoMensual + gastoVariableMensual);
 
-  const yFmtC = v => '$' + (
-    v >= 1000000 ? Math.round(v/1000000) + 'M' :
-    v >= 1000 ? Math.round(v/1000) + 'k' :
-    v
-  );
+  const primerCuotas = cuotasPorMes[0] || 0;
+  document.getElementById('cuotasTotalMes').innerHTML = `
+    <p style="font-size:10px;color:var(--t-444);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">Total estimado · ${labels[0]}</p>
+    <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:10px;">
+      <span style="font-size:28px;font-weight:500;color:var(--t-e8);letter-spacing:-0.5px;">${fmt(totalMesEstimado[0])}</span>
+      <span style="font-size:11px;color:var(--t-444);">ARS</span>
+    </div>
+    <div style="display:flex;gap:18px;flex-wrap:wrap;font-size:12px;color:var(--t-888);">
+      <span>Cuotas <strong style="color:var(--t-e8);font-weight:500;">${fmt(primerCuotas)}</strong></span>
+      <span>Débitos fijos <strong style="color:var(--t-e8);font-weight:500;">${fmt(gastoFijoMensual)}</strong></span>
+      <span>Variable estimado <strong style="color:var(--t-e8);font-weight:500;">${fmt(gastoVariableMensual)}</strong></span>
+    </div>`;
 
-  const cuotasDatasets = bancosFut.map((banco,i) => ({
+  const yFmtC = v=>'$'+(v>=1000000?Math.round(v/1000000)+'M':v>=1000?Math.round(v/1000)+'k':v);
+
+  const cuotasDatasets = bancosFut.map((banco,i)=>({
     label: banco,
-    data: absList.map(abs => futuros[abs]?.[banco] || 0),
-    backgroundColor: getBancoColor(banco,i) + '99',
+    data: absList.map(abs=>futuros[abs]?.[banco]||0),
+    backgroundColor: getBancoColor(banco,i)+'99',
     borderColor: getBancoColor(banco,i),
-    borderWidth: 1.5,
-    borderRadius: 5,
-    maxBarThickness: 64
+    borderWidth: 1.5, borderRadius: 5, maxBarThickness: 64
   }));
+  const COLOR_FIJOS_T = '#7F77DD', COLOR_VAR_T = '#888780';
+  if (gastoFijoMensual > 0) cuotasDatasets.push({
+    label: 'Débitos fijos',
+    data: absList.map(()=>gastoFijoMensual),
+    backgroundColor: COLOR_FIJOS_T+'99', borderColor: COLOR_FIJOS_T,
+    borderWidth: 1.5, borderRadius: 5, maxBarThickness: 64
+  });
+  if (gastoVariableMensual > 0) cuotasDatasets.push({
+    label: 'Variable estimado',
+    data: absList.map(()=>gastoVariableMensual),
+    backgroundColor: COLOR_VAR_T+'55', borderColor: COLOR_VAR_T,
+    borderWidth: 1.5, borderRadius: 5, maxBarThickness: 64, borderDash: [4,3]
+  });
 
   const cuotasTotalLabels = {
     id: 'cuotasTotalLabels',
@@ -1613,11 +1406,9 @@ function renderCompromisos() {
       const { ctx } = chart;
       for (let i = 0; i < chart.data.labels.length; i++) {
         let total = 0, topBar = null;
-
         chart.data.datasets.forEach((ds, di) => {
           const meta = chart.getDatasetMeta(di);
           if (meta.hidden) return;
-
           const v = ds.data[i];
           if (v) {
             total += v;
@@ -1625,9 +1416,7 @@ function renderCompromisos() {
             if (bar && (!topBar || bar.y < topBar.y)) topBar = bar;
           }
         });
-
         if (!topBar || !total) continue;
-
         ctx.save();
         ctx.fillStyle = VAL_LABEL;
         ctx.font = '600 11px -apple-system, BlinkMacSystemFont, sans-serif';
@@ -1640,57 +1429,44 @@ function renderCompromisos() {
   };
 
   if (cuotasChartInst) cuotasChartInst.destroy();
-
   cuotasChartInst = new Chart(document.getElementById('cuotasChart'), {
     type: 'bar',
     data: { labels, datasets: cuotasDatasets },
     plugins: [cuotasTotalLabels],
     options: {
-      responsive:true,
-      maintainAspectRatio:false,
+      responsive:true, maintainAspectRatio:false,
       interaction:{mode:'index',intersect:false},
       layout:{ padding:{ top: 18 } },
       plugins:{
         legend:{display:false},
-        tooltip:{
-          filter:item=>item.raw>0,
-          callbacks:{label:ctx=>` ${ctx.dataset.label}: ${fmt(ctx.raw)}`}
-        }
+        tooltip:{filter:item=>item.raw>0,callbacks:{label:ctx=>` ${ctx.dataset.label}: ${fmt(ctx.raw)}`}}
       },
       scales:{
         x:{stacked:true,grid:{display:false},ticks:{color:TICK,font:{size:11}}},
-        y:{
-          stacked:true,
-          grid:{color:GRID},
-          ticks:{color:TICK,font:{size:10},callback:yFmtC},
-          beginAtZero:true,
-          grace:'12%'
-        }
+        y:{stacked:true,grid:{color:GRID},ticks:{color:TICK,font:{size:10},callback:yFmtC},beginAtZero:true,grace:'12%'}
       }
     }
   });
 
   document.getElementById('cuotasLegend').innerHTML = bancosFut.map((b,i)=>
     `<span class="legend-item"><span class="legend-dot" style="background:${getBancoColor(b,i)}"></span>${b}</span>`
-  ).join('');
+  ).join('') +
+  (gastoFijoMensual > 0 ? `<span class="legend-item"><span class="legend-dot" style="background:${COLOR_FIJOS_T}"></span>Débitos fijos</span>` : '') +
+  (gastoVariableMensual > 0 ? `<span class="legend-item"><span class="legend-dot" style="background:${COLOR_VAR_T}"></span>Variable estimado</span>` : '');
 
-  // ── TABLA DE CUOTAS PENDIENTES ───────────────────────────────────────────
   const gruposPlanes = {};
-  planes.forEach(p => {
-    (gruposPlanes[p.bancoTipo] = gruposPlanes[p.bancoTipo] || []).push(p);
-  });
-
-  const ordenTarjetasPlanes = Object.keys(gruposPlanes).sort((a,b) => {
-    const sA = gruposPlanes[a].reduce((s,p) => s + p.totalRestante, 0);
-    const sB = gruposPlanes[b].reduce((s,p) => s + p.totalRestante, 0);
+  planes.forEach(p => { (gruposPlanes[p.bancoTipo] = gruposPlanes[p.bancoTipo]||[]).push(p); });
+  const ordenTarjetasPlanes = Object.keys(gruposPlanes).sort((a,b)=>{
+    const sA = gruposPlanes[a].reduce((s,p)=>s+p.totalRestante,0);
+    const sB = gruposPlanes[b].reduce((s,p)=>s+p.totalRestante,0);
     return sB - sA;
   });
 
   const cuerpoPlanes = ordenTarjetasPlanes.map((bt, gi) => {
-    const grupo = [...gruposPlanes[bt]].sort((a,b) => b.totalRestante - a.totalRestante);
+    const grupo = [...gruposPlanes[bt]].sort((a,b)=>b.totalRestante-a.totalRestante);
     const banco = bt.split(' ').slice(1).join(' ') || bt;
     const color = getBancoColor(banco, gi);
-    const subRestante = grupo.reduce((s,p) => s + p.totalRestante, 0);
+    const subRestante = grupo.reduce((s,p)=>s+p.totalRestante,0);
 
     const headerRow = `<tr>
       <td colspan="4" style="padding:14px 4px 7px;">
@@ -1703,18 +1479,15 @@ function renderCompromisos() {
       </td>
     </tr>`;
 
-    const dataRows = grupo.map(p => {
-      const pctPagado = ((p.cuotaActual / p.cuotaTotal) * 100).toFixed(0);
+    const dataRows = grupo.map(p=>{
+      const pctPagado = ((p.cuotaActual/p.cuotaTotal)*100).toFixed(0);
       return `<tr style="border-left:2px solid ${color}33;">
         <td style="font-weight:500;font-size:12px;padding-left:16px;">${p.detalle}
           <div class="bar-bg"><div class="bar-fill" style="width:${pctPagado}%;background:${color};"></div></div>
         </td>
         <td style="text-align:center;font-size:11px;color:var(--t-888)">${p.cuotaActual}/${p.cuotaTotal}</td>
-        <td style="text-align:right;font-size:12px;color:var(--t-888)">${p.montoCuota > 0 ? fmt(p.montoCuota) : (p.montoCuotaUSD > 0 ? `U$S ${p.montoCuotaUSD.toFixed(2)}` : '—')}</td>
-        <td style="text-align:right;font-weight:500">
-          ${p.totalRestante > 0 ? fmt(p.totalRestante) : (p.totalRestanteUSD > 0 ? `U$S ${p.totalRestanteUSD.toFixed(2)}` : '—')}
-          <br><span class="pct-label">${p.restantes} cuota${p.restantes!==1?'s':''}</span>
-        </td>
+        <td style="text-align:right;font-size:12px;color:var(--t-888)">${fmt(p.montoCuota)}</td>
+        <td style="text-align:right;font-weight:500">${fmt(p.totalRestante)}<br><span class="pct-label">${p.restantes} cuota${p.restantes!==1?'s':''}</span></td>
       </tr>`;
     }).join('');
 
