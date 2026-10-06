@@ -1420,53 +1420,93 @@ function filtrarTarjetasLog() {
 const AHORRO_OBJETIVO_ARS = 1500000;   // ahorro mínimo mensual
 const AHORRO_OBJETIVO_PCT = 0.20;      // o 20% del ingreso, el mayor de los dos
 const SEMAFORO_AMARILLO   = 0.85;      // ≥85% del tope → amarillo; >100% → rojo
-// Palabras que identifican el PAGO de la tarjeta en Movimientos (para no contarlo doble)
+const DESFASE_RESUMEN     = 1;         // gastos de Sep. se pagan con el sueldo del Ciclo Octubre
+const CICLOS_PROMEDIO     = 3;         // ciclos anteriores para estimar gastos fuera de tarjeta
 const CATS_PAGO_TARJETA   = ['tarjeta','visa','master','amex','resumen'];
 let compromisoProximoMes = 0;
+
+const esPagoTarjeta = r => CATS_PAGO_TARJETA.some(k => (r.categoria+' '+r.detalle).toLowerCase().includes(k));
+const sinIngresos = p => !p.ingresosMari && p.ingresosLucas === 3600000;
+const gastosFueraTarjeta = p => p.datos.filter(r => !esPagoTarjeta(r)).reduce((s,r)=>s+r.monto,0);
+
 function cicloParaResumen(mesKey) {
   const m = tarjetasMesMeta[mesKey];
   if (m && m.mIdx !== null) {
-    const idx = CICLOS.findIndex(c => c.cicloHasta.getFullYear()===m.year && c.cicloHasta.getMonth()===m.mIdx);
+    const abs = m.year*12 + m.mIdx + DESFASE_RESUMEN;
+    const idx = CICLOS.findIndex(c => c.cicloHasta.getFullYear()*12 + c.cicloHasta.getMonth() === abs);
     if (idx !== -1) return idx;
   }
   return CICLOS.length - 1;
 }
+
 function renderSemaforo(totalTarjetas, mesKey) {
   const block = document.getElementById('semaforoBlock');
   const idx = cicloParaResumen(mesKey);
   if (idx < 0 || !datosCache[idx]) { block.style.display='none'; return; }
-  const { datos, ingresosLucas, ingresosMari } = parsearCiclo(datosCache[idx]);
-  const ingreso = ingresosLucas + ingresosMari;
-  const ahorro  = Math.max(AHORRO_OBJETIVO_ARS, ingreso * AHORRO_OBJETIVO_PCT);
-  const esPagoTarjeta = r => CATS_PAGO_TARJETA.some(k => (r.categoria+' '+r.detalle).toLowerCase().includes(k));
-  const gastosNoTarjeta = datos.filter(r => !esPagoTarjeta(r)).reduce((s,r)=>s+r.monto,0);
-  const tope = ingreso - ahorro - gastosNoTarjeta;
+  const p = parsearCiclo(datosCache[idx]);
+  const avisos = [];
+
+  // Ingresos de Lucas + Mariana del ciclo que paga este resumen
+  let ingreso = p.ingresosLucas + p.ingresosMari;
+  if (sinIngresos(p)) {
+    for (let j = idx - 1; j >= 0; j--) {
+      const q = datosCache[j] && parsearCiclo(datosCache[j]);
+      if (q && !sinIngresos(q)) {
+        ingreso = q.ingresosLucas + q.ingresosMari;
+        avisos.push(`Faltan cargar los ingresos de ${CICLOS[idx].label}: uso los de ${CICLOS[j].label}.`);
+        break;
+      }
+    }
+  }
+
+  // Gastos fuera de tarjeta: si el ciclo sigue en curso, uso el promedio de los ciclos anteriores
+  let fuera = gastosFueraTarjeta(p);
+  const hoy = new Date(); hoy.setHours(0,0,0,0);
+  if (hoy <= CICLOS[idx].cicloHasta) {
+    const prev = [];
+    for (let j = idx - 1; j >= 0 && prev.length < CICLOS_PROMEDIO; j--) {
+      if (datosCache[j]) prev.push(gastosFueraTarjeta(parsearCiclo(datosCache[j])));
+    }
+    if (prev.length) {
+      const prom = prev.reduce((s,v)=>s+v,0) / prev.length;
+      if (prom > fuera) {
+        avisos.push(`Ciclo en curso: van ${fmt(fuera)} fuera de tarjeta; estimo ${fmt(prom)} (promedio de los últimos ${prev.length} ciclos).`);
+        fuera = prom;
+      }
+    }
+  }
+
+  const ahorro = Math.max(AHORRO_OBJETIVO_ARS, ingreso * AHORRO_OBJETIVO_PCT);
+  const tope = ingreso - ahorro - fuera;
   const pct  = tope > 0 ? totalTarjetas / tope : Infinity;
   const estado = pct > 1 ? {c:'#E24B4A', t:'ROJO', m:'Te pasaste del tope: este mes no llegás al ahorro objetivo.'}
               : pct >= SEMAFORO_AMARILLO ? {c:'#EF9F27', t:'AMARILLO', m:'Estás cerca del tope. Frená compras nuevas en cuotas.'}
               : {c:'#639922', t:'VERDE', m:'Vas bien: el ahorro objetivo está cubierto.'};
-  const ahorroReal = ingreso - gastosNoTarjeta - totalTarjetas;
+  const ahorroReal = ingreso - fuera - totalTarjetas;
   const margenNuevo = tope - compromisoProximoMes;
   const luz = (col,on) => `<span style="width:18px;height:18px;border-radius:50%;display:inline-block;background:${on?col:'var(--soft)'};box-shadow:${on?'0 0 10px '+col:'none'};"></span>`;
   const fila = (l,v,col) => `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:0.5px solid var(--softer);font-size:12px;"><span style="color:var(--t-888)">${l}</span><strong style="color:${col||'var(--t-e8)'};font-weight:500">${v}</strong></div>`;
+  const avisosHtml = avisos.map(a => `<p style="font-size:11px;color:#EF9F27;margin-bottom:6px;">⚠ ${a}</p>`).join('');
+
   block.innerHTML = `
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
       <div>
         <p class="chart-title" style="margin-bottom:4px;">Semáforo de tarjetas · ${mesKey}</p>
-        <p style="font-size:11px;color:var(--t-444);">Objetivo: ahorrar ${fmt(ahorro)} · ingresos de ${CICLOS[idx].label}</p>
+        <p style="font-size:11px;color:var(--t-444);">Objetivo: ahorrar ${fmt(ahorro)} · se paga con ${CICLOS[idx].label}</p>
       </div>
       <div style="display:flex;gap:6px;background:var(--input);padding:6px 10px;border-radius:20px;">
         ${luz('#639922',estado.t==='VERDE')}${luz('#EF9F27',estado.t==='AMARILLO')}${luz('#E24B4A',estado.t==='ROJO')}
       </div>
     </div>
+    ${avisosHtml}
     <p style="font-size:14px;color:${estado.c};font-weight:500;margin-bottom:10px;">${estado.t} · ${isFinite(pct)?(pct*100).toFixed(0)+'% del tope':'sin margen'} — <span style="font-weight:400;color:var(--t-888)">${estado.m}</span></p>
     <div style="background:var(--soft);border-radius:4px;height:8px;overflow:hidden;margin-bottom:14px;position:relative;">
       <div style="width:${Math.min(100,(isFinite(pct)?pct:1)*100).toFixed(1)}%;height:8px;background:${estado.c};"></div>
       <div style="position:absolute;left:${SEMAFORO_AMARILLO*100}%;top:0;height:8px;border-left:1.5px dashed var(--t-444);"></div>
     </div>
-    ${fila('Ingresos del ciclo', fmt(ingreso))}
+    ${fila('Ingresos Lucas + Mariana', fmt(ingreso))}
     ${fila('− Ahorro objetivo', fmt(ahorro))}
-    ${fila('− Gastos fuera de tarjeta', fmt(gastosNoTarjeta))}
+    ${fila('− Gastos fuera de tarjeta', fmt(fuera))}
     ${fila('= Tope para tarjetas', fmt(tope), tope>0?'#378ADD':'#E24B4A')}
     ${fila('Gastado en tarjetas', fmt(totalTarjetas), estado.c)}
     ${fila('Ahorro resultante', fmt(ahorroReal)+(ingreso>0?' ('+(ahorroReal/ingreso*100).toFixed(1)+'%)':''), ahorroReal>=ahorro?'#639922':'#E24B4A')}
