@@ -104,12 +104,16 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .badge-desconocido { background: var(--soft); color: var(--t-888); }
 .cat-tag { background: var(--soft); padding: 3px 8px; border-radius: 4px; font-size: 11px; color: var(--t-aaa); white-space: nowrap; }
 
-/* ─── ESTILOS SOLAPA CÓMO VENIMOS (RESUMEN EJECUTIVO) ─── */
+/* ─── ESTILOS SOLAPA CÓMO VENIMOS (RESUMEN EJECUTIVO & GAMIFICATION) ─── */
 .cv-kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin-bottom: 1.5rem; }
 .cv-kpi-card { background: var(--card); border: 0.5px solid var(--soft); border-radius: 12px; padding: 1.25rem 1.5rem; display: flex; flex-direction: column; gap: 6px; }
 .cv-kpi-label { font-size: 10px; color: var(--t-444); text-transform: uppercase; letter-spacing: 0.07em; }
 .cv-kpi-value { font-size: 24px; font-weight: 500; color: var(--t-e8); }
 .cv-kpi-sub { font-size: 12px; color: var(--t-555); }
+.cv-game-banner { background: var(--card); border: 0.5px solid var(--border); border-radius: 12px; padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 10px; }
+.cv-game-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; color: #1D9E75; display: flex; align-items: center; gap: 6px; }
+.cv-game-msg { font-size: 14px; color: var(--t-e8); line-height: 1.5; }
+.cv-game-msg strong { color: var(--t-fff); font-weight: 600; }
 
 /* Tarjetas tab */
 .tarjetas-controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 1.5rem; }
@@ -208,8 +212,14 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     </div>
   </div>
 
-  <!-- TAB: CÓMO VENIMOS (RESUMEN EJECUTIVO) -->
+  <!-- TAB: CÓMO VENIMOS (RESUMEN EJECUTIVO & GAMIFICATION) -->
   <div id="tabComovenimos" style="display:none;">
+    <!-- BANNER DE GAMIFICATION MOTIVACIONAL -->
+    <div class="cv-game-banner" id="cvGameBanner">
+      <div class="cv-game-title">🎯 Estado de Misión & Motivación</div>
+      <div class="cv-game-msg" id="cvGameMsg">Calculando estado del ciclo...</div>
+    </div>
+
     <div class="table-card" style="margin-bottom:1.5rem;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
         <p class="chart-title" style="margin-bottom:0;">Resumen ejecutivo del ciclo</p>
@@ -716,7 +726,7 @@ function buildDashboard(rows) {
   if (tabActivo==='comovenimos') renderComoVenimos();
   if (tabActivo==='comparativa') renderComparativa();
   if (tabActivo==='detalle') document.getElementById('tabDetalle').style.display='block';
-  if (tabActivo==='tarjetas') { document.getElementById('tabTarjetas').style.display='block'; initTarjetas(); }
+  if (tabActivo==='tarjetas' && tarjetasRawRows) { document.getElementById('tabTarjetas').style.display='block'; initTarjetas(); }
 }
 
 function renderComoVenimos() {
@@ -746,6 +756,26 @@ function renderComoVenimos() {
   const margRealEl = document.getElementById('cv-margen-real');
   margRealEl.innerText = fmt(margenReal);
   margRealEl.className = 'cv-kpi-value ' + (margenReal >= 0 ? 'positivo' : 'negativo');
+
+  // Lógica de Gamification / Motivación
+  const gameMsgEl = document.getElementById('cvGameMsg');
+  let mensajeGamification = '';
+  
+  if (totalIngreso >= 5000000) {
+    mensajeGamification += `🔥 <strong>¡Ingreso fuerte de ${fmt(totalIngreso)}!</strong> No es poco, che: este nivel de ingresos es clave para sostener la casa y el ahorro sin sobresaltos.<br>`;
+  } else {
+    mensajeGamification += `💪 <strong>¡Ingresos de ${fmt(totalIngreso)} en marcha!</strong> Cada peso cuenta y se valora un montón.<br>`;
+  }
+
+  if (margenReal >= objetivoAhorro) {
+    mensajeGamification += `🏆 <strong>¡Objetivo de ahorro cumplido y superado!</strong> Ya tenés asegurados tus <strong>${fmt(objetivoAhorro)}</strong> de ahorro. El margen de ocio real es de <strong>${fmt(margenReal)}</strong>: ¡está todo cubierto, podés gastarlo y disfrutarlo con total tranquilidad!`;
+  } else if (margenReal > 0) {
+    mensajeGamification += `✨ <strong>¡Viene re bien la mano!</strong> Venimos cumpliendo el objetivo de ahorro y te quedan <strong>${fmt(margenReal)}</strong> libres para ocio y disfrute sin culpas ni deudas. ¡A seguir así!`;
+  } else {
+    mensajeGamification += `🚀 <strong>¡Ciclo en movimiento!</strong> Venimos con gastos acumulados de ${fmt(totalGastado)}. Si este mes el ahorro se pone ajustado, ¡no pasa nada! Dale que el próximo mes se compensa y se llega con creces.`;
+  }
+
+  gameMsgEl.innerHTML = mensajeGamification;
 }
 
 function renderFijosVsVariables(datos, totalGastos, totalIngresos) {
