@@ -46,16 +46,14 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .btn-refresh { background: transparent; border: 0.5px solid var(--border); border-radius: 8px; padding: 8px 12px; font-size: 15px; color: var(--t-666); cursor: pointer; transition: all 0.15s; }
 .btn-refresh:hover { color: var(--t-ccc); border-color: var(--t-444); background: var(--card); }
 .ciclo-badge { font-size: 11px; color: var(--t-555); background: var(--card); border: 0.5px solid var(--soft); border-radius: 6px; padding: 4px 10px; white-space: nowrap; }
-.tabs { display: flex; background: var(--card); border: 0.5px solid var(--soft); border-radius: 10px; padding: 3px; margin-bottom: 1.5rem; gap: 2px; }
-.tab { flex: 1; padding: 8px 12px; font-size: 12px; color: var(--t-555); background: transparent; border: none; cursor: pointer; border-radius: 8px; transition: all 0.15s; text-align: center; letter-spacing: 0.02em; }
+.tabs { display: flex; background: var(--card); border: 0.5px solid var(--soft); border-radius: 10px; padding: 3px; margin-bottom: 1.5rem; gap: 2px; flex-wrap: wrap; }
+.tab { flex: 1; padding: 8px 12px; font-size: 12px; color: var(--t-555); background: transparent; border: none; cursor: pointer; border-radius: 8px; transition: all 0.15s; text-align: center; letter-spacing: 0.02em; min-width: 80px; }
 .tab:hover { color: var(--t-aaa); }
 .tab.active { color: var(--t-fff); background: var(--border); }
 .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 10px; }
 .metric { background: var(--card); border: 0.5px solid var(--soft); border-radius: 8px; padding: 14px 16px; }
 .metric-label { font-size: 10px; color: var(--t-444); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
 .metric-value { font-size: 17px; font-weight: 500; color: var(--t-e8); }
-.metric-value.danger { color: #E24B4A; }
-.metric-value.success { color: #639922; }
 .summary-strip { background: var(--card); border: 0.5px solid var(--soft); border-radius: 8px; padding: 14px 18px; margin-bottom: 1.5rem; display: flex; align-items: center; flex-wrap: wrap; gap: 0; }
 .summary-item { display: flex; flex-direction: column; gap: 4px; padding: 4px 22px; border-right: 0.5px solid var(--divider); flex: 1; min-width: 130px; }
 .summary-item:first-child { padding-left: 4px; }
@@ -64,10 +62,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .summary-value { font-size: 16px; font-weight: 500; color: var(--t-e8); white-space: nowrap; }
 .summary-value.danger { color: #E24B4A; }
 .summary-value.success { color: #639922; }
-@media (max-width: 600px) {
-  .summary-strip { padding: 10px 14px; }
-  .summary-item { flex: 1 1 40%; border-right: none; padding: 8px 4px; }
-}
 .proj-banner { background: var(--card); border: 0.5px solid var(--border); border-left: 2px solid #EF9F27; border-radius: 8px; padding: 12px 16px; margin-bottom: 1.5rem; display: flex; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
 .proj-banner-content { flex: 1; }
 .proj-banner-title { font-size: 10px; color: #EF9F27; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.06em; }
@@ -103,29 +97,36 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .badge-mariana { background: rgba(212,83,126,0.15); color: #D4537E; }
 .badge-desconocido { background: var(--soft); color: var(--t-888); }
 .cat-tag { background: var(--soft); padding: 3px 8px; border-radius: 4px; font-size: 11px; color: var(--t-aaa); white-space: nowrap; }
+
+/* ─── ESTILOS NUEVOS: CÓMO VENIMOS (PRESUPUESTO) ─── */
+.waterfall-card { background: var(--card); border: 0.5px solid var(--soft); border-radius: 12px; padding: 18px 20px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap:10px; transition: all 0.2s; }
+.waterfall-title { font-size: 11px; font-weight: 600; color: var(--t-aaa); text-transform: uppercase; letter-spacing: 0.05em; }
+.waterfall-value { font-size: 20px; font-weight: 600; text-align: right; }
+.waterfall-sub { font-size: 11px; color: var(--t-555); margin-top: 4px; }
+.waterfall-total { background: var(--softer); border: 1px solid var(--border); }
+.budget-alert { padding: 14px 18px; border-radius: 10px; font-size: 13px; font-weight: 500; margin-bottom: 20px; display: flex; gap: 10px; align-items: center; line-height: 1.5; }
+.budget-alert.success { background: rgba(99, 153, 34, 0.1); color: #639922; border: 1px solid rgba(99, 153, 34, 0.3); }
+.budget-alert.danger { background: rgba(226, 75, 74, 0.1); color: #E24B4A; border: 1px solid rgba(226, 75, 74, 0.3); }
+.budget-alert.warning { background: rgba(239, 159, 39, 0.1); color: #EF9F27; border: 1px solid rgba(239, 159, 39, 0.3); }
+.op-sign { text-align: center; color: var(--t-444); font-size: 18px; padding: 4px 0; font-weight: 300; }
+.fixed-breakdown { font-size: 12px; color: var(--t-888); display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; width: 100%; margin-top: 14px; padding-top: 14px; border-top: 0.5px dashed var(--soft); }
+.fixed-item { display: flex; justify-content: space-between; }
+
 /* Tarjetas tab */
 .tarjetas-controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 1.5rem; }
 .tarjetas-label { font-size: 11px; color: var(--t-444); text-transform: uppercase; letter-spacing: 0.05em; }
 .tarjetas-select { background: var(--card); border: 0.5px solid var(--border); border-radius: 8px; padding: 7px 28px 7px 12px; font-size: 12px; color: var(--t-ccc); cursor: pointer; outline: none; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23555' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; background-color: var(--card); }
-.tarjetas-select:hover { border-color: var(--t-444); background-color: var(--soft); }
 .tarjetas-toggle-group { display: flex; background: var(--card); border: 0.5px solid var(--soft); border-radius: 8px; padding: 2px; gap: 2px; }
 .tarjetas-toggle { padding: 6px 12px; font-size: 11px; color: var(--t-555); background: transparent; border: none; cursor: pointer; border-radius: 6px; transition: all 0.15s; white-space: nowrap; }
-.tarjetas-toggle:hover { color: var(--t-aaa); }
-.tarjetas-toggle.active { color: var(--t-fff); background: var(--border); }
 .tarjeta-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
-.tarjeta-card { background: var(--card); border: 0.5px solid var(--soft); border-radius: 10px; padding: 14px 16px; }
-.tarjeta-card-name { font-size: 10px; color: var(--t-444); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
-.tarjeta-card-amount { font-size: 18px; font-weight: 500; color: var(--t-e8); }
-.tarjeta-card-sub { font-size: 11px; color: var(--t-555); margin-top: 3px; }
-.tarjeta-card-bar { background: var(--soft); border-radius: 3px; height: 3px; margin-top: 10px; }
-.tarjeta-card-bar-fill { height: 3px; border-radius: 3px; }
 .line-chip { padding: 4px 10px; border-radius: 20px; font-size: 11px; cursor: pointer; transition: all 0.15s; border-width: 1px; border-style: solid; }
 .loading { text-align: center; padding: 3rem 0; color: var(--t-444); font-size: 14px; }
 .error-msg { background: #2a1010; color: #E24B4A; border: 0.5px solid #3a1515; border-radius: 8px; padding: 12px 16px; font-size: 13px; margin-bottom: 1rem; }
-@media (max-width: 540px) {
+@media (max-width: 600px) {
+  .summary-strip { padding: 10px 14px; }
+  .summary-item { flex: 1 1 40%; border-right: none; padding: 8px 4px; }
   .charts { grid-template-columns: 1fr; }
   .metrics { grid-template-columns: repeat(2, 1fr); }
-  .tarjeta-grid { grid-template-columns: repeat(2, 1fr); }
 }
 </style>
 </head>
@@ -150,14 +151,18 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     </div>
   </div>
   <div id="errorBox" style="display:none;" class="error-msg"></div>
-  <!-- TABS: Este ciclo | Detalle | Comparativa | Tarjetas -->
+  
+  <!-- TABS: Este ciclo | Cómo venimos | Detalle | Comparativa | Tarjetas -->
   <div class="tabs">
     <button class="tab active" onclick="setTab('mes', this)">Este ciclo</button>
+    <button class="tab" onclick="setTab('presupuesto', this)">Cómo venimos</button>
     <button class="tab" onclick="setTab('detalle', this)">Detalle</button>
     <button class="tab" onclick="setTab('comparativa', this)">Comparativa</button>
     <button class="tab" onclick="setTab('tarjetas', this)">Tarjetas</button>
   </div>
+  
   <div id="loadingBox" class="loading">Conectando con Google Sheets...</div>
+  
   <!-- TAB: ESTE CICLO -->
   <div id="tabMes" style="display:none;">
     <div id="cicloProgressWrap" class="ciclo-progress" style="display:none;">
@@ -196,6 +201,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       <table class="ranking-table" id="rankingTable"></table>
     </div>
   </div>
+
+  <!-- TAB: CÓMO VENIMOS (PRESUPUESTO) -->
+  <div id="tabPresupuesto" style="display:none;">
+      <!-- Se inyecta vía JS en renderPresupuesto() -->
+  </div>
+
   <!-- TAB: DETALLE -->
   <div id="tabDetalle" style="display:none;">
     <div class="table-card">
@@ -209,6 +220,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       </div>
     </div>
   </div>
+
   <!-- TAB: COMPARATIVA -->
   <div id="tabComparativa" style="display:none;">
     <div class="chart-card-full">
@@ -231,6 +243,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       <table class="ranking-table" id="compareTable"></table>
     </div>
   </div>
+
   <!-- TAB: TARJETAS -->
   <div id="tabTarjetas" style="display:none;">
     <div class="tarjetas-controls">
@@ -238,15 +251,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       <select class="tarjetas-select" id="tarjetasCicloSelect" onchange="onTarjetasMesChange()"></select>
     </div>
     <div id="tarjetasErrorBox" style="display:none;" class="error-msg"></div>
-    <!-- Semáforo de gasto con tarjeta vs objetivo de ahorro -->
     <div class="chart-card-full" id="semaforoBlock" style="display:none;"></div>
-    <!-- Gran total + desglose por banco -->
     <div id="tarjetasTotalBlock" style="display:none; margin-bottom:1.5rem;">
       <div id="tarjetasTotalInner"></div>
     </div>
-    <!-- Débitos fijos recurrentes del resumen -->
     <div class="chart-card-full" id="tarjetasFijosBlock" style="display:none;"></div>
-    <!-- Compromisos futuros por cuotas -->
     <div class="chart-card-full" id="cuotasBlock" style="display:none;">
       <div style="display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:4px;">
         <div>
@@ -261,9 +270,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       <div style="overflow-x:auto; margin-top:16px;">
         <table class="ranking-table" id="cuotasTable" style="width:100%; min-width:520px;"></table>
       </div>
-      <p style="font-size:10px; color:var(--t-3a); margin-top:12px;">* Cuotas: desde el mes calendario actual, con el valor de cuota del último resumen disponible de cada tarjeta. Débitos fijos: tomados del último resumen de cada tarjeta.</p>
     </div>
-    <!-- Gráfico de línea comparativo mes a mes -->
     <div class="chart-card-full">
       <div style="display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
         <div>
@@ -276,7 +283,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       <div style="position:relative; height:240px;"><canvas id="tarjetasLineChart"></canvas></div>
       <div class="legend" id="tarjetasLineLegend"></div>
     </div>
-    <!-- Tabla de movimientos -->
     <div class="table-card">
       <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
         <p class="chart-title" style="margin-bottom:0;">Movimientos <span id="tarjetasMovLabel" style="text-transform:none;color:var(--t-555);font-weight:400;"></span></p>
@@ -358,7 +364,7 @@ let tarjetasMovimientosActuales = [];
 let tarjetasLineSelected = [];
 let tarjetasRangoMeses = 3;
 let donutInst, barInst, compareBarInst, ratioLineInst, catCompareInst, tarjetasLineInst, cuotasChartInst;
-// ─── UTILS ────────────────────────────────────────────────────────────────────
+
 const fmt    = n => '$' + Math.round(n).toLocaleString('es-AR');
 const fmtUSD = n => 'U$S ' + Number(n).toFixed(0);
 function parseMonto(s) {
@@ -391,7 +397,7 @@ function parseCicloLabel(label) {
   const labelFinal = clean.startsWith('Ciclo') ? clean : 'Ciclo ' + clean;
   return { label: labelFinal, cicloDesde, cicloHasta, year: anio, monthIndex: mIdx };
 }
-// ─── DROPDOWN ─────────────────────────────────────────────────────────────────
+
 function buildDropdown() {
   if (!CICLOS.length) return;
   const byAnio = {};
@@ -431,19 +437,22 @@ function cambiarCiclo(idx) {
     buildDashboard(datosCache[cicloActivo]);
   }
 }
-// ─── TABS ─────────────────────────────────────────────────────────────────────
+
+// ─── NAVEGACIÓN ───
 function setTab(tab, el) {
   tabActivo = tab;
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
-  ['tabMes','tabDetalle','tabComparativa','tabTarjetas'].forEach(id =>
+  ['tabMes','tabPresupuesto','tabDetalle','tabComparativa','tabTarjetas'].forEach(id =>
     document.getElementById(id).style.display='none');
+    
   if (tab==='mes')         document.getElementById('tabMes').style.display='block';
+  if (tab==='presupuesto') { document.getElementById('tabPresupuesto').style.display='block'; renderPresupuesto(); }
   if (tab==='detalle')     document.getElementById('tabDetalle').style.display='block';
   if (tab==='comparativa') { document.getElementById('tabComparativa').style.display='block'; renderComparativa(); }
   if (tab==='tarjetas')    { document.getElementById('tabTarjetas').style.display='block'; initTarjetas(); }
 }
-// ─── CARGA DE DATOS UNIFICADOS ────────────────────────────────────────────────
+
 function fetchCSV(url) {
   return new Promise((resolve, reject) => {
     Papa.parse(url, {
@@ -475,28 +484,18 @@ function procesarMovimientosUnificados(rows) {
     }
   });
   listaCiclos.sort((a,b) => a.cicloHasta - b.cicloHasta);
-  CICLOS = listaCiclos.map(c => ({
-    label: c.label,
-    cicloDesde: c.cicloDesde,
-    cicloHasta: c.cicloHasta
-  }));
+  CICLOS = listaCiclos.map(c => ({ label: c.label, cicloDesde: c.cicloDesde, cicloHasta: c.cicloHasta }));
   datosCache = {};
-  listaCiclos.forEach((c, idx) => {
-    datosCache[idx] = c.rawRows;
-  });
+  listaCiclos.forEach((c, idx) => { datosCache[idx] = c.rawRows; });
   const hoy = new Date(); hoy.setHours(0,0,0,0);
   const idxEncontrado = CICLOS.findIndex(c => hoy >= c.cicloDesde && hoy <= c.cicloHasta);
-  if (idxEncontrado !== -1) {
-    cicloActivo = idxEncontrado;
-  } else if (CICLOS.length > 0) {
-    cicloActivo = CICLOS.length - 1;
-  }
+  if (idxEncontrado !== -1) { cicloActivo = idxEncontrado; } else if (CICLOS.length > 0) { cicloActivo = CICLOS.length - 1; }
 }
 function loadData(forzar) {
   if (forzar) { datosCache = {}; tarjetasRawRows = null; }
   document.getElementById('loadingBox').style.display='block';
   document.getElementById('errorBox').style.display='none';
-  ['tabMes','tabDetalle','tabComparativa','tabTarjetas'].forEach(id =>
+  ['tabMes','tabPresupuesto','tabDetalle','tabComparativa','tabTarjetas'].forEach(id =>
     document.getElementById(id).style.display='none');
   fetchCSV(MOVIMIENTOS_URL).then(rows => {
     procesarMovimientosUnificados(rows);
@@ -509,15 +508,12 @@ function loadData(forzar) {
     buildDropdown();
     buildDashboard(datosCache[cicloActivo]);
   }).catch(err => {
-    console.error('fetchCSV error', err);
     document.getElementById('loadingBox').style.display='none';
-    document.getElementById('errorBox').innerHTML =
-      'No se pudo cargar la hoja de Movimientos. ' +
-      'Verificá que la hoja esté publicada correctamente en la web como CSV.';
+    document.getElementById('errorBox').innerHTML = 'No se pudo cargar la hoja de Movimientos.';
     document.getElementById('errorBox').style.display='block';
   });
 }
-// ─── PARSEO DE FILAS ──────────────────────────────────────────────────────────
+
 function parsearCiclo(rows) {
   if (!rows || !rows.length) return { datos: [], ingresosLucas: 0, ingresosMari: 0 };
   const cols = Object.keys(rows[0]);
@@ -531,25 +527,13 @@ function parsearCiclo(rows) {
     const monto = parseMonto(r[cMonto]);
     const det = (r[cDet] || '').trim();
     const quien = (r[cQuien] || 'Desconocido').trim();
-    const dL = det.toLowerCase();
-    const cL = cat.toLowerCase();
-    const qL = quien.toLowerCase();
-    // "Sueldo Emilse" es un gasto, no un ingreso
+    const dL = det.toLowerCase(); const cL = cat.toLowerCase(); const qL = quien.toLowerCase();
     const esIngreso = !dL.includes('emilse') && !cL.includes('emilse') && palabrasIngreso.some(palabra => dL.includes(palabra) || cL.includes(palabra));
-    if (dL.includes('ingres. lucas')) {
-      ingresosLucas += monto;
-      return;
-    }
-    if (dL.includes('ingres. mariana')) {
-      ingresosMari += monto;
-      return;
-    }
+    if (dL.includes('ingres. lucas')) { ingresosLucas += monto; return; }
+    if (dL.includes('ingres. mariana')) { ingresosMari += monto; return; }
     if (esIngreso) {
-      if (qL.includes('mariana') || qL.includes('mari') || dL.includes('mariana') || cL.includes('mariana')) {
-        ingresosMari += monto;
-      } else {
-        ingresosLucas += monto;
-      }
+      if (qL.includes('mariana') || qL.includes('mari') || dL.includes('mariana') || cL.includes('mariana')) { ingresosMari += monto; }
+      else { ingresosLucas += monto; }
       return;
     }
     if (!fecha || !cat || monto <= 0) return;
@@ -558,15 +542,144 @@ function parsearCiclo(rows) {
   if (!ingresosLucas) ingresosLucas = 3600000;
   return { datos, ingresosLucas, ingresosMari };
 }
-// ─── DASHBOARD ────────────────────────────────────────────────────────────────
+
+// ─── NUEVO: TAB CÓMO VENIMOS (PRESUPUESTO) ───
+function renderPresupuesto() {
+  const block = document.getElementById('tabPresupuesto');
+  const rows = datosCache[cicloActivo];
+  if (!rows) return;
+  const {datos, ingresosLucas, ingresosMari} = parsearCiclo(rows);
+  const totalIngresos = ingresosLucas + ingresosMari;
+  
+  const AHORRO_META = 1500000;
+  
+  let fijos = { tarjetas: 0, bastian: 0, educacion: 0, hogar: 0, transporte: 0, otros: 0 };
+  let variables = 0;
+  
+  datos.forEach(r => {
+    const c = r.categoria.toLowerCase();
+    const d = r.detalle.toLowerCase();
+    let monto = r.monto;
+    // Lógica espejo a la pestaña del Google Sheet
+    if (c.includes('tarjeta') || c.includes('crédito') || c.includes('cuota')) { fijos.tarjetas += monto; }
+    else if (c.includes('bastian') || c.includes('veterinaria') || d.includes('bastian')) { fijos.bastian += monto; }
+    else if (c.includes('educación') || c.includes('colegio') || c.includes('emilse') || c.includes('jardín')) { fijos.educacion += monto; }
+    else if (c.includes('agua') || c.includes('gas') || c.includes('expensas') || c.includes('alquiler') || c.includes('servicios') || c.includes('luz')) { fijos.hogar += monto; }
+    else if (c.includes('transporte') || c.includes('combustible') || c.includes('patente') || c.includes('seguro') || c.includes('peaje')) { fijos.transporte += monto; }
+    else if (c.includes('salud') || c.includes('celular') || c.includes('farmacia')) { fijos.otros += monto; }
+    else { variables += monto; }
+  });
+  
+  const totalFijos = fijos.tarjetas + fijos.bastian + fijos.educacion + fijos.hogar + fijos.transporte + fijos.otros;
+  const margenVariable = totalIngresos - AHORRO_META - totalFijos;
+  const saldoFinal = margenVariable - variables;
+  
+  // Generar Alertas
+  let alertHtml = '';
+  if (saldoFinal < 0) {
+    alertHtml = `<div class="budget-alert danger">⚠️ <span><strong>Peligro:</strong> Estás usando plata del ahorro (o endeudándote) por <strong>${fmt(Math.abs(saldoFinal))}</strong>. Hay que ajustar urgente las compras variables.</span></div>`;
+  } else if (saldoFinal < 200000) {
+    alertHtml = `<div class="budget-alert warning">⚠️ <span><strong>Cuidado:</strong> Quedan solo <strong>${fmt(saldoFinal)}</strong> de margen libre antes de tocar el ahorro. Cuidá los consumos.</span></div>`;
+  } else {
+    alertHtml = `<div class="budget-alert success">✅ <span><strong>¡Excelente!</strong> Venís cumpliendo el objetivo de ahorro de $1.5M y tenés <strong>${fmt(saldoFinal)}</strong> libres todavía.</span></div>`;
+  }
+
+  // Sugerencias Dinámicas
+  let recomendacion = "¡Excelente disciplina! Mantené este ritmo. Considerá poner el ahorro de $1.5M a generar rendimiento diario (ej. USDT) a principio de mes.";
+  if (saldoFinal < 0) recomendacion = "Tus gastos ya superaron el margen disponible. Para llegar a los $1.5M, vas a tener que reducir los consumos con tarjeta el próximo mes o cortar el gasto variable hasta que cierre el ciclo.";
+  else if (fijos.tarjetas > (totalIngresos * 0.2)) recomendacion = "Las tarjetas están absorbiendo una parte grande de tus ingresos. Intentá liquidar las cuotas chicas para liberar efectivo el mes que viene.";
+  else if (variables > (totalIngresos * 0.15)) recomendacion = "Venís bien con el ahorro, pero ojo con el gasto hormiga en el día a día (salidas, extras).";
+  else if (fijos.bastian > 250000) recomendacion = "El rubro 'Bastian' está alto este mes. Evaluá comprar en mayorista si el volumen de gasto continúa así.";
+
+  block.innerHTML = `
+    <div class="chart-card-full" style="padding: 1.5rem;">
+      <div style="margin-bottom: 24px;">
+        <p class="chart-title" style="margin-bottom: 8px;">Mapa Financiero · Objetivo Ahorro $1.5M</p>
+        <p style="font-size:12px; color:var(--t-888);">Así se distribuye la plata de este ciclo a medida que gastás.</p>
+      </div>
+
+      ${alertHtml}
+      
+      <div class="waterfall-card">
+        <div>
+          <div class="waterfall-title" style="color: #639922;">1. Ingresos del Ciclo</div>
+          <div class="waterfall-sub">Total familiar (Lucas + Mariana)</div>
+        </div>
+        <div class="waterfall-value" style="color: #639922;">${fmt(totalIngresos)}</div>
+      </div>
+      
+      <div class="op-sign">−</div>
+      
+      <div class="waterfall-card">
+        <div>
+          <div class="waterfall-title" style="color: #378ADD;">2. Ahorro Objetivo</div>
+          <div class="waterfall-sub">Meta fija intocable mensual</div>
+        </div>
+        <div class="waterfall-value" style="color: #378ADD;">${fmt(AHORRO_META)}</div>
+      </div>
+      
+      <div class="op-sign">−</div>
+      
+      <div class="waterfall-card" style="display:block;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div class="waterfall-title" style="color: #EF9F27;">3. Fijos y Compromisos</div>
+            <div class="waterfall-sub">Lo que hay que pagar sí o sí</div>
+          </div>
+          <div class="waterfall-value" style="color: #EF9F27;">${fmt(totalFijos)}</div>
+        </div>
+        <div class="fixed-breakdown">
+           <div class="fixed-item"><span>💳 Tarjetas:</span> <span>${fmt(fijos.tarjetas)}</span></div>
+           <div class="fixed-item"><span>🏠 Hogar y Serv:</span> <span>${fmt(fijos.hogar)}</span></div>
+           <div class="fixed-item"><span>📚 Educación:</span> <span>${fmt(fijos.educacion)}</span></div>
+           <div class="fixed-item"><span>🚗 Transporte:</span> <span>${fmt(fijos.transporte)}</span></div>
+           <div class="fixed-item"><span>🐶 Bastian:</span> <span>${fmt(fijos.bastian)}</span></div>
+           <div class="fixed-item"><span>⚙️ Otros fijos:</span> <span>${fmt(fijos.otros)}</span></div>
+        </div>
+      </div>
+      
+      <div class="op-sign">=</div>
+      
+      <div class="waterfall-card waterfall-total" style="margin-bottom:12px;">
+        <div>
+          <div class="waterfall-title" style="color: ${margenVariable>0?'var(--t-e8)':'#E24B4A'};">4. Margen Libre</div>
+          <div class="waterfall-sub">La plata que realmente te queda en el bolsillo</div>
+        </div>
+        <div class="waterfall-value" style="color: ${margenVariable>0?'var(--t-e8)':'#E24B4A'}; font-size:24px;">${fmt(margenVariable)}</div>
+      </div>
+
+      <div class="op-sign">−</div>
+      
+      <div class="waterfall-card">
+        <div>
+          <div class="waterfall-title" style="color: #E24B4A;">5. Variables Actuales</div>
+          <div class="waterfall-sub">Súper, salidas, regalos y extras</div>
+        </div>
+        <div class="waterfall-value" style="color: #E24B4A;">${fmt(variables)}</div>
+      </div>
+
+      <div class="op-sign">=</div>
+
+      <div class="waterfall-card waterfall-total" style="background:${saldoFinal>=0?'#63992211':'#E24B4A11'}; border-color:${saldoFinal>=0?'#63992255':'#E24B4A55'}; margin-top:4px;">
+        <div>
+          <div class="waterfall-title" style="color:${saldoFinal>=0?'#639922':'#E24B4A'}; font-size:13px;">SALDO FINAL ACTUAL</div>
+          <div class="waterfall-sub">Plata disponible para gastar hoy</div>
+        </div>
+        <div class="waterfall-value" style="color: ${saldoFinal>=0?'#639922':'#E24B4A'}; font-size:26px;">${fmt(saldoFinal)}</div>
+      </div>
+
+      <div style="margin-top:24px; padding:16px; background:var(--softer); border:1px dashed var(--border); border-radius:10px; font-size:12px; color:var(--t-666); line-height:1.6;">
+        <strong style="color:var(--t-ccc); font-size:13px; display:block; margin-bottom:6px;">💡 La lectura del sistema:</strong>
+        ${recomendacion}
+      </div>
+    </div>
+  `;
+}
+
 function buildDashboard(rows) {
   const {datos,ingresosLucas,ingresosMari} = parsearCiclo(rows);
-  logDatos = [...datos].sort((a,b) => {
-    const da=parseDate(a.fecha),db=parseDate(b.fecha);
-    return (!da||!db)?0:db-da;
-  });
-  const ciclo=CICLOS[cicloActivo], hoy=new Date();
-  hoy.setHours(0,0,0,0);
+  logDatos = [...datos].sort((a,b) => { const da=parseDate(a.fecha),db=parseDate(b.fecha); return (!da||!db)?0:db-da; });
+  const ciclo=CICLOS[cicloActivo], hoy=new Date(); hoy.setHours(0,0,0,0);
   const {cicloDesde:desde, cicloHasta:hasta} = ciclo;
   const totalDias = diasEntre(desde,hasta);
   const esCicloActual = hoy>=desde && hoy<=hasta;
@@ -582,56 +695,34 @@ function buildDashboard(rows) {
   document.getElementById('progressTiempo').style.width=pctTiempo.toFixed(1)+'%';
   document.getElementById('progressGastos').style.width=Math.min(100,pctG).toFixed(1)+'%';
   document.getElementById('cicloProgressPct').textContent=`Día ${diasTrans} de ${totalDias}`;
-  document.getElementById('cicloLegendText').innerHTML=
-    `<span style="color:#E24B4A">■</span> Gastos: ${pctGastado}% del ingreso &nbsp;·&nbsp; `+
-    `<span style="color:#378ADD">▏</span> Tiempo transcurrido: ${pctTiempo.toFixed(0)}%`;
+  document.getElementById('cicloLegendText').innerHTML=`<span style="color:#E24B4A">■</span> Gastos: ${pctGastado}% del ingreso &nbsp;·&nbsp; <span style="color:#378ADD">▏</span> Tiempo transcurrido: ${pctTiempo.toFixed(0)}%`;
   document.getElementById('cicloProgressWrap').style.display=(esCicloActual||hoy>hasta)?'block':'none';
+  
   if (esCicloActual && diasTrans>0 && totalGastos>0) {
     const prom=totalGastos/diasTrans, proy=prom*totalDias;
     const pctProy=totalIngresos>0?((proy/totalIngresos)*100).toFixed(1):'—', restan=totalDias-diasTrans;
-    document.getElementById('projText').innerHTML=
-      `Llevan <strong>${fmt(totalGastos)}</strong> en ${diasTrans} días `+
-      `(promedio <strong>${fmt(Math.round(prom))}/día</strong>). `+
-      `Si el ritmo continúa, el ciclo cerraría en <strong>${fmt(Math.round(proy))}</strong> `+
-      `(<strong>${pctProy}%</strong> del ingreso). `+
-      `Quedan ${restan} días y ~<strong>${fmt(Math.round(proy-totalGastos))}</strong> por gastar.`;
+    document.getElementById('projText').innerHTML=`Llevan <strong>${fmt(totalGastos)}</strong> en ${diasTrans} días (promedio <strong>${fmt(Math.round(prom))}/día</strong>). Si el ritmo continúa, el ciclo cerraría en <strong>${fmt(Math.round(proy))}</strong> (<strong>${pctProy}%</strong> del ingreso). Quedan ${restan} días y ~<strong>${fmt(Math.round(proy-totalGastos))}</strong> por gastar.`;
     document.getElementById('projBanner').style.display='flex';
-  } else {
-    document.getElementById('projBanner').style.display='none';
-  }
-  const gastosLucas   = datos.filter(r=>['lucas'].includes(r.quien.toLowerCase())).reduce((s,r)=>s+r.monto,0);
-  const gastosMari    = datos.filter(r=>['mariana','mari'].includes(r.quien.toLowerCase())).reduce((s,r)=>s+r.monto,0);
-  const saldoLucas    = ingresosLucas - gastosLucas;
-  const saldoMari     = ingresosMari  - gastosMari;
-  const pctLucas      = ingresosLucas > 0 ? ((gastosLucas/ingresosLucas)*100).toFixed(0) : 0;
-  const pctMari       = ingresosMari  > 0 ? ((gastosMari /ingresosMari )*100).toFixed(0) : 0;
+  } else { document.getElementById('projBanner').style.display='none'; }
+  
+  const gastosLucas = datos.filter(r=>['lucas'].includes(r.quien.toLowerCase())).reduce((s,r)=>s+r.monto,0);
+  const gastosMari  = datos.filter(r=>['mariana','mari'].includes(r.quien.toLowerCase())).reduce((s,r)=>s+r.monto,0);
+  const saldoLucas  = ingresosLucas - gastosLucas;
+  const saldoMari   = ingresosMari  - gastosMari;
+  const pctLucas    = ingresosLucas > 0 ? ((gastosLucas/ingresosLucas)*100).toFixed(0) : 0;
+  const pctMari     = ingresosMari  > 0 ? ((gastosMari /ingresosMari )*100).toFixed(0) : 0;
   const sColor = s => s >= 0 ? '#639922' : '#E24B4A';
   const bColor = p => p > 80 ? '#E24B4A' : p > 55 ? '#EF9F27' : '#378ADD';
   const subRow = (gastos, saldo, pct) => `
     <div style="margin-top:9px;padding-top:9px;border-top:0.5px solid var(--soft);">
-      <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
-        <span style="font-size:10px;color:var(--t-444);text-transform:uppercase;letter-spacing:0.04em;">Gastó</span>
-        <span style="font-size:11px;color:var(--t-666);">${fmt(gastos)}${Number(pct)>100?` <span style="color:#E24B4A;font-weight:600;">(${pct}%)</span>`:''}</span>
-      </div>
-      <div style="background:var(--softer);border-radius:3px;height:3px;margin-bottom:6px;overflow:hidden;">
-        <div style="width:${Math.min(100, Number(pct))}%;height:3px;border-radius:3px;background:${bColor(Number(pct))};"></div>
-      </div>
-      <div style="display:flex;justify-content:space-between;align-items:baseline;">
-        <span style="font-size:10px;color:var(--t-444);text-transform:uppercase;letter-spacing:0.04em;">Queda</span>
-        <span style="font-size:14px;font-weight:600;color:${sColor(saldo)};">${fmt(saldo)}</span>
-      </div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:10px;color:var(--t-444);text-transform:uppercase;letter-spacing:0.04em;">Gastó</span><span style="font-size:11px;color:var(--t-666);">${fmt(gastos)}${Number(pct)>100?` <span style="color:#E24B4A;font-weight:600;">(${pct}%)</span>`:''}</span></div>
+      <div style="background:var(--softer);border-radius:3px;height:3px;margin-bottom:6px;overflow:hidden;"><div style="width:${Math.min(100, Number(pct))}%;height:3px;border-radius:3px;background:${bColor(Number(pct))};"></div></div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;"><span style="font-size:10px;color:var(--t-444);text-transform:uppercase;letter-spacing:0.04em;">Queda</span><span style="font-size:14px;font-weight:600;color:${sColor(saldo)};">${fmt(saldo)}</span></div>
     </div>`;
+  
   document.getElementById('metricsBox').innerHTML=`
-    <div class="metric">
-      <p class="metric-label">Lucas</p>
-      <p class="metric-value">${fmt(ingresosLucas)}</p>
-      ${ingresosLucas > 0 ? subRow(gastosLucas, saldoLucas, pctLucas) : ''}
-    </div>
-    <div class="metric">
-      <p class="metric-label">Mariana</p>
-      <p class="metric-value">${ingresosMari > 0 ? fmt(ingresosMari) : '<span style="font-size:13px;color:var(--t-444);">—</span>'}</p>
-      ${ingresosMari > 0 ? subRow(gastosMari, saldoMari, pctMari) : ''}
-    </div>
+    <div class="metric"><p class="metric-label">Lucas</p><p class="metric-value">${fmt(ingresosLucas)}</p>${ingresosLucas > 0 ? subRow(gastosLucas, saldoLucas, pctLucas) : ''}</div>
+    <div class="metric"><p class="metric-label">Mariana</p><p class="metric-value">${ingresosMari > 0 ? fmt(ingresosMari) : '<span style="font-size:13px;color:var(--t-444);">—</span>'}</p>${ingresosMari > 0 ? subRow(gastosMari, saldoMari, pctMari) : ''}</div>
   `;
   document.getElementById('summaryStrip').innerHTML=`
     <div class="summary-item"><span class="summary-label">Total ingresos</span><span class="summary-value">${fmt(totalIngresos)}</span></div>
@@ -639,46 +730,42 @@ function buildDashboard(rows) {
     <div class="summary-item"><span class="summary-label">Saldo total</span><span class="summary-value success">${fmt(resto)}</span></div>
     <div class="summary-item"><span class="summary-label">% gastado</span><span class="summary-value">${pctGastado}%</span></div>
   `;
+  
   renderFijosVsVariables(datos, totalGastos, totalIngresos);
-  const fechas=[...new Set(datos.map(r=>r.fecha))].sort((a,b)=>{
-    const da=parseDate(a),db=parseDate(b); return (!da||!db)?0:da-db;
-  });
+  const fechas=[...new Set(datos.map(r=>r.fecha))].sort((a,b)=>{ const da=parseDate(a),db=parseDate(b); return (!da||!db)?0:da-db; });
   const montosFecha=fechas.map(f=>datos.filter(r=>r.fecha===f).reduce((s,r)=>s+r.monto,0));
-  const catMap={};
-  datos.forEach(r=>{ catMap[r.categoria]=(catMap[r.categoria]||0)+r.monto; });
-  const cats=Object.entries(catMap).sort((a,b)=>b[1]-a[1])
-    .map(([nombre,monto],i)=>({nombre,monto,color:PALETTE[i%PALETTE.length]}));
+  const catMap={}; datos.forEach(r=>{ catMap[r.categoria]=(catMap[r.categoria]||0)+r.monto; });
+  const cats=Object.entries(catMap).sort((a,b)=>b[1]-a[1]).map(([nombre,monto],i)=>({nombre,monto,color:PALETTE[i%PALETTE.length]}));
+  
   if (donutInst) donutInst.destroy();
   donutInst=new Chart(document.getElementById('donutChart'),{
     type:'doughnut',
     data:{labels:cats.map(c=>c.nombre),datasets:[{data:cats.map(c=>c.monto),backgroundColor:cats.map(c=>c.color),borderWidth:2,borderColor:CHART_CARD}]},
     options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${fmt(ctx.raw)} (${((ctx.raw/totalGastos)*100).toFixed(1)}%)`}}}}
   });
-  document.getElementById('donutLegend').innerHTML=cats.slice(0,6).map(c=>
-    `<span class="legend-item"><span class="legend-dot" style="background:${c.color}"></span>${c.nombre.split(' ')[0]} ${((c.monto/totalGastos)*100).toFixed(1)}%</span>`
-  ).join('');
+  document.getElementById('donutLegend').innerHTML=cats.slice(0,6).map(c=>`<span class="legend-item"><span class="legend-dot" style="background:${c.color}"></span>${c.nombre.split(' ')[0]} ${((c.monto/totalGastos)*100).toFixed(1)}%</span>`).join('');
+  
   if (barInst) barInst.destroy();
   barInst=new Chart(document.getElementById('barChart'),{
     type:'bar',
     data:{labels:fechas,datasets:[{data:montosFecha,backgroundColor:'#378ADD33',borderColor:'#378ADD',borderWidth:1.5,borderRadius:4}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{
-      x:{grid:{color:GRID},ticks:{color:TICK,font:{size:10},maxRotation:45,autoSkip:true,maxTicksLimit:8}},
-      y:{grid:{color:GRID},ticks:{color:TICK,font:{size:10},callback:v=>'$'+(v>=1000?Math.round(v/1000)+'k':v)}}
-    }}
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:GRID},ticks:{color:TICK,font:{size:10},maxRotation:45,autoSkip:true,maxTicksLimit:8}},y:{grid:{color:GRID},ticks:{color:TICK,font:{size:10},callback:v=>'$'+(v>=1000?Math.round(v/1000)+'k':v)}}}}
   });
   document.getElementById('rankingTable').innerHTML=cats.map((c,i)=>{
     const pct=((c.monto/totalGastos)*100).toFixed(1);
     return `<tr><td>${i+1}</td><td>${c.nombre}<div class="bar-bg"><div class="bar-fill" style="width:${pct}%;background:${c.color};"></div></div></td><td>${fmt(c.monto)}<br><span class="pct-label">${pct}%</span></td></tr>`;
   }).join('');
   renderLog(logDatos);
+  
   document.getElementById('loadingBox').style.display='none';
   document.getElementById('tabMes').style.display='block';
+  
+  if (tabActivo==='presupuesto') { renderPresupuesto(); document.getElementById('tabPresupuesto').style.display='block'; }
   if (tabActivo==='comparativa') renderComparativa();
   if (tabActivo==='detalle') document.getElementById('tabDetalle').style.display='block';
   if (tabActivo==='tarjetas') { document.getElementById('tabTarjetas').style.display='block'; initTarjetas(); }
 }
-// ─── FIJOS VS VARIABLES ───────────────────────────────────────────────────────
-const COLOR_FIJO = '#7F77DD', COLOR_VAR = '#378ADD';
+
 function renderFijosVsVariables(datos, totalGastos, totalIngresos) {
   const block = document.getElementById('fijosBlock');
   if (!totalGastos) { block.style.display='none'; return; }
@@ -686,15 +773,7 @@ function renderFijosVsVariables(datos, totalGastos, totalIngresos) {
   const totFijo = gastosFijos.reduce((s,r)=>s+r.monto,0);
   const totVar  = totalGastos - totFijo;
   const catsFijas = [...new Set(gastosFijos.map(r=>r.categoria))];
-  if (!totFijo) {
-    block.innerHTML = `
-      <p class="chart-title" style="margin-bottom:8px;">Fijos vs variables</p>
-      <p style="font-size:12px;color:var(--t-666);line-height:1.6;">
-        Ninguna categoría de este ciclo coincide con la lista de gastos fijos.
-      </p>`;
-    block.style.display='block';
-    return;
-  }
+  if (!totFijo) { block.style.display='none'; return; }
   const pctFijoGasto   = (totFijo/totalGastos)*100;
   const pctVarGasto    = 100 - pctFijoGasto;
   const pctFijoIngreso = totalIngresos > 0 ? (totFijo/totalIngresos)*100 : 0;
@@ -709,38 +788,15 @@ function renderFijosVsVariables(datos, totalGastos, totalIngresos) {
       <div style="width:${pctVarGasto.toFixed(1)}%;background:${COLOR_VAR};"></div>
     </div>
     <div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:14px;">
-      <div style="display:flex;align-items:baseline;gap:8px;">
-        <span style="width:8px;height:8px;border-radius:2px;background:${COLOR_FIJO};display:inline-block;"></span>
-        <span style="font-size:11px;color:var(--t-555);text-transform:uppercase;letter-spacing:0.04em;">Fijos</span>
-        <span style="font-size:15px;font-weight:500;color:var(--t-e8);">${fmt(totFijo)}</span>
-        <span style="font-size:11px;color:var(--t-555);">${pctFijoGasto.toFixed(1)}% del gasto</span>
-      </div>
-      <div style="display:flex;align-items:baseline;gap:8px;">
-        <span style="width:8px;height:8px;border-radius:2px;background:${COLOR_VAR};display:inline-block;"></span>
-        <span style="font-size:11px;color:var(--t-555);text-transform:uppercase;letter-spacing:0.04em;">Variables</span>
-        <span style="font-size:15px;font-weight:500;color:var(--t-e8);">${fmt(totVar)}</span>
-        <span style="font-size:11px;color:var(--t-555);">${pctVarGasto.toFixed(1)}% del gasto</span>
-      </div>
-    </div>
-    <p style="font-size:12px;color:var(--t-888);line-height:1.6;margin-bottom:10px;">
-      Tu margen de maniobra real (ingreso − fijos) es <strong style="color:var(--t-e8);font-weight:500;">${fmt(margenVariable)}</strong>:
-      de ahí salen los gastos variables y el ahorro.
-    </p>
-    <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
-      <span style="font-size:10px;color:var(--t-444);text-transform:uppercase;letter-spacing:0.05em;">Categorías fijas detectadas:</span>
-      ${catsFijas.map(c=>`<span class="cat-tag">${c}</span>`).join('')}
+      <div style="display:flex;align-items:baseline;gap:8px;"><span style="width:8px;height:8px;border-radius:2px;background:${COLOR_FIJO};display:inline-block;"></span><span style="font-size:11px;color:var(--t-555);text-transform:uppercase;letter-spacing:0.04em;">Fijos</span><span style="font-size:15px;font-weight:500;color:var(--t-e8);">${fmt(totFijo)}</span><span style="font-size:11px;color:var(--t-555);">${pctFijoGasto.toFixed(1)}%</span></div>
+      <div style="display:flex;align-items:baseline;gap:8px;"><span style="width:8px;height:8px;border-radius:2px;background:${COLOR_VAR};display:inline-block;"></span><span style="font-size:11px;color:var(--t-555);text-transform:uppercase;letter-spacing:0.04em;">Variables</span><span style="font-size:15px;font-weight:500;color:var(--t-e8);">${fmt(totVar)}</span><span style="font-size:11px;color:var(--t-555);">${pctVarGasto.toFixed(1)}%</span></div>
     </div>`;
   block.style.display='block';
 }
-// ─── LOG ──────────────────────────────────────────────────────────────────────
+
 function renderLog(datos) {
-  document.getElementById('logTable').innerHTML=`
-    <thead><tr><th style="width:15%">Fecha</th><th style="width:35%">Detalle</th><th style="width:22%">Categoría</th><th style="width:15%;text-align:right">Monto</th><th style="width:13%;text-align:center">Quién</th></tr></thead>
-    <tbody>${datos.map(r=>{
-      let bc='badge-desconocido';
-      const q=r.quien.toLowerCase();
-      if(q==='lucas') bc='badge-lucas';
-      if(q==='mariana'||q==='mari') bc='badge-mariana';
+  document.getElementById('logTable').innerHTML=`<thead><tr><th style="width:15%">Fecha</th><th style="width:35%">Detalle</th><th style="width:22%">Categoría</th><th style="width:15%;text-align:right">Monto</th><th style="width:13%;text-align:center">Quién</th></tr></thead><tbody>${datos.map(r=>{
+      let bc='badge-desconocido'; const q=r.quien.toLowerCase(); if(q==='lucas') bc='badge-lucas'; if(q==='mariana'||q==='mari') bc='badge-mariana';
       return `<tr><td style="color:var(--t-555);font-size:12px">${r.fecha}</td><td style="font-weight:500">${r.detalle}</td><td><span class="cat-tag">${r.categoria}</span></td><td style="text-align:right;font-weight:500">${fmt(r.monto)}</td><td style="text-align:center"><span class="badge-user ${bc}">${r.quien}</span></td></tr>`;
     }).join('')}</tbody>`;
 }
@@ -748,7 +804,7 @@ function filtrarLog() {
   const q=document.getElementById('searchInput').value.toLowerCase();
   renderLog(logDatos.filter(r=>r.detalle.toLowerCase().includes(q)||r.categoria.toLowerCase().includes(q)||r.quien.toLowerCase().includes(q)));
 }
-// ─── COMPARATIVA ──────────────────────────────────────────────────────────────
+
 function renderComparativa() {
   const parsed=CICLOS.map((c,i)=>datosCache[i]?{label:c.label,...parsearCiclo(datosCache[i])}:null).filter(Boolean);
   if (!parsed.length) return;
@@ -757,315 +813,101 @@ function renderComparativa() {
   const ingresos=parsed.map(p=>p.ingresosLucas+p.ingresosMari);
   const ratios=parsed.map((p,i)=>parseFloat(((totales[i]/ingresos[i])*100).toFixed(1)));
   if (compareBarInst) compareBarInst.destroy();
-  compareBarInst=new Chart(document.getElementById('compareBarChart'),{type:'bar',data:{labels,datasets:[
-    {label:'Gastos',data:totales,backgroundColor:labels.map((_,i)=>parsed[i].label===(CICLOS[cicloActivo]?CICLOS[cicloActivo].label:'')?'#378ADD':'#378ADD44'),borderColor:'#378ADD',borderWidth:1.5,borderRadius:6},
-    {label:'Ingresos',data:ingresos,type:'line',borderColor:'#1D9E75',backgroundColor:'transparent',borderWidth:1.5,borderDash:[4,4],pointRadius:4,pointBackgroundColor:'#1D9E75',tension:0.3}
-  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{
-    x:{grid:{color:GRID},ticks:{color:TICK,font:{size:11}}},
-    y:{grid:{color:GRID},ticks:{color:TICK,font:{size:10},callback:v=>'$'+(v>=1000000?Math.round(v/1000000)+'M':v>=1000?Math.round(v/1000)+'k':v)}}
-  }}});
+  compareBarInst=new Chart(document.getElementById('compareBarChart'),{type:'bar',data:{labels,datasets:[{label:'Gastos',data:totales,backgroundColor:labels.map((_,i)=>parsed[i].label===(CICLOS[cicloActivo]?CICLOS[cicloActivo].label:'')?'#378ADD':'#378ADD44'),borderColor:'#378ADD',borderWidth:1.5,borderRadius:6},{label:'Ingresos',data:ingresos,type:'line',borderColor:'#1D9E75',backgroundColor:'transparent',borderWidth:1.5,borderDash:[4,4],pointRadius:4,pointBackgroundColor:'#1D9E75',tension:0.3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:GRID},ticks:{color:TICK,font:{size:11}}},y:{grid:{color:GRID},ticks:{color:TICK,font:{size:10},callback:v=>'$'+(v>=1000000?Math.round(v/1000000)+'M':v>=1000?Math.round(v/1000)+'k':v)}}}}});
   if (ratioLineInst) ratioLineInst.destroy();
-  ratioLineInst=new Chart(document.getElementById('ratioLineChart'),{type:'line',data:{labels,datasets:[{label:'%',data:ratios,borderColor:'#EF9F27',backgroundColor:'#EF9F2715',borderWidth:2,pointRadius:5,pointBackgroundColor:'#EF9F27',tension:0.3,fill:true}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.raw}% del ingreso`}}},scales:{
-      x:{grid:{color:GRID},ticks:{color:TICK,font:{size:11}}},
-      y:{grid:{color:GRID},ticks:{color:TICK,font:{size:10},callback:v=>v+'%'},min:0,max:100}
-    }}});
+  ratioLineInst=new Chart(document.getElementById('ratioLineChart'),{type:'line',data:{labels,datasets:[{label:'%',data:ratios,borderColor:'#EF9F27',backgroundColor:'#EF9F2715',borderWidth:2,pointRadius:5,pointBackgroundColor:'#EF9F27',tension:0.3,fill:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.raw}% del ingreso`}}},scales:{x:{grid:{color:GRID},ticks:{color:TICK,font:{size:11}}},y:{grid:{color:GRID},ticks:{color:TICK,font:{size:10},callback:v=>v+'%'},min:0,max:100}}}});
   const allCats=[...new Set(parsed.flatMap(p=>p.datos.map(d=>d.categoria)))];
   const topCats=allCats.map(cat=>({cat,total:parsed.reduce((s,p)=>s+p.datos.filter(d=>d.categoria===cat).reduce((ss,r)=>ss+r.monto,0),0)})).sort((a,b)=>b.total-a.total).slice(0,5).map(x=>x.cat);
   if (catCompareInst) catCompareInst.destroy();
-  catCompareInst=new Chart(document.getElementById('catCompareChart'),{type:'bar',data:{labels,datasets:topCats.map((cat,i)=>({label:cat,data:parsed.map(p=>Math.round(p.datos.filter(d=>d.categoria===cat).reduce((s,r)=>s+r.monto,0))),backgroundColor:PALETTE[i]+'88',borderColor:PALETTE[i],borderWidth:1.5,borderRadius:4}))},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{stacked:true,grid:{color:GRID},ticks:{color:TICK,font:{size:11}}},y:{stacked:true,grid:{color:GRID},ticks:{color:TICK,font:{size:10},callback:v=>'$'+(v>=1000?Math.round(v/1000)+'k':v)}}}}});
+  catCompareInst=new Chart(document.getElementById('catCompareChart'),{type:'bar',data:{labels,datasets:topCats.map((cat,i)=>({label:cat,data:parsed.map(p=>Math.round(p.datos.filter(d=>d.categoria===cat).reduce((s,r)=>s+r.monto,0))),backgroundColor:PALETTE[i]+'88',borderColor:PALETTE[i],borderWidth:1.5,borderRadius:4}))},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{stacked:true,grid:{color:GRID},ticks:{color:TICK,font:{size:11}}},y:{stacked:true,grid:{color:GRID},ticks:{color:TICK,font:{size:10},callback:v=>'$'+(v>=1000?Math.round(v/1000)+'k':v)}}}}});
   document.getElementById('catCompareLegend').innerHTML=topCats.map((cat,i)=>`<span class="legend-item"><span class="legend-dot" style="background:${PALETTE[i]}"></span>${cat.split(' ')[0]}</span>`).join('');
-  document.getElementById('compareTable').innerHTML=`
-    <thead><tr><th>Ciclo</th><th style="text-align:right">Ingresos</th><th style="text-align:right">Gastos</th><th style="text-align:right">Saldo</th><th style="text-align:right">%</th></tr></thead>
-    <tbody>${parsed.map((p,i)=>{
-      const t=totales[i],ing=ingresos[i],s=ing-t,r=ratios[i],isCurr=p.label===(CICLOS[cicloActivo]?CICLOS[cicloActivo].label:'');
-      return `<tr style="${isCurr?'color:var(--t-fff)':''}"><td style="color:${isCurr?'#378ADD':'var(--t-666)'};font-size:12px">${labels[i]}</td><td style="text-align:right">${fmt(ing)}</td><td style="text-align:right;color:#E24B4A">${fmt(t)}</td><td style="text-align:right;color:#639922">${fmt(s)}</td><td style="text-align:right">${r}%</td></tr>`;
-    }).join('')}</tbody>`;
+  document.getElementById('compareTable').innerHTML=`<thead><tr><th>Ciclo</th><th style="text-align:right">Ingresos</th><th style="text-align:right">Gastos</th><th style="text-align:right">Saldo</th><th style="text-align:right">%</th></tr></thead><tbody>${parsed.map((p,i)=>{ const t=totales[i],ing=ingresos[i],s=ing-t,r=ratios[i],isCurr=p.label===(CICLOS[cicloActivo]?CICLOS[cicloActivo].label:''); return `<tr style="${isCurr?'color:var(--t-fff)':''}"><td style="color:${isCurr?'#378ADD':'var(--t-666)'};font-size:12px">${labels[i]}</td><td style="text-align:right">${fmt(ing)}</td><td style="text-align:right;color:#E24B4A">${fmt(t)}</td><td style="text-align:right;color:#639922">${fmt(s)}</td><td style="text-align:right">${r}%</td></tr>`; }).join('')}</tbody>`;
 }
-// ─── TAB TARJETAS ─────────────────────────────────────────────────────────
-const BANCO_COLORS = {
-  'Galicia':        '#378ADD',
-  'Cencopay':       '#1D9E75',
-  'Mercardo Libre': '#EF9F27',
-  'Mercado Libre':  '#EF9F27',
-  'Santander':      '#D4537E',
-};
-function getBancoColor(banco, idx) {
-  return BANCO_COLORS[banco] || PALETTE[idx % PALETTE.length];
-}
-function initTarjetas() {
-  tarjetasLineSelected = [];
-  loadTarjetasData();
-}
+
+function initTarjetas() { tarjetasLineSelected = []; loadTarjetasData(); }
 function loadTarjetasData() {
   if (tarjetasRawRows) { procesarYRenderTarjetas(); return; }
   document.getElementById('tarjetasErrorBox').style.display = 'none';
-  fetchCSV(TARJETAS_URL).then(rows => {
-    tarjetasRawRows = rows;
-    procesarYRenderTarjetas();
-  }).catch(err => {
-    console.error('fetchTarjetas error', err);
-    document.getElementById('tarjetasErrorBox').innerHTML =
-      'No se pudo cargar el sheet de tarjetas. Verificá que esté publicado correctamente.';
-    document.getElementById('tarjetasErrorBox').style.display = 'block';
-    document.getElementById('tarjetasTotalBlock').style.display = 'none';
-  });
+  fetchCSV(TARJETAS_URL).then(rows => { tarjetasRawRows = rows; procesarYRenderTarjetas(); }).catch(err => { document.getElementById('tarjetasErrorBox').innerHTML = 'Error cargando Tarjetas.'; document.getElementById('tarjetasErrorBox').style.display = 'block'; });
 }
 const MES_CAL_NOMBRES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Sep.','Oct.','Nov.','Dic.'];
 const MES_CAL_INDEX = Object.fromEntries(MES_CAL_NOMBRES.map((m,i)=>[m,i]));
 function parseTarjetasRows(rows) {
-  const cols = Object.keys(rows[0]||{});
-  const [cBancoTipo,cMes,cFecha,cTarjeta,cDetalle,cCuota,cARS,cUSD,cVenc,cTotalARS,cTotalUSD] = cols;
-  const porMes = {};
-  const meta = {};
+  const cols = Object.keys(rows[0]||{}); const [cBancoTipo,cMes,cFecha,cTarjeta,cDetalle,cCuota,cARS,cUSD,cVenc,cTotalARS,cTotalUSD] = cols;
+  const porMes = {}; const meta = {};
   rows.forEach(row => {
-    const bancoTipo = (row[cBancoTipo]||'').trim();
-    if (!bancoTipo) return;
-    const mesRaw = (row[cMes]||'').trim();
-    const yMatch = mesRaw.match(/(\d{4})/);
-    let year = yMatch ? parseInt(yMatch[1]) : null;
+    const bancoTipo = (row[cBancoTipo]||'').trim(); if (!bancoTipo) return;
+    const mesRaw = (row[cMes]||'').trim(); const yMatch = mesRaw.match(/(\d{4})/); let year = yMatch ? parseInt(yMatch[1]) : null;
     const nombreRaw = mesRaw.replace(/\d{4}/,'').replace(/[\/\-.,]/g,' ').trim().toLowerCase();
-    const nombre = MES_NOMBRES_MAP[nombreRaw] ||
-      (nombreRaw ? nombreRaw.charAt(0).toUpperCase()+nombreRaw.slice(1) : 'Sin mes');
+    const nombre = MES_NOMBRES_MAP[nombreRaw] || (nombreRaw ? nombreRaw.charAt(0).toUpperCase()+nombreRaw.slice(1) : 'Sin mes');
     const mIdx = MES_CAL_INDEX[nombre] !== undefined ? MES_CAL_INDEX[nombre] : null;
-    if (year === null) {
-      const vParts = (row[cVenc]||'').trim().split('/');
-      if (vParts.length === 3 && mIdx !== null) {
-        const vy = parseInt(vParts[2]), vm = parseInt(vParts[1]) - 1;
-        year = mIdx > vm ? vy - 1 : vy;
-      } else {
-        year = new Date().getFullYear();
-      }
-    }
+    if (year === null) { const vParts = (row[cVenc]||'').trim().split('/'); if (vParts.length === 3 && mIdx !== null) { const vy = parseInt(vParts[2]), vm = parseInt(vParts[1]) - 1; year = mIdx > vm ? vy - 1 : vy; } else { year = new Date().getFullYear(); } }
     const mesKey = mIdx !== null ? `${nombre} ${year}` : nombre;
-    if (!porMes[mesKey]) {
-      porMes[mesKey] = { movimientos: [], grupos: {} };
-      meta[mesKey] = { nombre, year, mIdx,
-        sortKey: mIdx !== null ? year*12 + mIdx : Number.MAX_SAFE_INTEGER };
-    }
+    if (!porMes[mesKey]) { porMes[mesKey] = { movimientos: [], grupos: {} }; meta[mesKey] = { nombre, year, mIdx, sortKey: mIdx !== null ? year*12 + mIdx : Number.MAX_SAFE_INTEGER }; }
     if (!porMes[mesKey].grupos[bancoTipo]) porMes[mesKey].grupos[bancoTipo] = { totalARS: 0, totalUSD: 0 };
-    const tARS = parseMonto(row[cTotalARS]);
-    const tUSD = parseMonto(row[cTotalUSD]);
-    if (tARS > 0) porMes[mesKey].grupos[bancoTipo].totalARS = tARS;
-    if (tUSD > 0) porMes[mesKey].grupos[bancoTipo].totalUSD = tUSD;
-    const partes = bancoTipo.split(' ');
-    const tipo  = partes[0] || '';
-    const banco = partes.slice(1).join(' ') || bancoTipo;
-    porMes[mesKey].movimientos.push({
-      fecha:       (row[cFecha]||'').trim(),
-      detalle:     (row[cDetalle]||'').trim(),
-      banco, tipo, bancoTipo, mes: mesKey,
-      tarjeta:     (row[cTarjeta]||'').trim(),
-      cuota:       (row[cCuota]||'').trim(),
-      montoARS:    parseMonto(row[cARS]),
-      montoUSD:    parseMonto(row[cUSD]),
-      vencimiento: (row[cVenc]||'').trim(),
-    });
+    const tARS = parseMonto(row[cTotalARS]), tUSD = parseMonto(row[cTotalUSD]);
+    if (tARS > 0) porMes[mesKey].grupos[bancoTipo].totalARS = tARS; if (tUSD > 0) porMes[mesKey].grupos[bancoTipo].totalUSD = tUSD;
+    const partes = bancoTipo.split(' '); const tipo  = partes[0] || ''; const banco = partes.slice(1).join(' ') || bancoTipo;
+    porMes[mesKey].movimientos.push({ fecha:(row[cFecha]||'').trim(), detalle:(row[cDetalle]||'').trim(), banco, tipo, bancoTipo, mes: mesKey, tarjeta:(row[cTarjeta]||'').trim(), cuota:(row[cCuota]||'').trim(), montoARS:parseMonto(row[cARS]), montoUSD:parseMonto(row[cUSD]), vencimiento:(row[cVenc]||'').trim() });
   });
   const mesesOrden = Object.keys(porMes).sort((a,b)=>meta[a].sortKey - meta[b].sortKey);
   return { porMes, mesesOrden, meta };
 }
-function mesCorto(mesKey) {
-  const m = tarjetasMesMeta[mesKey];
-  if (!m || m.mIdx === null) return mesKey;
-  return `${m.nombre} '${String(m.year).slice(2)}`;
-}
+function mesCorto(mesKey) { const m = tarjetasMesMeta[mesKey]; if (!m || m.mIdx === null) return mesKey; return `${m.nombre} '${String(m.year).slice(2)}`; }
 function procesarYRenderTarjetas() {
   const { porMes, mesesOrden, meta } = parseTarjetasRows(tarjetasRawRows);
-  tarjetasPorMes = porMes;
-  tarjetasMesesOrden = mesesOrden;
-  tarjetasMesMeta = meta;
+  tarjetasPorMes = porMes; tarjetasMesesOrden = mesesOrden; tarjetasMesMeta = meta;
   const sel = document.getElementById('tarjetasCicloSelect');
-  const mesesDesc = [...mesesOrden].reverse();
-  sel.innerHTML = mesesDesc.map(m => `<option value="${m}">Gastos de ${m}</option>`).join('');
-  if (!tarjetasMesActivo || !mesesOrden.includes(tarjetasMesActivo)) {
-    tarjetasMesActivo = mesesOrden[mesesOrden.length - 1];
-  }
-  sel.value = tarjetasMesActivo;
-  renderTarjetas();
+  sel.innerHTML = [...mesesOrden].reverse().map(m => `<option value="${m}">Gastos de ${m}</option>`).join('');
+  if (!tarjetasMesActivo || !mesesOrden.includes(tarjetasMesActivo)) tarjetasMesActivo = mesesOrden[mesesOrden.length - 1];
+  sel.value = tarjetasMesActivo; renderTarjetas();
 }
-function cambiarRangoTarjetas(n) {
-  tarjetasRangoMeses = n;
-  renderTarjetas();
-}
-function onTarjetasMesChange() {
-  tarjetasMesActivo = document.getElementById('tarjetasCicloSelect').value;
-  tarjetasLineSelected = [];
-  renderTarjetas();
-}
+function cambiarRangoTarjetas(n) { tarjetasRangoMeses = n; renderTarjetas(); }
+function onTarjetasMesChange() { tarjetasMesActivo = document.getElementById('tarjetasCicloSelect').value; tarjetasLineSelected = []; renderTarjetas(); }
 function renderTarjetas() {
-  const mes = tarjetasMesActivo;
-  const dataMes = tarjetasPorMes[mes];
-  if (!dataMes) return;
+  const mes = tarjetasMesActivo; const dataMes = tarjetasPorMes[mes]; if (!dataMes) return;
   const bancoTotalesARS = {}, bancoTotalesUSD = {}, bancoTarjetas = {};
-  Object.entries(dataMes.grupos).forEach(([bt, g]) => {
-    const partes = bt.split(' ');
-    const banco  = partes.slice(1).join(' ') || bt;
-    const tipo   = partes[0];
-    if (!bancoTotalesARS[banco]) { bancoTotalesARS[banco]=0; bancoTotalesUSD[banco]=0; bancoTarjetas[banco]=[]; }
-    bancoTotalesARS[banco] += g.totalARS;
-    bancoTotalesUSD[banco] += g.totalUSD;
-    bancoTarjetas[banco].push({ bancoTipo:bt, tipo, totalARS:g.totalARS, totalUSD:g.totalUSD });
-  });
+  Object.entries(dataMes.grupos).forEach(([bt, g]) => { const partes = bt.split(' '); const banco = partes.slice(1).join(' ') || bt; const tipo = partes[0]; if (!bancoTotalesARS[banco]) { bancoTotalesARS[banco]=0; bancoTotalesUSD[banco]=0; bancoTarjetas[banco]=[]; } bancoTotalesARS[banco] += g.totalARS; bancoTotalesUSD[banco] += g.totalUSD; bancoTarjetas[banco].push({ bancoTipo:bt, tipo, totalARS:g.totalARS, totalUSD:g.totalUSD }); });
   const bancosArr = Object.keys(bancoTotalesARS).sort((a,b)=>bancoTotalesARS[b]-bancoTotalesARS[a]);
-  const totalGralARS = Object.values(bancoTotalesARS).reduce((s,v)=>s+v, 0);
-  const totalGralUSD = Object.values(bancoTotalesUSD).reduce((s,v)=>s+v, 0);
+  const totalGralARS = Object.values(bancoTotalesARS).reduce((s,v)=>s+v, 0); const totalGralUSD = Object.values(bancoTotalesUSD).reduce((s,v)=>s+v, 0);
   const totalInner = document.getElementById('tarjetasTotalInner');
   if (totalInner) {
     const bancoRows = bancosArr.map((banco, i) => {
-      const tARS  = bancoTotalesARS[banco];
-      const tUSD  = bancoTotalesUSD[banco];
-      const pct   = totalGralARS > 0 ? ((tARS / totalGralARS) * 100).toFixed(0) : 0;
-      const color = getBancoColor(banco, i);
-      const sub   = bancoTarjetas[banco];
-      const tipoStr = sub.map(t => t.tipo).join(' + ');
-      const subDetalle = sub.length > 1
-        ? `<span style="font-size:11px;color:var(--t-444);margin-left:8px;">${sub.map(t=>`${t.tipo}${fmt(t.totalARS)}`).join(' · ')}</span>`
-        : '';
-      const usdCell = tUSD > 0
-        ? `<span style="font-size:16px;font-weight:500;color:#5DCAA5;">U$S ${tUSD.toFixed(2)}</span>` : '';
-      return `<div style="display:flex;align-items:center;gap:14px;padding:11px 0;border-bottom:0.5px solid var(--softer);flex-wrap:wrap;">
-        <span style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0;"></span>
-        <div style="min-width:110px;">
-          <span style="font-size:13px;color:var(--t-ccc);font-weight:500;">${banco}</span>
-          <span style="font-size:10px;color:var(--t-444);margin-left:6px;">${tipoStr}</span>
-        </div>
-        <div style="display:flex;align-items:baseline;gap:10px;flex:1;flex-wrap:wrap;">
-          <span style="font-size:16px;font-weight:500;color:var(--t-e8);">${fmt(tARS)}</span>
-          ${usdCell}
-          ${subDetalle}
-        </div>
-        <div style="min-width:70px;text-align:right;">
-          <span style="font-size:12px;color:var(--t-555);">${pct}%</span>
-          <div style="background:var(--soft);border-radius:3px;height:3px;margin-top:5px;">
-            <div style="width:${pct}%;height:3px;border-radius:3px;background:${color};"></div>
-          </div>
-        </div>
-      </div>`;
+      const tARS = bancoTotalesARS[banco], tUSD = bancoTotalesUSD[banco], pct = totalGralARS > 0 ? ((tARS / totalGralARS) * 100).toFixed(0) : 0, color = getBancoColor(banco, i), sub = bancoTarjetas[banco], tipoStr = sub.map(t => t.tipo).join(' + ');
+      const subDetalle = sub.length > 1 ? `<span style="font-size:11px;color:var(--t-444);margin-left:8px;">${sub.map(t=>`${t.tipo}${fmt(t.totalARS)}`).join(' · ')}</span>` : '';
+      const usdCell = tUSD > 0 ? `<span style="font-size:16px;font-weight:500;color:#5DCAA5;">U$S ${tUSD.toFixed(2)}</span>` : '';
+      return `<div style="display:flex;align-items:center;gap:14px;padding:11px 0;border-bottom:0.5px solid var(--softer);flex-wrap:wrap;"><span style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0;"></span><div style="min-width:110px;"><span style="font-size:13px;color:var(--t-ccc);font-weight:500;">${banco}</span><span style="font-size:10px;color:var(--t-444);margin-left:6px;">${tipoStr}</span></div><div style="display:flex;align-items:baseline;gap:10px;flex:1;flex-wrap:wrap;"><span style="font-size:16px;font-weight:500;color:var(--t-e8);">${fmt(tARS)}</span>${usdCell}${subDetalle}</div><div style="min-width:70px;text-align:right;"><span style="font-size:12px;color:var(--t-555);">${pct}%</span><div style="background:var(--soft);border-radius:3px;height:3px;margin-top:5px;"><div style="width:${pct}%;height:3px;border-radius:3px;background:${color};"></div></div></div></div>`;
     }).join('');
-    const usdTotalHtml = totalGralUSD > 0
-      ? `<div style="display:flex;align-items:baseline;gap:6px;padding-left:24px;border-left:0.5px solid var(--soft);">
-          <span style="font-size:28px;font-weight:500;color:#5DCAA5;letter-spacing:-0.5px;">U$S ${totalGralUSD.toFixed(2)}</span>
-          <span style="font-size:11px;color:var(--t-444);">USD</span>
-        </div>` : '';
-    totalInner.innerHTML = `
-      <div style="background:var(--card);border:0.5px solid var(--border);border-radius:12px;padding:22px 24px;">
-        <p style="font-size:10px;color:var(--t-444);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:18px;">Total tarjetas · ${mes}</p>
-        <div style="display:flex;align-items:baseline;gap:0;flex-wrap:wrap;margin-bottom:22px;padding-bottom:20px;border-bottom:0.5px solid var(--soft);">
-          <div style="display:flex;align-items:baseline;gap:6px;padding-right:24px;">
-            <span style="font-size:28px;font-weight:500;color:var(--t-e8);letter-spacing:-0.5px;">${fmt(totalGralARS)}</span>
-            <span style="font-size:11px;color:var(--t-444);">ARS</span>
-          </div>
-          ${usdTotalHtml}
-        </div>
-        <div>${bancoRows}</div>
-      </div>`;
+    totalInner.innerHTML = `<div style="background:var(--card);border:0.5px solid var(--border);border-radius:12px;padding:22px 24px;"><p style="font-size:10px;color:var(--t-444);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:18px;">Total tarjetas · ${mes}</p><div style="display:flex;align-items:baseline;gap:0;flex-wrap:wrap;margin-bottom:22px;padding-bottom:20px;border-bottom:0.5px solid var(--soft);"><div style="display:flex;align-items:baseline;gap:6px;padding-right:24px;"><span style="font-size:28px;font-weight:500;color:var(--t-e8);letter-spacing:-0.5px;">${fmt(totalGralARS)}</span><span style="font-size:11px;color:var(--t-444);">ARS</span></div>${totalGralUSD > 0 ? `<div style="display:flex;align-items:baseline;gap:6px;padding-left:24px;border-left:0.5px solid var(--soft);"><span style="font-size:28px;font-weight:500;color:#5DCAA5;letter-spacing:-0.5px;">U$S ${totalGralUSD.toFixed(2)}</span><span style="font-size:11px;color:var(--t-444);">USD</span></div>` : ''}</div><div>${bancoRows}</div></div>`;
     document.getElementById('tarjetasTotalBlock').style.display = 'block';
   }
   const rangosDisponibles = [2,3,4,5,6].filter(n => n <= tarjetasMesesOrden.length);
-  if (!rangosDisponibles.includes(tarjetasRangoMeses)) {
-    tarjetasRangoMeses = rangosDisponibles[rangosDisponibles.length-1] || tarjetasMesesOrden.length;
-  }
-  document.getElementById('tarjetasRangoControls').innerHTML = rangosDisponibles.map(n => {
-    const active = n === tarjetasRangoMeses;
-    return `<button class="tarjetas-toggle ${active?'active':''}" onclick="cambiarRangoTarjetas(${n})">${n}M</button>`;
-  }).join('');
+  if (!rangosDisponibles.includes(tarjetasRangoMeses)) tarjetasRangoMeses = rangosDisponibles[rangosDisponibles.length-1] || tarjetasMesesOrden.length;
+  document.getElementById('tarjetasRangoControls').innerHTML = rangosDisponibles.map(n => `<button class="tarjetas-toggle ${n === tarjetasRangoMeses?'active':''}" onclick="cambiarRangoTarjetas(${n})">${n}M</button>`).join('');
   const allMeses = tarjetasMesesOrden.slice(-tarjetasRangoMeses);
   const lineDataByBanco = {};
-  allMeses.forEach(m => {
-    Object.entries(tarjetasPorMes[m].grupos).forEach(([bt, g]) => {
-      const partes = bt.split(' ');
-      const banco  = partes.slice(1).join(' ') || bt;
-      if (!lineDataByBanco[banco]) lineDataByBanco[banco] = {};
-      lineDataByBanco[banco][m] = (lineDataByBanco[banco][m]||0) + g.totalARS;
-    });
-  });
-  const bancosGlobalArr = Object.keys(lineDataByBanco).sort((a,b)=>{
-    const sumA = Object.values(lineDataByBanco[a]).reduce((s,v)=>s+v,0);
-    const sumB = Object.values(lineDataByBanco[b]).reduce((s,v)=>s+v,0);
-    return sumB - sumA;
-  });
+  allMeses.forEach(m => { Object.entries(tarjetasPorMes[m].grupos).forEach(([bt, g]) => { const banco = bt.split(' ').slice(1).join(' ') || bt; if (!lineDataByBanco[banco]) lineDataByBanco[banco] = {}; lineDataByBanco[banco][m] = (lineDataByBanco[banco][m]||0) + g.totalARS; }); });
+  const bancosGlobalArr = Object.keys(lineDataByBanco).sort((a,b)=>Object.values(lineDataByBanco[b]).reduce((s,v)=>s+v,0) - Object.values(lineDataByBanco[a]).reduce((s,v)=>s+v,0));
   if (!tarjetasLineSelected.length) tarjetasLineSelected = [...bancosGlobalArr];
-  document.getElementById('tarjetasLineControls').innerHTML = bancosGlobalArr.map((k, i) => {
-    const color = getBancoColor(k, i);
-    const on = tarjetasLineSelected.includes(k);
-    return `<button class="line-chip" onclick="toggleTarjetaLine('${k}')"
-      style="border-color:${color}55; background:${on?color+'22':'transparent'}; color:${on?color:'var(--t-444)'};">
-      ${k}
-    </button>`;
-  }).join('');
-  const barDatasets = bancosGlobalArr.filter(k=>tarjetasLineSelected.includes(k)).map((banco) => {
-    const color = getBancoColor(banco, bancosGlobalArr.indexOf(banco));
-    const bData = lineDataByBanco[banco] || {};
-    return {
-      label: banco,
-      data: allMeses.map(m=>bData[m]||0),
-      backgroundColor: color+'99',
-      borderColor: color,
-      borderWidth: 1.5,
-      borderRadius: 5,
-      maxBarThickness: 64
-    };
-  });
+  document.getElementById('tarjetasLineControls').innerHTML = bancosGlobalArr.map((k, i) => { const color = getBancoColor(k, i); const on = tarjetasLineSelected.includes(k); return `<button class="line-chip" onclick="toggleTarjetaLine('${k}')" style="border-color:${color}55; background:${on?color+'22':'transparent'}; color:${on?color:'var(--t-444)'};">${k}</button>`; }).join('');
+  const barDatasets = bancosGlobalArr.filter(k=>tarjetasLineSelected.includes(k)).map((banco) => { const color = getBancoColor(banco, bancosGlobalArr.indexOf(banco)); const bData = lineDataByBanco[banco] || {}; return { label: banco, data: allMeses.map(m=>bData[m]||0), backgroundColor: color+'99', borderColor: color, borderWidth: 1.5, borderRadius: 5, maxBarThickness: 64 }; });
   if (tarjetasLineInst) tarjetasLineInst.destroy();
   const yFmt = v=>'$'+(v>=1000000?(v/1000000).toLocaleString('es-AR',{maximumFractionDigits:1})+'M':v>=1000?Math.round(v/1000)+'k':v);
   const barValueLabels = {
     id: 'barValueLabels',
     afterDatasetsDraw(chart) {
       const { ctx } = chart;
-      const labelCount = chart.data.labels.length;
-      for (let i = 0; i < labelCount; i++) {
+      for (let i = 0; i < chart.data.labels.length; i++) {
         let total = 0, topBar = null;
-        chart.data.datasets.forEach((dataset, dsIndex) => {
-          const meta = chart.getDatasetMeta(dsIndex);
-          if (meta.hidden) return;
-          const value = dataset.data[i];
-          if (value) {
-            total += value;
-            const bar = meta.data[i];
-            if (bar && (!topBar || bar.y < topBar.y)) topBar = bar;
-          }
-        });
+        chart.data.datasets.forEach((dataset, dsIndex) => { const meta = chart.getDatasetMeta(dsIndex); if (meta.hidden) return; const value = dataset.data[i]; if (value) { total += value; const bar = meta.data[i]; if (bar && (!topBar || bar.y < topBar.y)) topBar = bar; } });
         if (!topBar || !total) continue;
-        ctx.save();
-        ctx.fillStyle = VAL_LABEL;
-        ctx.font = '600 11px -apple-system, BlinkMacSystemFont, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'bottom';
-        ctx.fillText(fmt(total), topBar.x, topBar.y - 6);
-        ctx.restore();
+        ctx.save(); ctx.fillStyle = VAL_LABEL; ctx.font = '600 11px -apple-system, BlinkMacSystemFont, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom'; ctx.fillText(fmt(total), topBar.x, topBar.y - 6); ctx.restore();
       }
     }
   };
-  tarjetasLineInst = new Chart(document.getElementById('tarjetasLineChart'), {
-    type: 'bar',
-    data: { labels: allMeses.length ? allMeses.map(mesCorto) : ['Sin datos'], datasets: barDatasets },
-    plugins: [barValueLabels],
-    options: {
-      responsive:true, maintainAspectRatio:false,
-      interaction:{mode:'index',intersect:false},
-      layout:{ padding:{ top: 18 } },
-      plugins:{
-        legend:{display:false},
-        tooltip:{filter:item=>item.raw>0,callbacks:{label:ctx=>` ${ctx.dataset.label}: ${fmt(ctx.raw)}`}}
-      },
-      scales:{
-        x:{stacked:true,grid:{display:false},ticks:{color:TICK,font:{size:11}}},
-        y:{stacked:true,grid:{color:GRID},ticks:{color:TICK,font:{size:10},callback:yFmt},beginAtZero:true,grace:'12%'}
-      }
-    }
-  });
-  document.getElementById('tarjetasLineLegend').innerHTML = bancosGlobalArr
-    .filter(k=>tarjetasLineSelected.includes(k))
-    .map(k=>{
-      const color=getBancoColor(k,bancosGlobalArr.indexOf(k));
-      return `<span class="legend-item"><span class="legend-dot" style="background:${color}"></span>${k}</span>`;
-    }).join('');
-  tarjetasMovimientosActuales = [...dataMes.movimientos].sort((a,b)=>{
-    const da=parseDate(a.fecha), db=parseDate(b.fecha);
-    return (!da||!db)?0:db-da;
-  });
+  tarjetasLineInst = new Chart(document.getElementById('tarjetasLineChart'), { type: 'bar', data: { labels: allMeses.length ? allMeses.map(mesCorto) : ['Sin datos'], datasets: barDatasets }, plugins: [barValueLabels], options: { responsive:true, maintainAspectRatio:false, interaction:{mode:'index',intersect:false}, layout:{ padding:{ top: 18 } }, plugins:{ legend:{display:false}, tooltip:{filter:item=>item.raw>0,callbacks:{label:ctx=>` ${ctx.dataset.label}: ${fmt(ctx.raw)}`}} }, scales:{ x:{stacked:true,grid:{display:false},ticks:{color:TICK,font:{size:11}}}, y:{stacked:true,grid:{color:GRID},ticks:{color:TICK,font:{size:10},callback:yFmt},beginAtZero:true,grace:'12%'} } } });
+  document.getElementById('tarjetasLineLegend').innerHTML = bancosGlobalArr.filter(k=>tarjetasLineSelected.includes(k)).map(k=>`<span class="legend-item"><span class="legend-dot" style="background:${getBancoColor(k,bancosGlobalArr.indexOf(k))}"></span>${k}</span>`).join('');
+  tarjetasMovimientosActuales = [...dataMes.movimientos].sort((a,b)=>{ const da=parseDate(a.fecha), db=parseDate(b.fecha); return (!da||!db)?0:db-da; });
   document.getElementById('tarjetasMovLabel').textContent = `· ${mes}`;
   document.getElementById('tarjetasSearch').value = '';
   renderTarjetasLog(tarjetasMovimientosActuales);
@@ -1073,357 +915,126 @@ function renderTarjetas() {
   renderCompromisos();
   renderSemaforo(totalGralARS, mes);
 }
-// ─── DÉBITOS FIJOS RECURRENTES ──────────────────────────────────────────
+
 function renderTarjetasFijos(dataMes, mes) {
   const block = document.getElementById('tarjetasFijosBlock');
   if (!dataMes || !TARJETAS_FIJOS.length) { block.style.display='none'; return; }
-  const detectados = [];
-  const ausentes = [];
+  const detectados = []; const ausentes = [];
   TARJETAS_FIJOS.forEach(f => {
-    const matches = dataMes.movimientos.filter(r => {
-      const d = r.detalle.toLowerCase();
-      return f.match.some(k => d.includes(k));
-    });
+    const matches = dataMes.movimientos.filter(r => f.match.some(k => r.detalle.toLowerCase().includes(k)));
     if (!matches.length) { ausentes.push(f); return; }
-    const totARS = matches.reduce((s,r)=>s+r.montoARS,0);
-    const totUSD = matches.reduce((s,r)=>s+r.montoUSD,0);
-    const tarjetas = [...new Set(matches.map(r=>r.bancoTipo))];
-    detectados.push({ ...f, totARS, totUSD, tarjetas, cant: matches.length });
+    detectados.push({ ...f, totARS: matches.reduce((s,r)=>s+r.montoARS,0), totUSD: matches.reduce((s,r)=>s+r.montoUSD,0), tarjetas: [...new Set(matches.map(r=>r.bancoTipo))], cant: matches.length });
   });
-  const totalARS = detectados.reduce((s,d)=>s+d.totARS,0);
-  const totalUSD = detectados.reduce((s,d)=>s+d.totUSD,0);
+  const totalARS = detectados.reduce((s,d)=>s+d.totARS,0); const totalUSD = detectados.reduce((s,d)=>s+d.totUSD,0);
   detectados.sort((a,b)=>b.totARS-a.totARS);
-  const filas = detectados.map(d => {
-    const montoStr = [
-      d.totARS>0 ? fmt(d.totARS) : '',
-      d.totUSD>0 ? `<span style="color:#5DCAA5;">U$S ${d.totUSD.toFixed(2)}</span>` : ''
-    ].filter(Boolean).join(' · ') || '—';
-    return `<tr>
-      <td style="font-weight:500;font-size:12px;">${d.nombre}${d.cant>1?` <span class="pct-label">×${d.cant}</span>`:''}</td>
-      <td><span style="font-size:11px;color:var(--t-aaa);">${d.tarjetas.join(' · ')}</span></td>
-      <td style="text-align:right;font-weight:500;">${montoStr}</td>
-    </tr>`;
-  }).join('');
-  const ausentesHtml = ausentes.length
-    ? `<div style="margin-top:14px;padding-top:12px;border-top:0.5px solid var(--softer);">
-        <span style="font-size:10px;color:var(--t-444);text-transform:uppercase;letter-spacing:0.05em;">Sin aparecer en este resumen:</span>
-        <span style="display:inline-flex;gap:6px;flex-wrap:wrap;margin-left:6px;">
-          ${ausentes.map(f=>`<span class="cat-tag" style="opacity:0.65;">${f.nombre}</span>`).join('')}
-        </span>
-      </div>`
-    : '';
-  const totalStr = [
-    totalARS>0 ? `<strong style="color:var(--t-e8);">${fmt(totalARS)}</strong>` : '',
-    totalUSD>0 ? `<strong style="color:#5DCAA5;">U$S ${totalUSD.toFixed(2)}</strong>` : ''
-  ].filter(Boolean).join(' + ');
+  const filas = detectados.map(d => `<tr><td style="font-weight:500;font-size:12px;">${d.nombre}${d.cant>1?` <span class="pct-label">×${d.cant}</span>`:''}</td><td><span style="font-size:11px;color:var(--t-aaa);">${d.tarjetas.join(' · ')}</span></td><td style="text-align:right;font-weight:500;">${[d.totARS>0 ? fmt(d.totARS) : '', d.totUSD>0 ? `<span style="color:#5DCAA5;">U$S ${d.totUSD.toFixed(2)}</span>` : ''].filter(Boolean).join(' · ') || '—'}</td></tr>`).join('');
   block.innerHTML = `
-    <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:4px;">
-      <div>
-        <p class="chart-title" style="margin-bottom:4px;">Débitos fijos del resumen · ${mes}</p>
-        <p style="font-size:11px;color:var(--t-444);">Suscripciones y cargos recurrentes detectados en las tarjetas</p>
-      </div>
-    </div>
-    ${detectados.length
-      ? `<p style="font-size:13px;color:var(--t-888);margin-bottom:12px;line-height:1.6;">
-          ${detectados.length} fijos este mes por ${totalStr}.
-        </p>
-        <table class="ranking-table">
-          <thead><tr>
-            <th style="width:38%">Fijo</th>
-            <th style="width:37%">Tarjeta</th>
-            <th style="width:25%;text-align:right">Monto</th>
-          </tr></thead>
-          <tbody>${filas}</tbody>
-        </table>`
-      : `<p style="font-size:12px;color:var(--t-666);">Ningún fijo detectado en este resumen.</p>`}
-    ${ausentesHtml}`;
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:4px;"><div><p class="chart-title" style="margin-bottom:4px;">Débitos fijos del resumen · ${mes}</p><p style="font-size:11px;color:var(--t-444);">Suscripciones y cargos recurrentes detectados</p></div></div>
+    ${detectados.length ? `<p style="font-size:13px;color:var(--t-888);margin-bottom:12px;line-height:1.6;">${detectados.length} fijos este mes por${[totalARS>0 ? `<strong style="color:var(--t-e8);">${fmt(totalARS)}</strong>` : '', totalUSD>0 ? `<strong style="color:#5DCAA5;">U$S ${totalUSD.toFixed(2)}</strong>` : ''].filter(Boolean).join(' + ')}.</p><table class="ranking-table"><thead><tr><th style="width:38%">Fijo</th><th style="width:37%">Tarjeta</th><th style="width:25%;text-align:right">Monto</th></tr></thead><tbody>${filas}</tbody></table>` : `<p style="font-size:12px;color:var(--t-666);">Ningún fijo detectado en este resumen.</p>`}
+    ${ausentes.length ? `<div style="margin-top:14px;padding-top:12px;border-top:0.5px solid var(--softer);"><span style="font-size:10px;color:var(--t-444);text-transform:uppercase;letter-spacing:0.05em;">Sin aparecer:</span><span style="display:inline-flex;gap:6px;flex-wrap:wrap;margin-left:6px;">${ausentes.map(f=>`<span class="cat-tag" style="opacity:0.65;">${f.nombre}</span>`).join('')}</span></div>` : ''}`;
   block.style.display='block';
 }
-// ─── COMPROMISOS FUTUROS POR CUOTAS ──────────────────────────────────────────
+
 function renderCompromisos() {
   compromisoProximoMes = 0;
   const block = document.getElementById('cuotasBlock');
   const ultimoMesPorTarjeta = {};
-  tarjetasMesesOrden.forEach(m => {
-    Object.keys(tarjetasPorMes[m].grupos).forEach(bt => { ultimoMesPorTarjeta[bt] = m; });
-  });
-  const planes = [];
-  const futuros = {};
-  let minAbs = Infinity, maxAbs = -Infinity;
-  const hoyD = new Date();
-  const hoyAbs = hoyD.getFullYear()*12 + hoyD.getMonth();
+  tarjetasMesesOrden.forEach(m => { Object.keys(tarjetasPorMes[m].grupos).forEach(bt => { ultimoMesPorTarjeta[bt] = m; }); });
+  const planes = []; const futuros = {}; let minAbs = Infinity, maxAbs = -Infinity;
+  const hoyD = new Date(); const hoyAbs = hoyD.getFullYear()*12 + hoyD.getMonth();
   Object.entries(ultimoMesPorTarjeta).forEach(([bt, mesBase]) => {
-    const metaBase = tarjetasMesMeta[mesBase];
-    if (!metaBase || metaBase.mIdx === null) return;
+    const metaBase = tarjetasMesMeta[mesBase]; if (!metaBase || metaBase.mIdx === null) return;
     const baseIdx = metaBase.year*12 + metaBase.mIdx;
     tarjetasPorMes[mesBase].movimientos.forEach(r => {
-      if (r.bancoTipo !== bt) return;
-      if (esMovimientoFijo(r.detalle)) return;
-      const m = (r.cuota||'').match(/^(\d+)\s*\/\s*(\d+)$/);
-      if (!m) return;
-      const c = parseInt(m[1]), t = parseInt(m[2]);
-      if (!(t > c) || r.montoARS <= 0) return;
-      const restantes = t - c;
-      const pasadas  = Math.min(restantes, Math.max(0, hoyAbs - baseIdx - 1));
-      const visibles = restantes - pasadas;
-      if (visibles <= 0) return;
-      planes.push({
-        detalle: r.detalle, bancoTipo: bt, banco: r.banco,
-        cuotaActual: c, cuotaTotal: t, restantes: visibles,
-        montoCuota: r.montoARS, totalRestante: r.montoARS * visibles
-      });
+      if (r.bancoTipo !== bt || esMovimientoFijo(r.detalle)) return;
+      const m = (r.cuota||'').match(/^(\d+)\s*\/\s*(\d+)$/); if (!m) return;
+      const c = parseInt(m[1]), t = parseInt(m[2]); if (!(t > c) || r.montoARS <= 0) return;
+      const restantes = t - c; const pasadas  = Math.min(restantes, Math.max(0, hoyAbs - baseIdx - 1));
+      const visibles = restantes - pasadas; if (visibles <= 0) return;
+      planes.push({ detalle: r.detalle, bancoTipo: bt, banco: r.banco, cuotaActual: c, cuotaTotal: t, restantes: visibles, montoCuota: r.montoARS, totalRestante: r.montoARS * visibles });
       for (let k = pasadas + 1; k <= restantes; k++) {
-        const abs = baseIdx + k;
-        if (!futuros[abs]) futuros[abs] = {};
+        const abs = baseIdx + k; if (!futuros[abs]) futuros[abs] = {};
         futuros[abs][r.banco] = (futuros[abs][r.banco]||0) + r.montoARS;
-        if (abs < minAbs) minAbs = abs;
-        if (abs > maxAbs) maxAbs = abs;
+        if (abs < minAbs) minAbs = abs; if (abs > maxAbs) maxAbs = abs;
       }
     });
   });
-  if (!planes.length) {
-    block.style.display = 'none';
-    return;
-  }
+  if (!planes.length) { block.style.display = 'none'; return; }
   block.style.display = 'block';
   let gastoFijoMensual = 0;
-  Object.entries(ultimoMesPorTarjeta).forEach(([bt, mesBase]) => {
-    tarjetasPorMes[mesBase].movimientos.forEach(r => {
-      if (r.bancoTipo === bt && esMovimientoFijo(r.detalle)) gastoFijoMensual += r.montoARS;
-    });
-  });
+  Object.entries(ultimoMesPorTarjeta).forEach(([bt, mesBase]) => { tarjetasPorMes[mesBase].movimientos.forEach(r => { if (r.bancoTipo === bt && esMovimientoFijo(r.detalle)) gastoFijoMensual += r.montoARS; }); });
   const totalComprometido = planes.reduce((s,p)=>s+p.totalRestante,0);
   const mesesHorizonte = maxAbs - minAbs + 1;
-  const labels = [], absList = [];
-  const aniosSpan = new Set();
-  for (let abs = minAbs; abs <= maxAbs; abs++) aniosSpan.add(Math.floor(abs/12));
-  const multiAnio = aniosSpan.size > 1;
-  for (let abs = minAbs; abs <= maxAbs; abs++) {
-    const anio = Math.floor(abs/12);
-    labels.push(MES_CAL_NOMBRES[abs % 12] + (multiAnio ? ` '${String(anio).slice(2)}` : ''));
-    absList.push(abs);
-  }
-  const bancosFut = [...new Set(Object.values(futuros).flatMap(o=>Object.keys(o)))]
-    .sort((a,b)=>{
-      const sA = absList.reduce((s,abs)=>s+(futuros[abs]?.[a]||0),0);
-      const sB = absList.reduce((s,abs)=>s+(futuros[abs]?.[b]||0),0);
-      return sB - sA;
-    });
-  document.getElementById('cuotasResumen').innerHTML =
-    `Tenés <strong style="color:var(--t-e8);">${fmt(totalComprometido)}</strong> comprometidos en `+
-    `<strong style="color:var(--t-e8);">${planes.length}</strong> plan${planes.length!==1?'es':''} de cuotas, `+
-    `repartidos en los próximos <strong style="color:var(--t-e8);">${mesesHorizonte}</strong> mes${mesesHorizonte!==1?'es':''}. `+
-    `A eso se suman <strong style="color:var(--t-e8);">${fmt(gastoFijoMensual)}</strong> de débitos fijos por mes.`;
+  const labels = [], absList = []; const aniosSpan = new Set();
+  for (let abs = minAbs; abs <= maxAbs; abs++) { aniosSpan.add(Math.floor(abs/12)); }
+  for (let abs = minAbs; abs <= maxAbs; abs++) { labels.push(MES_CAL_NOMBRES[abs % 12] + (aniosSpan.size > 1 ? ` '${String(Math.floor(abs/12)).slice(2)}` : '')); absList.push(abs); }
+  const bancosFut = [...new Set(Object.values(futuros).flatMap(o=>Object.keys(o)))].sort((a,b)=>absList.reduce((s,abs)=>s+(futuros[abs]?.[b]||0),0) - absList.reduce((s,abs)=>s+(futuros[abs]?.[a]||0),0));
+  
+  document.getElementById('cuotasResumen').innerHTML = `Tenés <strong style="color:var(--t-e8);">${fmt(totalComprometido)}</strong> comprometidos en <strong style="color:var(--t-e8);">${planes.length}</strong> plan${planes.length!==1?'es':''} de cuotas, repartidos en los próximos <strong style="color:var(--t-e8);">${mesesHorizonte}</strong> mes${mesesHorizonte!==1?'es':''}. A eso se suman <strong style="color:var(--t-e8);">${fmt(gastoFijoMensual)}</strong> de débitos fijos por mes.`;
   const cuotasPorMes = absList.map(abs => Object.values(futuros[abs]||{}).reduce((s,v)=>s+v,0));
   const totalMes = cuotasPorMes.map(c => c + gastoFijoMensual);
   compromisoProximoMes = totalMes[0] || 0;
+  
   document.getElementById('cuotasTotalMes').innerHTML = `
     <p style="font-size:10px;color:var(--t-444);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">Total · ${labels[0]}</p>
-    <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:10px;">
-      <span style="font-size:28px;font-weight:500;color:var(--t-e8);letter-spacing:-0.5px;">${fmt(totalMes[0])}</span>
-      <span style="font-size:11px;color:var(--t-444);">ARS</span>
-    </div>
-    <div style="display:flex;gap:18px;flex-wrap:wrap;font-size:12px;color:var(--t-888);">
-      <span>Cuotas <strong style="color:var(--t-e8);font-weight:500;">${fmt(cuotasPorMes[0]||0)}</strong></span>
-      <span>Débitos fijos <strong style="color:var(--t-e8);font-weight:500;">${fmt(gastoFijoMensual)}</strong></span>
-    </div>`;
-  const yFmtC = v=>'$'+(v>=1000000?(v/1000000).toLocaleString('es-AR',{maximumFractionDigits:1})+'M':v>=1000?Math.round(v/1000)+'k':v);
-  const cuotasDatasets = bancosFut.map((banco,i)=>({
-    label: banco,
-    data: absList.map(abs=>futuros[abs]?.[banco]||0),
-    backgroundColor: getBancoColor(banco,i)+'99',
-    borderColor: getBancoColor(banco,i),
-    borderWidth: 1.5, borderRadius: 5, maxBarThickness: 64
-  }));
-  const COLOR_FIJOS_T = '#7F77DD';
-  if (gastoFijoMensual > 0) cuotasDatasets.push({
-    label: 'Débitos fijos',
-    data: absList.map(()=>gastoFijoMensual),
-    backgroundColor: COLOR_FIJOS_T+'99', borderColor: COLOR_FIJOS_T,
-    borderWidth: 1.5, borderRadius: 5, maxBarThickness: 64
-  });
+    <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:10px;"><span style="font-size:28px;font-weight:500;color:var(--t-e8);letter-spacing:-0.5px;">${fmt(totalMes[0])}</span><span style="font-size:11px;color:var(--t-444);">ARS</span></div>
+    <div style="display:flex;gap:18px;flex-wrap:wrap;font-size:12px;color:var(--t-888);"><span>Cuotas <strong style="color:var(--t-e8);font-weight:500;">${fmt(cuotasPorMes[0]||0)}</strong></span><span>Débitos fijos <strong style="color:var(--t-e8);font-weight:500;">${fmt(gastoFijoMensual)}</strong></span></div>`;
+  
+  const cuotasDatasets = bancosFut.map((banco,i)=>({ label: banco, data: absList.map(abs=>futuros[abs]?.[banco]||0), backgroundColor: getBancoColor(banco,i)+'99', borderColor: getBancoColor(banco,i), borderWidth: 1.5, borderRadius: 5, maxBarThickness: 64 }));
+  if (gastoFijoMensual > 0) cuotasDatasets.push({ label: 'Débitos fijos', data: absList.map(()=>gastoFijoMensual), backgroundColor: '#7F77DD99', borderColor: '#7F77DD', borderWidth: 1.5, borderRadius: 5, maxBarThickness: 64 });
+  
   const cuotasTotalLabels = {
     id: 'cuotasTotalLabels',
     afterDatasetsDraw(chart) {
       const { ctx } = chart;
       for (let i = 0; i < chart.data.labels.length; i++) {
         let total = 0, topBar = null;
-        chart.data.datasets.forEach((ds, di) => {
-          const meta = chart.getDatasetMeta(di);
-          if (meta.hidden) return;
-          const v = ds.data[i];
-          if (v) {
-            total += v;
-            const bar = meta.data[i];
-            if (bar && (!topBar || bar.y < topBar.y)) topBar = bar;
-          }
-        });
+        chart.data.datasets.forEach((ds, di) => { const meta = chart.getDatasetMeta(di); if (meta.hidden) return; const v = ds.data[i]; if (v) { total += v; const bar = meta.data[i]; if (bar && (!topBar || bar.y < topBar.y)) topBar = bar; } });
         if (!topBar || !total) continue;
-        ctx.save();
-        ctx.fillStyle = VAL_LABEL;
-        ctx.font = '600 11px -apple-system, BlinkMacSystemFont, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'bottom';
-        ctx.fillText(fmt(total), topBar.x, topBar.y - 6);
-        ctx.restore();
+        ctx.save(); ctx.fillStyle = VAL_LABEL; ctx.font = '600 11px -apple-system, BlinkMacSystemFont, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom'; ctx.fillText(fmt(total), topBar.x, topBar.y - 6); ctx.restore();
       }
     }
   };
+  
   if (cuotasChartInst) cuotasChartInst.destroy();
-  cuotasChartInst = new Chart(document.getElementById('cuotasChart'), {
-    type: 'bar',
-    data: { labels, datasets: cuotasDatasets },
-    plugins: [cuotasTotalLabels],
-    options: {
-      responsive:true, maintainAspectRatio:false,
-      interaction:{mode:'index',intersect:false},
-      layout:{ padding:{ top: 18 } },
-      plugins:{
-        legend:{display:false},
-        tooltip:{filter:item=>item.raw>0,callbacks:{label:ctx=>` ${ctx.dataset.label}: ${fmt(ctx.raw)}`}}
-      },
-      scales:{
-        x:{stacked:true,grid:{display:false},ticks:{color:TICK,font:{size:11}}},
-        y:{stacked:true,grid:{color:GRID},ticks:{color:TICK,font:{size:10},callback:yFmtC},beginAtZero:true,grace:'12%'}
-      }
-    }
-  });
-  document.getElementById('cuotasLegend').innerHTML = bancosFut.map((b,i)=>
-    `<span class="legend-item"><span class="legend-dot" style="background:${getBancoColor(b,i)}"></span>${b}</span>`
-  ).join('') +
-  (gastoFijoMensual > 0 ? `<span class="legend-item"><span class="legend-dot" style="background:${COLOR_FIJOS_T}"></span>Débitos fijos</span>` : '');
-  const gruposPlanes = {};
-  planes.forEach(p => { (gruposPlanes[p.bancoTipo] = gruposPlanes[p.bancoTipo]||[]).push(p); });
-  const ordenTarjetasPlanes = Object.keys(gruposPlanes).sort((a,b)=>{
-    const sA = gruposPlanes[a].reduce((s,p)=>s+p.totalRestante,0);
-    const sB = gruposPlanes[b].reduce((s,p)=>s+p.totalRestante,0);
-    return sB - sA;
-  });
-  const cuerpoPlanes = ordenTarjetasPlanes.map((bt, gi) => {
-    const grupo = [...gruposPlanes[bt]].sort((a,b)=>b.totalRestante-a.totalRestante);
-    const banco = bt.split(' ').slice(1).join(' ') || bt;
-    const color = getBancoColor(banco, gi);
-    const subRestante = grupo.reduce((s,p)=>s+p.totalRestante,0);
-    const headerRow = `<tr>
-      <td colspan="4" style="padding:14px 4px 7px;">
-        <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;">
-          <span style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0;align-self:center;"></span>
-          <span style="font-size:12px;font-weight:600;color:var(--t-e8);">${bt}</span>
-          <span style="font-size:11px;color:var(--t-555);">${grupo.length} plan${grupo.length!==1?'es':''}</span>
-          <span style="margin-left:auto;font-size:12px;font-weight:500;color:var(--t-ccc);">${fmt(subRestante)} restantes</span>
-        </div>
-      </td>
-    </tr>`;
-    const dataRows = grupo.map(p=>{
-      const pctPagado = ((p.cuotaActual/p.cuotaTotal)*100).toFixed(0);
-      return `<tr style="border-left:2px solid ${color}33;">
-        <td style="font-weight:500;font-size:12px;padding-left:16px;">${p.detalle}
-          <div class="bar-bg"><div class="bar-fill" style="width:${pctPagado}%;background:${color};"></div></div>
-        </td>
-        <td style="text-align:center;font-size:11px;color:var(--t-888)">${p.cuotaActual}/${p.cuotaTotal}</td>
-        <td style="text-align:right;font-size:12px;color:var(--t-888)">${fmt(p.montoCuota)}</td>
-        <td style="text-align:right;font-weight:500">${fmt(p.totalRestante)}<br><span class="pct-label">${p.restantes} cuota${p.restantes!==1?'s':''}</span></td>
-      </tr>`;
-    }).join('');
-    return headerRow + dataRows;
-  }).join('');
-  document.getElementById('cuotasTable').innerHTML = `
-    <thead><tr>
-      <th style="width:44%">Detalle</th>
-      <th style="width:14%;text-align:center">Cuota</th>
-      <th style="width:21%;text-align:right">Por cuota</th>
-      <th style="width:21%;text-align:right">Falta pagar</th>
-    </tr></thead>
-    <tbody>${cuerpoPlanes}</tbody>`;
+  cuotasChartInst = new Chart(document.getElementById('cuotasChart'), { type: 'bar', data: { labels, datasets: cuotasDatasets }, plugins: [cuotasTotalLabels], options: { responsive:true, maintainAspectRatio:false, interaction:{mode:'index',intersect:false}, layout:{ padding:{ top: 18 } }, plugins:{ legend:{display:false}, tooltip:{filter:item=>item.raw>0,callbacks:{label:ctx=>` ${ctx.dataset.label}: ${fmt(ctx.raw)}`}} }, scales:{ x:{stacked:true,grid:{display:false},ticks:{color:TICK,font:{size:11}}}, y:{stacked:true,grid:{color:GRID},ticks:{color:TICK,font:{size:10},callback:v=>'$'+(v>=1000000?(v/1000000).toLocaleString('es-AR',{maximumFractionDigits:1})+'M':v>=1000?Math.round(v/1000)+'k':v)},beginAtZero:true,grace:'12%'} } } });
+  
+  document.getElementById('cuotasLegend').innerHTML = bancosFut.map((b,i)=>`<span class="legend-item"><span class="legend-dot" style="background:${getBancoColor(b,i)}"></span>${b}</span>`).join('') + (gastoFijoMensual > 0 ? `<span class="legend-item"><span class="legend-dot" style="background:#7F77DD"></span>Débitos fijos</span>` : '');
+  
+  const gruposPlanes = {}; planes.forEach(p => { (gruposPlanes[p.bancoTipo] = gruposPlanes[p.bancoTipo]||[]).push(p); });
+  const ordenTarjetasPlanes = Object.keys(gruposPlanes).sort((a,b)=>gruposPlanes[b].reduce((s,p)=>s+p.totalRestante,0) - gruposPlanes[a].reduce((s,p)=>s+p.totalRestante,0));
+  
+  document.getElementById('cuotasTable').innerHTML = `<thead><tr><th style="width:44%">Detalle</th><th style="width:14%;text-align:center">Cuota</th><th style="width:21%;text-align:right">Por cuota</th><th style="width:21%;text-align:right">Falta pagar</th></tr></thead><tbody>${ordenTarjetasPlanes.map((bt, gi) => {
+    const grupo = [...gruposPlanes[bt]].sort((a,b)=>b.totalRestante-a.totalRestante); const color = getBancoColor(bt.split(' ').slice(1).join(' ') || bt, gi); const subRestante = grupo.reduce((s,p)=>s+p.totalRestante,0);
+    return `<tr><td colspan="4" style="padding:14px 4px 7px;"><div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;"><span style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0;align-self:center;"></span><span style="font-size:12px;font-weight:600;color:var(--t-e8);">${bt}</span><span style="font-size:11px;color:var(--t-555);">${grupo.length} plan${grupo.length!==1?'es':''}</span><span style="margin-left:auto;font-size:12px;font-weight:500;color:var(--t-ccc);">${fmt(subRestante)} restantes</span></div></td></tr>` + grupo.map(p=>`<tr style="border-left:2px solid ${color}33;"><td style="font-weight:500;font-size:12px;padding-left:16px;">${p.detalle}<div class="bar-bg"><div class="bar-fill" style="width:${((p.cuotaActual/p.cuotaTotal)*100).toFixed(0)}\%;background:${color};"></div></div></td><td style="text-align:center;font-size:11px;color:var(--t-888)">${p.cuotaActual}/${p.cuotaTotal}</td><td style="text-align:right;font-size:12px;color:var(--t-888)">${fmt(p.montoCuota)}</td><td style="text-align:right;font-weight:500">${fmt(p.totalRestante)}<br><span class="pct-label">${p.restantes} cuota${p.restantes!==1?'s':''}</span></td></tr>`).join('');
+  }).join('')}</tbody>`;
 }
-function toggleTarjetaLine(key) {
-  if (tarjetasLineSelected.includes(key)) {
-    if (tarjetasLineSelected.length>1) tarjetasLineSelected=tarjetasLineSelected.filter(k=>k!==key);
-  } else {
-    tarjetasLineSelected.push(key);
-  }
-  renderTarjetas();
-}
+
+function toggleTarjetaLine(key) { if (tarjetasLineSelected.includes(key)) { if (tarjetasLineSelected.length>1) tarjetasLineSelected=tarjetasLineSelected.filter(k=>k!==key); } else { tarjetasLineSelected.push(key); } renderTarjetas(); }
+
 function renderTarjetasLog(datos) {
-  const allBancoTipos = [...new Set(datos.map(r=>r.bancoTipo))];
-  const btColorMap = {};
-  allBancoTipos.forEach((bt,i)=>{
-    const partes=bt.split(' '); const banco=partes.slice(1).join(' ')||bt;
-    btColorMap[bt] = getBancoColor(banco, i);
-  });
-  const grupos = {};
-  datos.forEach(r => { (grupos[r.bancoTipo] = grupos[r.bancoTipo]||[]).push(r); });
-  const ordenTarjetas = Object.keys(grupos).sort((a,b)=>{
-    const sA = grupos[a].reduce((s,r)=>s+r.montoARS,0);
-    const sB = grupos[b].reduce((s,r)=>s+r.montoARS,0);
-    return sB - sA;
-  });
-  ordenTarjetas.forEach(bt => grupos[bt].sort((a,b)=>{
-    const da=parseDate(a.fecha), db=parseDate(b.fecha);
-    return (!da||!db)?0:db-da;
-  }));
-  const bodyHtml = ordenTarjetas.map(bt => {
-    const rows  = grupos[bt];
-    const color = btColorMap[bt] || 'var(--t-555)';
-    const subARS = rows.reduce((s,r)=>s+r.montoARS,0);
-    const subUSD = rows.reduce((s,r)=>s+r.montoUSD,0);
-    const headerRow = `<tr>
-      <td colspan="6" style="padding:14px 4px 7px;">
-        <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;">
-          <span style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0;align-self:center;"></span>
-          <span style="font-size:12px;font-weight:600;color:var(--t-e8);">${bt}</span>
-          <span style="font-size:11px;color:var(--t-555);">${rows.length} mov.</span>
-          <span style="margin-left:auto;font-size:12px;font-weight:500;color:var(--t-ccc);">
-            ${subARS>0?fmt(subARS):''}${subUSD>0?`<span style="color:#5DCAA5;margin-left:8px;">U$S ${subUSD.toFixed(2)}</span>`:''}
-          </span>
-        </div>
-      </td>
-    </tr>`;
-    const dataRows = rows.map(r=>{
-      const arsStr = r.montoARS > 0 ? fmt(r.montoARS) : '—';
-      const usdStr = r.montoUSD > 0 ? fmtUSD(r.montoUSD) : '—';
-      const venc   = r.vencimiento ? r.vencimiento.replace('/2026','') : '—';
-      return `<tr style="border-left:2px solid ${color}33;">
-        <td style="color:var(--t-555);font-size:12px;padding-left:16px">${r.fecha}</td>
-        <td style="font-weight:500;font-size:12px">${r.detalle}</td>
-        <td style="font-size:11px;color:var(--t-666)">${r.cuota||'—'}</td>
-        <td style="font-size:11px;color:var(--t-555)">${venc}</td>
-        <td style="text-align:right;font-weight:500">${arsStr}</td>
-        <td style="text-align:right;color:${r.montoUSD>0?'#5DCAA5':'var(--t-444)'};font-size:12px">${usdStr}</td>
-      </tr>`;
-    }).join('');
-    return headerRow + dataRows;
-  }).join('');
-  document.getElementById('tarjetasLogTable').innerHTML=`
-    <thead><tr>
-      <th style="width:13%">Fecha</th>
-      <th style="width:41%">Detalle</th>
-      <th style="width:11%">Cuota</th>
-      <th style="width:12%">Vence</th>
-      <th style="width:13%;text-align:right">ARS</th>
-      <th style="width:10%;text-align:right">USD</th>
-    </tr></thead>
-    <tbody>${bodyHtml}</tbody>`;
+  const btColorMap = {}; [...new Set(datos.map(r=>r.bancoTipo))].forEach((bt,i)=>{ btColorMap[bt] = getBancoColor(bt.split(' ').slice(1).join(' ')||bt, i); });
+  const grupos = {}; datos.forEach(r => { (grupos[r.bancoTipo] = grupos[r.bancoTipo]||[]).push(r); });
+  const ordenTarjetas = Object.keys(grupos).sort((a,b)=>grupos[b].reduce((s,r)=>s+r.montoARS,0) - grupos[a].reduce((s,r)=>s+r.montoARS,0));
+  ordenTarjetas.forEach(bt => grupos[bt].sort((a,b)=>{ const da=parseDate(a.fecha), db=parseDate(b.fecha); return (!da||!db)?0:db-da; }));
+  
+  document.getElementById('tarjetasLogTable').innerHTML=`<thead><tr><th style="width:13%">Fecha</th><th style="width:41%">Detalle</th><th style="width:11%">Cuota</th><th style="width:12%">Vence</th><th style="width:13%;text-align:right">ARS</th><th style="width:10%;text-align:right">USD</th></tr></thead><tbody>${ordenTarjetas.map(bt => {
+    const rows = grupos[bt], color = btColorMap[bt] || 'var(--t-555)', subARS = rows.reduce((s,r)=>s+r.montoARS,0), subUSD = rows.reduce((s,r)=>s+r.montoUSD,0);
+    return `<tr><td colspan="6" style="padding:14px 4px 7px;"><div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;"><span style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0;align-self:center;"></span><span style="font-size:12px;font-weight:600;color:var(--t-e8);">${bt}</span><span style="font-size:11px;color:var(--t-555);">${rows.length} mov.</span><span style="margin-left:auto;font-size:12px;font-weight:500;color:var(--t-ccc);">${subARS>0?fmt(subARS):''}${subUSD>0?`<span style="color:#5DCAA5;margin-left:8px;">U$S ${subUSD.toFixed(2)}</span>`:''}</span></div></td></tr>` + rows.map(r=>`<tr style="border-left:2px solid ${color}33;"><td style="color:var(--t-555);font-size:12px;padding-left:16px">${r.fecha}</td><td style="font-weight:500;font-size:12px">${r.detalle}</td><td style="font-size:11px;color:var(--t-666)">${r.cuota||'—'}</td><td style="font-size:11px;color:var(--t-555)">${r.vencimiento ? r.vencimiento.replace('/2026','') : '—'}</td><td style="text-align:right;font-weight:500">${r.montoARS > 0 ? fmt(r.montoARS) : '—'}</td><td style="text-align:right;color:${r.montoUSD>0?'#5DCAA5':'var(--t-444)'};font-size:12px">${r.montoUSD > 0 ? fmtUSD(r.montoUSD) : '—'}</td></tr>`).join('');
+  }).join('')}</tbody>`;
 }
+
 function filtrarTarjetasLog() {
   const q=document.getElementById('tarjetasSearch').value.toLowerCase();
-  renderTarjetasLog(tarjetasMovimientosActuales.filter(r=>
-    r.detalle.toLowerCase().includes(q)||
-    (r.bancoTipo||'').toLowerCase().includes(q)||
-    r.banco.toLowerCase().includes(q)||
-    r.tarjeta.toLowerCase().includes(q)||
-    r.tipo.toLowerCase().includes(q)||
-    (r.cuota||'').toLowerCase().includes(q)
-  ));
+  renderTarjetasLog(tarjetasMovimientosActuales.filter(r=> r.detalle.toLowerCase().includes(q)|| (r.bancoTipo||'').toLowerCase().includes(q)|| r.banco.toLowerCase().includes(q)|| r.tarjeta.toLowerCase().includes(q)|| r.tipo.toLowerCase().includes(q)|| (r.cuota||'').toLowerCase().includes(q) ));
 }
-// ─── SEMÁFORO DE TARJETAS ─────────────────────────────────────────────────────
-const AHORRO_OBJETIVO_ARS = 1500000;   // ahorro mínimo mensual
-const AHORRO_OBJETIVO_PCT = 0.20;      // o 20% del ingreso, el mayor de los dos
-const SEMAFORO_AMARILLO   = 0.85;      // ≥85% del tope → amarillo; >100% → rojo
-const DESFASE_RESUMEN     = 1;         // gastos de Sep. se pagan con el sueldo del Ciclo Octubre
-const CICLOS_PROMEDIO     = 3;         // ciclos anteriores para estimar gastos fuera de tarjeta
+
+const AHORRO_OBJETIVO_ARS = 1500000;
+const AHORRO_OBJETIVO_PCT = 0.20;
+const SEMAFORO_AMARILLO   = 0.85;
+const DESFASE_RESUMEN     = 1;
+const CICLOS_PROMEDIO     = 3;
 const CATS_PAGO_TARJETA   = ['tarjeta','visa','master','amex','resumen'];
-let compromisoProximoMes = 0;
 
 const esPagoTarjeta = r => CATS_PAGO_TARJETA.some(k => (r.categoria+' '+r.detalle).toLowerCase().includes(k));
 const sinIngresos = p => !p.ingresosMari && p.ingresosLucas === 3600000;
@@ -1446,7 +1057,6 @@ function renderSemaforo(totalTarjetas, mesKey) {
   const p = parsearCiclo(datosCache[idx]);
   const avisos = [];
 
-  // Ingresos de Lucas + Mariana del ciclo que paga este resumen
   let ingreso = p.ingresosLucas + p.ingresosMari;
   if (sinIngresos(p)) {
     for (let j = idx - 1; j >= 0; j--) {
@@ -1459,7 +1069,6 @@ function renderSemaforo(totalTarjetas, mesKey) {
     }
   }
 
-  // Gastos fuera de tarjeta: si el ciclo sigue en curso, uso el promedio de los ciclos anteriores
   let fuera = gastosFueraTarjeta(p);
   const hoy = new Date(); hoy.setHours(0,0,0,0);
   if (hoy <= CICLOS[idx].cicloHasta) {
@@ -1514,36 +1123,32 @@ function renderSemaforo(totalTarjetas, mesKey) {
     ${fila('Margen para compras nuevas el próximo mes', fmt(margenNuevo), margenNuevo>0?'#639922':'#E24B4A')}`;
   block.style.display='block';
 }
-// ─── TEMA CLARO/OSCURO ────────────────────────────────────────────────────────
+
 function actualizarThemeBtn() {
   const l = document.body.classList.contains('light');
-  const btn = document.getElementById('themeBtn');
-  btn.textContent = l ? '☀' : '☾';
+  document.getElementById('themeBtn').textContent = l ? '☀' : '☾';
 }
 function refreshAllRenders() {
   if (datosCache[cicloActivo]) buildDashboard(datosCache[cicloActivo]);
-  const map = { mes:'tabMes', detalle:'tabDetalle', comparativa:'tabComparativa', tarjetas:'tabTarjetas' };
-  ['tabMes','tabDetalle','tabComparativa','tabTarjetas'].forEach(id =>
+  const map = { mes:'tabMes', presupuesto:'tabPresupuesto', detalle:'tabDetalle', comparativa:'tabComparativa', tarjetas:'tabTarjetas' };
+  ['tabMes','tabPresupuesto','tabDetalle','tabComparativa','tabTarjetas'].forEach(id =>
     document.getElementById(id).style.display='none');
   document.getElementById(map[tabActivo]).style.display='block';
   if (tabActivo==='comparativa') renderComparativa();
+  if (tabActivo==='presupuesto') renderPresupuesto();
   if (tabActivo==='tarjetas' && tarjetasRawRows) renderTarjetas();
 }
 function toggleTheme() {
   document.body.classList.toggle('light');
   try { localStorage.setItem('gastosTema', document.body.classList.contains('light') ? 'light' : 'dark'); } catch(e) {}
-  applyChartTheme();
-  actualizarThemeBtn();
-  refreshAllRenders();
+  applyChartTheme(); actualizarThemeBtn(); refreshAllRenders();
 }
 (function initTheme() {
-  let t = null;
-  try { t = localStorage.getItem('gastosTema'); } catch(e) {}
+  let t = null; try { t = localStorage.getItem('gastosTema'); } catch(e) {}
   if (t === 'light') document.body.classList.add('light');
-  applyChartTheme();
-  actualizarThemeBtn();
+  applyChartTheme(); actualizarThemeBtn();
 })();
-// ─── INICIO ───────────────────────────────────────────────────────────────────
+
 loadData();
 </script>
 </body>
