@@ -104,22 +104,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .badge-desconocido { background: var(--soft); color: var(--t-888); }
 .cat-tag { background: var(--soft); padding: 3px 8px; border-radius: 4px; font-size: 11px; color: var(--t-aaa); white-space: nowrap; }
 
-/* ─── ESTILOS SOLAPA CÓMO VENIMOS ─── */
-.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 1.5rem; }
-.kpi-card { background-color: var(--card); border: 0.5px solid var(--soft); border-radius: 12px; padding: 1.25rem; text-align: left; }
-.kpi-title { font-size: 10px; color: var(--t-444); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 8px; }
-.kpi-value { font-size: 20px; font-weight: 500; color: var(--t-e8); }
-.kpi-value.positivo { color: #639922; }
-.kpi-value.negativo { color: #E24B4A; }
-.progress-container { display: flex; flex-direction: column; gap: 16px; margin-top: 10px; }
-.progress-item { display: flex; flex-direction: column; gap: 6px; }
-.progress-header { display: flex; justify-content: space-between; font-size: 13px; color: var(--t-e8); font-weight: 500; }
-.progress-bar-bg { width: 100%; height: 8px; background-color: var(--soft); border-radius: 4px; overflow: hidden; }
-.progress-bar-fill { height: 100%; border-radius: 4px; transition: width 0.4s ease; }
-.fill-good { background-color: #639922; }
-.fill-warning { background-color: #EF9F27; }
-.fill-danger { background-color: #E24B4A; }
-.progress-subtext { font-size: 11px; color: var(--t-555); text-align: right; }
+/* ─── ESTILOS SOLAPA CÓMO VENIMOS (RESUMEN EJECUTIVO) ─── */
+.cv-kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin-bottom: 1.5rem; }
+.cv-kpi-card { background: var(--card); border: 0.5px solid var(--soft); border-radius: 12px; padding: 1.25rem 1.5rem; display: flex; flex-direction: column; gap: 6px; }
+.cv-kpi-label { font-size: 10px; color: var(--t-444); text-transform: uppercase; letter-spacing: 0.07em; }
+.cv-kpi-value { font-size: 24px; font-weight: 500; color: var(--t-e8); }
+.cv-kpi-sub { font-size: 12px; color: var(--t-555); }
 
 /* Tarjetas tab */
 .tarjetas-controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 1.5rem; }
@@ -218,28 +208,40 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     </div>
   </div>
 
-  <!-- TAB: CÓMO VENIMOS (PRESUPUESTO MENSUAL) -->
+  <!-- TAB: CÓMO VENIMOS (RESUMEN EJECUTIVO) -->
   <div id="tabComovenimos" style="display:none;">
-    <div class="kpi-grid">
-      <div class="kpi-card">
-        <div class="kpi-title">Ingreso Mensual (Real)</div>
-        <div class="kpi-value" id="cv-ingreso">$0</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-title">Objetivo de Ahorro</div>
-        <div class="kpi-value" id="cv-ahorro">$1.500.000</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-title">Margen Ocio / Variable (Real)</div>
-        <div class="kpi-value positivo" id="cv-margen-real">$0</div>
-      </div>
-    </div>
-    <div class="table-card">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
-        <p class="chart-title" style="margin-bottom:0;">Presupuesto Mensual vs. Real</p>
+    <div class="table-card" style="margin-bottom:1.5rem;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+        <p class="chart-title" style="margin-bottom:0;">Resumen ejecutivo del ciclo</p>
         <span style="font-size:11px; color:var(--t-555);" id="cv-ciclo-label">Ciclo Octubre 2026</span>
       </div>
-      <div id="cv-progress-container" class="progress-container"></div>
+      <div class="cv-kpi-grid">
+        <div class="cv-kpi-card">
+          <div class="cv-kpi-label">Ciclo a analizar</div>
+          <div class="cv-kpi-value" id="cv-ciclo-val" style="font-size:20px;">—</div>
+        </div>
+        <div class="cv-kpi-card">
+          <div class="cv-kpi-label">Ingreso Mensual (Real)</div>
+          <div class="cv-kpi-value" id="cv-ingreso">$0</div>
+        </div>
+        <div class="cv-kpi-card">
+          <div class="cv-kpi-label">Gastos hasta ahora</div>
+          <div class="cv-kpi-value" id="cv-gastos" style="color:#E24B4A;">$0</div>
+        </div>
+        <div class="cv-kpi-card">
+          <div class="cv-kpi-label">Objetivo de Ahorro</div>
+          <div class="cv-kpi-value" id="cv-ahorro">$1.500.000</div>
+          <div class="cv-kpi-sub" id="cv-ahorro-pct">Representa el 19.9% de los ingresos totales</div>
+        </div>
+        <div class="cv-kpi-card">
+          <div class="cv-kpi-label">Margen Ocio / Variable (Presupuestado)</div>
+          <div class="cv-kpi-value" id="cv-margen-presup" style="color:#378ADD;">$0</div>
+        </div>
+        <div class="cv-kpi-card">
+          <div class="cv-kpi-label">Margen Ocio / Variable (Real)</div>
+          <div class="cv-kpi-value" id="cv-margen-real">$0</div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -333,7 +335,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 <script>
 const SHEET_BASE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTSR-jEHWGJNTU5Wk2HOm6U5_pQkHudAuzgL46QYnVg5WNv-2K9H8hDsNVGUtFifICuhdcCzBWich3V/pub';
 const MOVIMIENTOS_URL = `${SHEET_BASE}?single=true&output=csv`;
-const PRESUPUESTO_URL = `${SHEET_BASE}?gid=190367375&single=true&output=csv`; // Pestaña Presupuesto Mensual
 const MESES_DICT = {
   'enero': 0, 'febrero': 1, 'marzo': 2, 'abril': 3, 'mayo': 4, 'junio': 5,
   'julio': 6, 'agosto': 7, 'septiembre': 8, 'octubre': 9, 'noviembre': 10, 'diciembre': 11
@@ -387,7 +388,6 @@ let cicloActivo = 0;
 let tabActivo = 'mes';
 let datosCache = {};
 let logDatos = [];
-let presupuestoCache = null;
 let tarjetasRawRows = null;
 let tarjetasPorMes = {};
 let tarjetasMesMeta = {};
@@ -497,12 +497,6 @@ function fetchCSV(url) {
   });
 }
 
-function fetchRawText(url) {
-  return fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-    .then(res => res.text())
-    .catch(() => '');
-}
-
 function procesarMovimientosUnificados(rows) {
   if (!rows || !rows.length) return;
   const cols = Object.keys(rows[0]);
@@ -541,18 +535,14 @@ function procesarMovimientosUnificados(rows) {
 }
 
 function loadData(forzar) {
-  if (forzar) { datosCache = {}; tarjetasRawRows = null; presupuestoCache = null; }
+  if (forzar) { datosCache = {}; tarjetasRawRows = null; }
   document.getElementById('loadingBox').style.display='block';
   document.getElementById('errorBox').style.display='none';
   ['tabMes','tabComovenimos','tabDetalle','tabComparativa','tabTarjetas'].forEach(id =>
     document.getElementById(id).style.display='none');
   
-  Promise.all([
-    fetchCSV(MOVIMIENTOS_URL),
-    fetchRawText(PRESUPUESTO_URL).catch(() => '')
-  ]).then(([rows, presText]) => {
+  fetchCSV(MOVIMIENTOS_URL).then(rows => {
     procesarMovimientosUnificados(rows);
-    if (presText) presupuestoCache = presText;
     if (!CICLOS.length || !datosCache[cicloActivo]) {
       document.getElementById('loadingBox').style.display='none';
       document.getElementById('errorBox').innerHTML = 'No se encontraron datos de ciclos en la pestaña Movimientos.';
@@ -736,62 +726,30 @@ function renderComoVenimos() {
   const totalIngreso = ingresosLucas + ingresosMari;
   const objetivoAhorro = 1500000;
   const totalGastado = datos.reduce((s, r) => s + r.monto, 0);
+  const pctAhorro = totalIngreso > 0 ? ((objetivoAhorro / totalIngreso) * 100).toFixed(1) : '0.0';
 
-  // Si hay caché de presupuesto externo, podemos intentar parsearlo, sino usamos cálculo dinámico basado en las categorías reales del ciclo
-  let htmlBarras = '';
-  const catMap = {};
-  datos.forEach(r => { catMap[r.categoria] = (catMap[r.categoria] || 0) + r.monto; });
+  // Gastos fijos estimados/estándar para calcular el margen presupuestado o calculados de categorías fijas
+  const gastosFijosDetectados = datos.filter(r => esCategoriaFija(r.categoria)).reduce((s,r)=>s+r.monto,0);
+  // Presupuesto de fijos base (p.ej. 4.9M como en tu planilla, o dinámico)
+  const presupFijos = 4900000; 
+  const margenPresup = totalIngreso - objetivoAhorro - presupFijos;
+  const margenReal = totalIngreso - objetivoAhorro - totalGastado;
 
-  // Categorías fijas estándar sugeridas contra lo real gastado
-  const presupuestosDefault = {
-    'Educación': 1000000,
-    'Hogar y Servicios': 2000000,
-    'Transporte': 200000,
-    'Bastian': 200000,
-    'Tarjetas': 1500000
-  };
+  const cicloLabel = CICLOS[cicloActivo] ? CICLOS[cicloActivo].label : '';
 
-  let presTotalFijos = 4900000;
-  let realTotalFijos = 0;
-
-  const categoriasList = Object.keys(catMap).length ? Object.keys(catMap) : Object.keys(presupuestosDefault);
-
-  categoriasList.forEach((cat, i) => {
-    const real = catMap[cat] || 0;
-    const pres = presupuestosDefault[cat] || 500000;
-    if (!catMap[cat]) presTotalFijos += pres;
-    realTotalFijos += real;
-
-    const pct = pres > 0 ? (real / pres) * 100 : 0;
-    let colorClass = 'fill-good';
-    if (pct >= 90) colorClass = 'fill-danger';
-    else if (pct >= 75) colorClass = 'fill-warning';
-
-    htmlBarras += `
-      <div class="progress-item">
-        <div class="progress-header">
-          <span>${cat}</span>
-          <span>${fmt(real)} / <span style="color:var(--t-555)">Presup: ${fmt(pres)}</span></span>
-        </div>
-        <div class="progress-bar-bg">
-          <div class="progress-bar-fill ${colorClass}" style="width: ${Math.min(pct, 100)}%;"></div>
-        </div>
-        <div class="progress-subtext">${pct.toFixed(1)}% consumido</div>
-      </div>
-    `;
-  });
-
-  const margenReal = totalIngreso - objetivoAhorro - realTotalFijos;
-
+  document.getElementById('cv-ciclo-label').innerText = cicloLabel;
+  document.getElementById('cv-ciclo-val').innerText = cicloLabel.replace('Ciclo ', '');
   document.getElementById('cv-ingreso').innerText = fmt(totalIngreso);
+  document.getElementById('cv-gastos').innerText = fmt(totalGastado);
   document.getElementById('cv-ahorro').innerText = fmt(objetivoAhorro);
+  document.getElementById('cv-ahorro-pct').innerText = `Representa el ${pctAhorro}% de los ingresos totales`;
   
-  const margenEl = document.getElementById('cv-margen-real');
-  margenEl.innerText = fmt(margenReal);
-  margenEl.className = 'kpi-value ' + (margenReal >= 0 ? 'positivo' : 'negativo');
+  const margPresEl = document.getElementById('cv-margen-presup');
+  margPresEl.innerText = fmt(margenPresup);
 
-  document.getElementById('cv-ciclo-label').innerText = CICLOS[cicloActivo] ? CICLOS[cicloActivo].label : '';
-  document.getElementById('cv-progress-container').innerHTML = htmlBarras;
+  const margRealEl = document.getElementById('cv-margen-real');
+  margRealEl.innerText = fmt(margenReal);
+  margRealEl.className = 'cv-kpi-value ' + (margenReal >= 0 ? 'positivo' : 'negativo');
 }
 
 function renderFijosVsVariables(datos, totalGastos, totalIngresos) {
