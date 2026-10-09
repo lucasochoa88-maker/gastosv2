@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard de Gastos Personales</title>
+<title>Gastos Personales - Nuestro Termómetro Económico</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <style>
@@ -68,15 +68,57 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* ─── LAYOUT DE APLICACIÓN (SIDEBAR + CONTENT) ─── */
+/* ─── LAYOUT RESPONSIVE ─── */
 .app-container {
   display: flex;
   min-height: 100vh;
 }
 
+/* HEADER MÓVIL */
+.mobile-header {
+  display: none;
+  background: var(--sidebar-bg);
+  border-bottom: 1px solid var(--border);
+  padding: 1rem 1.25rem;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 60;
+}
+
+.mobile-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hamburger-btn {
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--t-fff);
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 90;
+}
+
 /* SIDEBAR */
 .sidebar {
-  width: 260px;
+  width: 270px;
   background: var(--sidebar-bg);
   border-right: 1px solid var(--border);
   padding: 1.75rem 1.25rem;
@@ -87,7 +129,8 @@ body {
   top: 0;
   height: 100vh;
   flex-shrink: 0;
-  z-index: 50;
+  z-index: 100;
+  transition: transform 0.3s ease;
 }
 
 .brand {
@@ -98,14 +141,14 @@ body {
 }
 
 .brand-icon {
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
   border-radius: 12px;
   background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
+  font-size: 22px;
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
@@ -119,13 +162,11 @@ body {
 .brand-text p {
   font-size: 11px;
   color: var(--t-aaa);
+  line-height: 1.2;
 }
 
-/* CICLO DROPDOWN EN SIDEBAR */
-.sidebar-cycle-wrap {
-  margin-bottom: 1.5rem;
-}
-
+/* DROPDOWN CICLOS */
+.sidebar-cycle-wrap { margin-bottom: 1.5rem; }
 .dropdown-wrap { position: relative; width: 100%; }
 
 .dropdown-btn {
@@ -144,17 +185,8 @@ body {
   transition: all 0.2s ease;
 }
 
-.dropdown-btn:hover {
-  border-color: var(--accent-blue);
-  background: var(--card-hover);
-}
-
-.dropdown-chevron {
-  color: var(--t-aaa);
-  font-size: 10px;
-  transition: transform 0.2s ease;
-}
-
+.dropdown-btn:hover { border-color: var(--accent-blue); background: var(--card-hover); }
+.dropdown-chevron { color: var(--t-aaa); font-size: 10px; transition: transform 0.2s ease; }
 .dropdown-chevron.open { transform: rotate(180deg); }
 
 .dropdown-menu {
@@ -198,29 +230,12 @@ body {
 }
 
 .dropdown-item:hover { background: var(--soft); color: var(--t-fff); }
-
-.dropdown-item.active {
-  color: var(--t-fff);
-  background: rgba(59, 130, 246, 0.15);
-  font-weight: 600;
-}
-
-.dropdown-item .dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--accent-blue);
-  opacity: 0;
-}
-
+.dropdown-item.active { color: var(--t-fff); background: rgba(59, 130, 246, 0.15); font-weight: 600; }
+.dropdown-item .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-blue); opacity: 0; }
 .dropdown-item.active .dot { opacity: 1; }
 
 /* MENÚ NAVEGACIÓN VERTICAL */
-.nav-menu {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
+.nav-menu { display: flex; flex-direction: column; gap: 6px; }
 
 .nav-item {
   display: flex;
@@ -239,21 +254,11 @@ body {
   transition: all 0.2s ease;
 }
 
-.nav-item:hover {
-  color: var(--t-fff);
-  background: var(--soft);
-}
-
-.nav-item.active {
-  color: var(--t-fff);
-  background: var(--accent-blue);
-  font-weight: 600;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-}
-
+.nav-item:hover { color: var(--t-fff); background: var(--soft); }
+.nav-item.active { color: var(--t-fff); background: var(--accent-blue); font-weight: 600; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
 .nav-icon { font-size: 16px; }
 
-/* SIDEBAR FOOTER ACTIONS */
+/* FOOTER SIDEBAR */
 .sidebar-footer {
   padding-top: 1.5rem;
   border-top: 1px solid var(--divider);
@@ -277,13 +282,9 @@ body {
   transition: all 0.2s ease;
 }
 
-.btn-icon:hover {
-  border-color: var(--accent-blue);
-  color: var(--t-fff);
-  background: var(--card-hover);
-}
+.btn-icon:hover { border-color: var(--accent-blue); color: var(--t-fff); background: var(--card-hover); }
 
-/* ─── MAIN CONTENT AREA (FLUÍDO & FULL WIDTH) ─── */
+/* ─── AREA PRINCIPAL ─── */
 .main-wrapper {
   flex: 1;
   padding: 2rem 2.5rem;
@@ -300,17 +301,8 @@ body {
   gap: 12px;
 }
 
-.top-bar-title h1 {
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--t-fff);
-  letter-spacing: -0.02em;
-}
-
-.top-bar-title p {
-  font-size: 13px;
-  color: var(--t-aaa);
-}
+.top-bar-title h1 { font-size: 22px; font-weight: 700; color: var(--t-fff); letter-spacing: -0.02em; }
+.top-bar-title p { font-size: 13px; color: var(--t-aaa); }
 
 .ciclo-badge {
   font-size: 12px;
@@ -323,7 +315,7 @@ body {
   box-shadow: var(--shadow);
 }
 
-/* ─── GRID DEL DASHBOARD (2 COLUMNAS + SIDEBAR WIDGETS) ─── */
+/* ─── GRID DASHBOARD ─── */
 .dashboard-grid {
   display: grid;
   grid-template-columns: 1fr 340px;
@@ -333,7 +325,7 @@ body {
 .grid-main-col { display: flex; flex-direction: column; gap: 1.5rem; }
 .grid-side-col { display: flex; flex-direction: column; gap: 1.5rem; }
 
-/* ─── CARDS FINTECH ─── */
+/* CARDS FINTECH */
 .metric, .summary-strip, .proj-banner, .ciclo-progress, .chart-card, .chart-card-full, .table-card, .cv-kpi-card {
   background: var(--card);
   border: 1px solid var(--border);
@@ -342,7 +334,6 @@ body {
   box-shadow: var(--shadow);
 }
 
-/* FILA DE KPIS TOP */
 .metrics {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -350,21 +341,8 @@ body {
   margin-bottom: 1.5rem;
 }
 
-.metric-label {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--t-aaa);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  margin-bottom: 6px;
-}
-
-.metric-value {
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--t-fff);
-  letter-spacing: -0.02em;
-}
+.metric-label { font-size: 11px; font-weight: 600; color: var(--t-aaa); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+.metric-value { font-size: 22px; font-weight: 700; color: var(--t-fff); letter-spacing: -0.02em; }
 
 .summary-strip {
   margin-bottom: 1.5rem;
@@ -375,65 +353,37 @@ body {
   padding: 1rem 1.5rem;
 }
 
-.summary-item {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  flex: 1;
-  min-width: 130px;
-}
-
-.summary-item + .summary-item {
-  border-left: 1px solid var(--divider);
-  padding-left: 16px;
-}
-
+.summary-item { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 130px; }
+.summary-item + .summary-item { border-left: 1px solid var(--divider); padding-left: 16px; }
 .summary-label { font-size: 11px; font-weight: 600; color: var(--t-aaa); text-transform: uppercase; letter-spacing: 0.05em; }
 .summary-value { font-size: 18px; font-weight: 700; color: var(--t-fff); }
 .summary-value.danger { color: var(--accent-red); }
 .summary-value.success { color: var(--accent-green); }
 
-/* Banner Proyección */
 .proj-banner {
   border-left: 4px solid var(--accent-amber);
   background: linear-gradient(90deg, rgba(245, 158, 11, 0.08) 0%, var(--card) 100%);
 }
 
-.proj-banner-title {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--accent-amber);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  margin-bottom: 4px;
-}
-
+.proj-banner-title { font-size: 11px; font-weight: 700; color: var(--accent-amber); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
 .proj-banner-body { font-size: 13px; color: var(--t-ccc); line-height: 1.6; }
 .proj-banner-body strong { color: var(--t-fff); }
 
-/* Progress widget */
+/* WIDGET AVANCE */
 .ciclo-progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
 .ciclo-progress-label { font-size: 11px; font-weight: 600; color: var(--t-aaa); text-transform: uppercase; letter-spacing: 0.06em; }
 .ciclo-progress-pct { font-size: 12px; font-weight: 600; color: var(--t-ccc); }
 
-.progress-track {
-  background: var(--soft);
-  border-radius: 8px;
-  height: 8px;
-  position: relative;
-  overflow: hidden;
-}
-
+.progress-track { background: var(--soft); border-radius: 8px; height: 8px; position: relative; overflow: hidden; }
 .progress-fill-gastos { height: 100%; border-radius: 8px; background: var(--accent-red); position: absolute; left: 0; top: 0; transition: width 0.4s; }
 .progress-fill-tiempo { height: 100%; border-radius: 8px; background: rgba(59, 130, 246, 0.25); position: absolute; left: 0; top: 0; border-right: 2px solid var(--accent-blue); }
 
-/* Charts & Legends */
 .chart-title { font-size: 12px; font-weight: 700; color: var(--t-aaa); margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.06em; }
 .legend { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
 .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--t-ccc); }
 .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 
-/* Tables */
+/* TABLAS */
 .ranking-table { width: 100%; border-collapse: collapse; font-size: 13px; }
 .ranking-table tr { border-bottom: 1px solid var(--divider); }
 .ranking-table tr:last-child { border-bottom: none; }
@@ -446,21 +396,56 @@ body {
 .bar-fill { height: 4px; border-radius: 4px; }
 .pct-label { font-size: 11px; color: var(--t-aaa); font-weight: 400; }
 
-/* Badges */
 .badge-user { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; display: inline-block; text-transform: capitalize; }
 .badge-lucas { background: rgba(59, 130, 246, 0.15); color: #60A5FA; border: 1px solid rgba(59, 130, 246, 0.3); }
 .badge-mariana { background: rgba(236, 72, 153, 0.15); color: #F472B6; border: 1px solid rgba(236, 72, 153, 0.3); }
 .badge-desconocido { background: var(--soft); color: var(--t-aaa); }
 .cat-tag { background: var(--soft); padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 500; color: var(--t-ccc); border: 1px solid var(--border); white-space: nowrap; }
 
-/* Resumen Ejecutivo */
-.cv-kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-top: 1rem; }
-.cv-kpi-card { display: flex; flex-direction: column; gap: 6px; }
-.cv-kpi-label { font-size: 11px; font-weight: 600; color: var(--t-aaa); text-transform: uppercase; letter-spacing: 0.06em; }
-.cv-kpi-value { font-size: 24px; font-weight: 700; color: var(--t-fff); }
-.cv-kpi-sub { font-size: 12px; color: var(--t-aaa); }
+/* ─── RESUMEN EJECUTIVO (CÓMO VENIMOS - SIMÉTRICO) ─── */
+.cv-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  margin-top: 1.25rem;
+}
 
-/* Tarjetas Tab Controls */
+.cv-kpi-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 130px;
+  transition: transform 0.2s, border-color 0.2s;
+}
+
+.cv-kpi-card:hover {
+  border-color: var(--accent-blue);
+  transform: translateY(-2px);
+}
+
+.cv-kpi-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cv-kpi-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.cv-kpi-label { font-size: 11px; font-weight: 600; color: var(--t-aaa); text-transform: uppercase; letter-spacing: 0.06em; }
+.cv-kpi-value { font-size: 24px; font-weight: 700; color: var(--t-fff); letter-spacing: -0.02em; }
+.cv-kpi-sub { font-size: 12px; color: var(--t-aaa); font-weight: 400; }
+
+/* TARJETAS CONTROLS */
 .tarjetas-controls { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 1.5rem; }
 .tarjetas-label { font-size: 11px; font-weight: 700; color: var(--t-aaa); text-transform: uppercase; letter-spacing: 0.05em; }
 .tarjetas-select {
@@ -476,33 +461,63 @@ body {
 .loading { text-align: center; padding: 4rem 0; color: var(--t-aaa); font-size: 15px; font-weight: 500; }
 .error-msg { background: rgba(239, 68, 68, 0.1); color: #FCA5A5; border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 12px; padding: 14px 18px; font-size: 13px; margin-bottom: 1rem; }
 
-/* Media Queries para Pantallas Pequeñas */
+/* ─── MEDIA QUERIES RESPONSIVE ─── */
 @media (max-width: 1024px) {
   .dashboard-grid { grid-template-columns: 1fr; }
+  .cv-kpi-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (max-width: 900px) {
-  .app-container { flex-direction: column; }
-  .sidebar { width: 100%; height: auto; position: relative; border-right: none; border-bottom: 1px solid var(--border); }
-  .main-wrapper { padding: 1.5rem 1rem; }
+  .mobile-header { display: flex; }
+  .sidebar-overlay { display: block; }
+  .sidebar-overlay.open { display: block; }
+  .sidebar {
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    transform: translateX(-100%);
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
+  }
+  .sidebar.open { transform: translateX(0); }
+  .main-wrapper { padding: 1.25rem 1rem; }
+}
+
+@media (max-width: 600px) {
+  .cv-kpi-grid { grid-template-columns: 1fr; }
+  .summary-strip { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .summary-item + .summary-item { border-left: none; padding-left: 0; border-top: 1px solid var(--divider); padding-top: 12px; width: 100%; }
 }
 </style>
 </head>
 <body>
+
 <div class="app-container">
 
+  <!-- HEADER MÓVIL -->
+  <header class="mobile-header">
+    <div class="mobile-brand">
+      <div class="brand-icon" style="width:34px; height:34px; font-size:18px;">🏡</div>
+      <div class="brand-text">
+        <h2 style="font-size:14px;">Gastos Personales</h2>
+      </div>
+    </div>
+    <button class="hamburger-btn" onclick="toggleSidebar()" aria-label="Abrir Menú">☰</button>
+  </header>
+
+  <!-- OVERLAY PARA CERRAR SIDEBAR MÓVIL -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
   <!-- BARRA LATERAL (SIDEBAR) -->
-  <aside class="sidebar">
+  <aside class="sidebar" id="sidebar">
     <div>
       <div class="brand">
-        <div class="brand-icon">💳</div>
+        <div class="brand-icon">🏡</div>
         <div class="brand-text">
-          <h2>Finances</h2>
-          <p>Gastos Personales</p>
+          <h2>Gastos Personales</h2>
+          <p>Nuestro termómetro económico</p>
         </div>
       </div>
 
-      <!-- DROPDOWN DE CICLOS EN SIDEBAR -->
+      <!-- DROPDOWN DE CICLOS -->
       <div class="sidebar-cycle-wrap">
         <div class="dropdown-wrap" id="dropdownWrap">
           <button class="dropdown-btn" id="dropdownBtn" onclick="toggleDropdown()">
@@ -533,9 +548,9 @@ body {
       </nav>
     </div>
 
-    <!-- BOTONES DE ACCIÓN FOOTER -->
+    <!-- FOOTER ACCIONES -->
     <div class="sidebar-footer">
-      <span style="font-size:12px; color:var(--t-aaa);" id="dashSub">Cargando...</span>
+      <span style="font-size:11px; color:var(--t-aaa);" id="dashSub">Cargando...</span>
       <div style="display:flex; gap:8px;">
         <button class="btn-icon" id="themeBtn" onclick="toggleTheme()" title="Modo Claro / Oscuro">☾</button>
         <button class="btn-icon" onclick="loadData(true)" title="Actualizar Datos">↻</button>
@@ -546,7 +561,6 @@ body {
   <!-- CONTENIDO PRINCIPAL -->
   <main class="main-wrapper">
     
-    <!-- TOP BAR DE PANTALLA -->
     <div class="top-bar">
       <div class="top-bar-title">
         <h1 id="tabTitleHeader">Resumen del Ciclo</h1>
@@ -561,11 +575,9 @@ body {
     <!-- TAB: ESTE CICLO -->
     <div id="tabMes" style="display:none;">
       
-      <!-- FILA DE KPIS PRINCIPALES -->
       <div class="metrics" id="metricsBox"></div>
       <div class="summary-strip" id="summaryStrip"></div>
 
-      <!-- DASHBOARD GRID 2 COLUMNAS (MAIN / SIDEBAR) -->
       <div class="dashboard-grid">
         
         <!-- COLUMNA PRINCIPAL (IZQUIERDA) -->
@@ -614,39 +626,70 @@ body {
       </div>
     </div>
 
-    <!-- TAB: CÓMO VENIMOS (RESUMEN EJECUTIVO) -->
+    <!-- TAB: CÓMO VENIMOS (REDISAÑO SIMÉTRICO 3x2) -->
     <div id="tabComovenimos" style="display:none;">
       <div class="table-card">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
           <p class="chart-title" style="margin-bottom:0;">Resumen ejecutivo del ciclo</p>
-          <span style="font-size:12px; color:var(--t-aaa); font-weight:500;" id="cv-ciclo-label">—</span>
+          <span style="font-size:12px; color:var(--t-aaa); font-weight:600;" id="cv-ciclo-label">—</span>
         </div>
+        
         <div class="cv-kpi-grid">
+          
           <div class="cv-kpi-card">
-            <div class="cv-kpi-label">Ciclo a analizar</div>
+            <div class="cv-kpi-header">
+              <span class="cv-kpi-label">Ciclo Analizado</span>
+              <div class="cv-kpi-icon">🗓️</div>
+            </div>
             <div class="cv-kpi-value" id="cv-ciclo-val" style="font-size:20px;">—</div>
+            <div class="cv-kpi-sub">Período en curso</div>
           </div>
+
           <div class="cv-kpi-card">
-            <div class="cv-kpi-label">Ingreso Mensual (Real)</div>
+            <div class="cv-kpi-header">
+              <span class="cv-kpi-label">Ingreso Mensual (Real)</span>
+              <div class="cv-kpi-icon">💰</div>
+            </div>
             <div class="cv-kpi-value" id="cv-ingreso" style="color:var(--accent-green);">$0</div>
+            <div class="cv-kpi-sub">Entradas consolidadas</div>
           </div>
+
           <div class="cv-kpi-card">
-            <div class="cv-kpi-label">Gastos hasta ahora</div>
+            <div class="cv-kpi-header">
+              <span class="cv-kpi-label">Gastos hasta ahora</span>
+              <div class="cv-kpi-icon">💸</div>
+            </div>
             <div class="cv-kpi-value" id="cv-gastos" style="color:var(--accent-red);">$0</div>
+            <div class="cv-kpi-sub">Total ejecutado</div>
           </div>
+
           <div class="cv-kpi-card">
-            <div class="cv-kpi-label">Objetivo de Ahorro</div>
+            <div class="cv-kpi-header">
+              <span class="cv-kpi-label">Objetivo de Ahorro</span>
+              <div class="cv-kpi-icon">🎯</div>
+            </div>
             <div class="cv-kpi-value" id="cv-ahorro" style="color:var(--accent-purple);">$1.500.000</div>
-            <div class="cv-kpi-sub" id="cv-ahorro-pct">Representa el 19.9% de los ingresos totales</div>
+            <div class="cv-kpi-sub" id="cv-ahorro-pct">Meta fijada</div>
           </div>
+
           <div class="cv-kpi-card">
-            <div class="cv-kpi-label">Margen Ocio / Variable (Presupuestado)</div>
+            <div class="cv-kpi-header">
+              <span class="cv-kpi-label">Margen Ocio / Var. (Presup.)</span>
+              <div class="cv-kpi-icon">📐</div>
+            </div>
             <div class="cv-kpi-value" id="cv-margen-presup" style="color:var(--accent-blue);">$0</div>
+            <div class="cv-kpi-sub">Ingreso − Ahorro − Fijos</div>
           </div>
+
           <div class="cv-kpi-card">
-            <div class="cv-kpi-label">Margen Ocio / Variable (Real)</div>
+            <div class="cv-kpi-header">
+              <span class="cv-kpi-label">Margen Ocio / Var. (Real)</span>
+              <div class="cv-kpi-icon">⚡</div>
+            </div>
             <div class="cv-kpi-value" id="cv-margen-real">$0</div>
+            <div class="cv-kpi-sub">Disponible real para gastar</div>
           </div>
+
         </div>
       </div>
     </div>
@@ -764,10 +807,6 @@ const CATEGORIAS_FIJAS_KEYWORDS = [
   'alquiler','expensa','servicio','suscrip','seguro','prepaga','obra social',
   'colegio','educa','internet','luz','gas','agua','celular','gimnasio','impuesto'
 ];
-const esCategoriaFija = cat => {
-  const c = (cat||'').toLowerCase();
-  return CATEGORIAS_FIJAS_KEYWORDS.some(k => c.includes(k));
-};
 
 const TARJETAS_FIJOS = [
   { nombre:'Telesmart',                match:['telesmart'] },
@@ -783,7 +822,9 @@ const TARJETAS_FIJOS = [
   { nombre:'Cuota social CAR',         match:['cuota social car','cuota social'] },
   { nombre:'Comisión adm. de cuenta',  match:['mensual administ'] },
 ];
-const esMovimientoFijo = detalle => {
+
+const esMovimientoFijo = (detalle, tipoGasto) => {
+  if (tipoGasto && tipoGasto.toLowerCase().includes('fijo')) return true;
   const d = (detalle||'').toLowerCase();
   return TARJETAS_FIJOS.some(f => f.match.some(k => d.includes(k)));
 };
@@ -820,6 +861,13 @@ let donutInst, barInst, compareBarInst, ratioLineInst, catCompareInst, tarjetasL
 
 const fmt    = n => '$' + Math.round(n).toLocaleString('es-AR');
 const fmtUSD = n => 'U$S ' + Number(n).toFixed(0);
+
+function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+  sidebar.classList.toggle('open');
+  overlay.classList.toggle('open');
+}
 
 function parseMonto(s) {
   if (!s) return 0;
@@ -903,6 +951,11 @@ function setTab(tab, el) {
   document.querySelectorAll('.nav-item').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
   
+  if (window.innerWidth <= 900) {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebarOverlay').classList.remove('open');
+  }
+
   const titles = {
     mes: 'Resumen del Ciclo',
     comovenimos: 'Cómo Venimos',
@@ -999,20 +1052,32 @@ function loadData(forzar) {
 
 function parsearCiclo(rows) {
   if (!rows || !rows.length) return { datos: [], ingresosLucas: 0, ingresosMari: 0 };
-  const cols = Object.keys(rows[0]);
-  const [cFecha, cDet, cCat, cMonto, cQuien] = cols;
+  const cols = Object.keys(rows[0] || {});
+  const findCol = (name) => cols.find(c => c.toLowerCase().trim() === name.toLowerCase()) || cols.find(c => c.toLowerCase().includes(name.toLowerCase()));
+
+  const cFecha = findCol('fecha') || cols[0];
+  const cDet   = findCol('detalle') || cols[1];
+  const cCat   = findCol('categoria') || cols[2];
+  const cMonto = findCol('monto') || cols[3];
+  const cQuien = findCol('quien') || cols[4];
+  const cTipo  = findCol('tipo'); // 💡 NUEVA COLUMNA "Tipo"
+
   let ingresosLucas = 0, ingresosMari = 0;
   const datos = [];
   const palabrasIngreso = ['sueldo', 'ingreso', 'ingresos', 'ingre', 'ingr'];
+
   rows.forEach(r => {
     const fecha = (r[cFecha] || '').trim();
     const cat = (r[cCat] || '').trim();
     const monto = parseMonto(r[cMonto]);
     const det = (r[cDet] || '').trim();
     const quien = (r[cQuien] || 'Desconocido').trim();
+    const tipoVal = cTipo ? (r[cTipo] || '').trim() : '';
+
     const dL = det.toLowerCase();
     const cL = cat.toLowerCase();
     const qL = quien.toLowerCase();
+
     const esIngreso = !dL.includes('emilse') && !cL.includes('emilse') && palabrasIngreso.some(palabra => dL.includes(palabra) || cL.includes(palabra));
     if (dL.includes('ingres. lucas')) {
       ingresosLucas += monto;
@@ -1031,8 +1096,21 @@ function parsearCiclo(rows) {
       return;
     }
     if (!fecha || !cat || monto <= 0) return;
-    datos.push({ fecha, detalle: det, categoria: cat, monto, quien });
+
+    // Detectar si es Gasto Fijo por columna "Tipo" O por palabras clave de categoría
+    const esFijo = tipoVal.toLowerCase().includes('fijo') || CATEGORIAS_FIJAS_KEYWORDS.some(k => cL.includes(k));
+
+    datos.push({
+      fecha,
+      detalle: det,
+      categoria: cat,
+      monto,
+      quien,
+      tipo: tipoVal || (esFijo ? 'Gasto Fijo' : 'Gasto Variable'),
+      esFijo
+    });
   });
+
   if (!ingresosLucas) ingresosLucas = 3600000;
   return { datos, ingresosLucas, ingresosMari };
 }
@@ -1193,7 +1271,7 @@ function renderComoVenimos() {
   document.getElementById('cv-ingreso').innerText = fmt(totalIngreso);
   document.getElementById('cv-gastos').innerText = fmt(totalGastado);
   document.getElementById('cv-ahorro').innerText = fmt(objetivoAhorro);
-  document.getElementById('cv-ahorro-pct').innerText = `Representa el ${pctAhorro}% de los ingresos totales`;
+  document.getElementById('cv-ahorro-pct').innerText = `Representa el ${pctAhorro}% de los ingresos`;
   
   document.getElementById('cv-margen-presup').innerText = fmt(margenPresup);
 
@@ -1205,7 +1283,9 @@ function renderComoVenimos() {
 function renderFijosVsVariables(datos, totalGastos, totalIngresos) {
   const block = document.getElementById('fijosBlock');
   if (!totalGastos) { block.style.display='none'; return; }
-  const gastosFijos = datos.filter(r => esCategoriaFija(r.categoria));
+  
+  // 💡 Usa la propiedad esFijo que contempla la columna "Tipo"
+  const gastosFijos = datos.filter(r => r.esFijo);
   const totFijo = gastosFijos.reduce((s,r)=>s+r.monto,0);
   const totVar  = totalGastos - totFijo;
   const catsFijas = [...new Set(gastosFijos.map(r=>r.categoria))];
@@ -1214,7 +1294,7 @@ function renderFijosVsVariables(datos, totalGastos, totalIngresos) {
     block.innerHTML = `
       <p class="chart-title" style="margin-bottom:8px;">Fijos vs variables</p>
       <p style="font-size:13px;color:var(--t-aaa);line-height:1.6;">
-        Ninguna categoría de este ciclo coincide con la lista de gastos fijos.
+        No se detectaron gastos fijos etiquetados en este ciclo.
       </p>`;
     block.style.display='block';
     return;
@@ -1249,7 +1329,7 @@ function renderFijosVsVariables(datos, totalGastos, totalIngresos) {
       </div>
     </div>
     <p style="font-size:13px;color:var(--t-ccc);line-height:1.6;margin-bottom:12px;">
-      Tu margen libre (ingreso − fijos) es <strong style="color:var(--t-fff);">${fmt(margenVariable)}</strong>: de ahí se cubren variables y ahorro.
+      Tu margen libre (ingreso − fijos) es <strong style="color:var(--t-fff);">${fmt(margenVariable)}</strong>.
     </p>
     <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
       <span style="font-size:11px;color:var(--t-aaa);text-transform:uppercase;letter-spacing:0.05em;">Categorías fijas:</span>
@@ -1260,19 +1340,26 @@ function renderFijosVsVariables(datos, totalGastos, totalIngresos) {
 
 function renderLog(datos) {
   document.getElementById('logTable').innerHTML=`
-    <thead><tr><th style="width:15%">Fecha</th><th style="width:35%">Detalle</th><th style="width:22%">Categoría</th><th style="width:15%;text-align:right">Monto</th><th style="width:13%;text-align:center">Quién</th></tr></thead>
+    <thead><tr><th style="width:15%">Fecha</th><th style="width:35%">Detalle</th><th style="width:18%">Categoría</th><th style="width:12%">Tipo</th><th style="width:12%;text-align:right">Monto</th><th style="width:8%;text-align:center">Quién</th></tr></thead>
     <tbody>${datos.map(r=>{
       let bc='badge-desconocido';
       const q=r.quien.toLowerCase();
       if(q==='lucas') bc='badge-lucas';
       if(q==='mariana'||q==='mari') bc='badge-mariana';
-      return `<tr><td style="color:var(--t-aaa);font-size:12px">${r.fecha}</td><td style="font-weight:600">${r.detalle}</td><td><span class="cat-tag">${r.categoria}</span></td><td style="text-align:right;font-weight:700">${fmt(r.monto)}</td><td style="text-align:center"><span class="badge-user ${bc}">${r.quien}</span></td></tr>`;
+      return `<tr>
+        <td style="color:var(--t-aaa);font-size:12px">${r.fecha}</td>
+        <td style="font-weight:600">${r.detalle}</td>
+        <td><span class="cat-tag">${r.categoria}</span></td>
+        <td><span style="font-size:11px; color:${r.esFijo?'var(--accent-purple)':'var(--t-aaa)'}; font-weight:600;">${r.tipo}</span></td>
+        <td style="text-align:right;font-weight:700">${fmt(r.monto)}</td>
+        <td style="text-align:center"><span class="badge-user ${bc}">${r.quien}</span></td>
+      </tr>`;
     }).join('')}</tbody>`;
 }
 
 function filtrarLog() {
   const q=document.getElementById('searchInput').value.toLowerCase();
-  renderLog(logDatos.filter(r=>r.detalle.toLowerCase().includes(q)||r.categoria.toLowerCase().includes(q)||r.quien.toLowerCase().includes(q)));
+  renderLog(logDatos.filter(r=>r.detalle.toLowerCase().includes(q)||r.categoria.toLowerCase().includes(q)||r.quien.toLowerCase().includes(q)||(r.tipo||'').toLowerCase().includes(q)));
 }
 
 /* ─── RENDER COMPARATIVA ─── */
@@ -1393,7 +1480,21 @@ const MES_CAL_INDEX = Object.fromEntries(MES_CAL_NOMBRES.map((m,i)=>[m,i]));
 
 function parseTarjetasRows(rows) {
   const cols = Object.keys(rows[0]||{});
-  const [cBancoTipo,cMes,cFecha,cTarjeta,cDetalle,cCuota,cARS,cUSD,cVenc,cTotalARS,cTotalUSD] = cols;
+  const findCol = (name) => cols.find(c => c.toLowerCase().trim() === name.toLowerCase()) || cols.find(c => c.toLowerCase().includes(name.toLowerCase()));
+
+  const cBancoTipo = findCol('banco') || findCol('tarjeta') || cols[0];
+  const cMes       = findCol('mes') || cols[1];
+  const cFecha     = findCol('fecha') || cols[2];
+  const cTarjeta   = findCol('tarjeta') || cols[3];
+  const cDetalle   = findCol('detalle') || cols[4];
+  const cCuota     = findCol('cuota') || cols[5];
+  const cARS       = findCol('ars') || cols[6];
+  const cUSD       = findCol('usd') || cols[7];
+  const cVenc      = findCol('venc') || cols[8];
+  const cTotalARS  = findCol('total ars') || cols[9];
+  const cTotalUSD  = findCol('total usd') || cols[10];
+  const cTipo      = findCol('tipo'); // 💡 NUEVA COLUMNA "Tipo" en Tarjetas
+
   const porMes = {};
   const meta = {};
   rows.forEach(row => {
@@ -1428,6 +1529,8 @@ function parseTarjetasRows(rows) {
     const partes = bancoTipo.split(' ');
     const tipo  = partes[0] || '';
     const banco = partes.slice(1).join(' ') || bancoTipo;
+    const tipoGasto = cTipo ? (row[cTipo]||'').trim() : '';
+
     porMes[mesKey].movimientos.push({
       fecha:       (row[cFecha]||'').trim(),
       detalle:     (row[cDetalle]||'').trim(),
@@ -1437,6 +1540,8 @@ function parseTarjetasRows(rows) {
       montoARS:    parseMonto(row[cARS]),
       montoUSD:    parseMonto(row[cUSD]),
       vencimiento: (row[cVenc]||'').trim(),
+      tipoGasto:   tipoGasto,
+      esFijo:      esMovimientoFijo((row[cDetalle]||''), tipoGasto)
     });
   });
   const mesesOrden = Object.keys(porMes).sort((a,b)=>meta[a].sortKey - meta[b].sortKey);
@@ -1674,12 +1779,14 @@ function renderTarjetas() {
 function renderTarjetasFijos(dataMes, mes) {
   const block = document.getElementById('tarjetasFijosBlock');
   if (!dataMes || !TARJETAS_FIJOS.length) { block.style.display='none'; return; }
+  
   const detectados = [];
   const ausentes = [];
+
   TARJETAS_FIJOS.forEach(f => {
     const matches = dataMes.movimientos.filter(r => {
       const d = r.detalle.toLowerCase();
-      return f.match.some(k => d.includes(k));
+      return r.esFijo || f.match.some(k => d.includes(k));
     });
     if (!matches.length) { ausentes.push(f); return; }
     const totARS = matches.reduce((s,r)=>s+r.montoARS,0);
@@ -1761,7 +1868,7 @@ function renderCompromisos() {
     const baseIdx = metaBase.year*12 + metaBase.mIdx;
     tarjetasPorMes[mesBase].movimientos.forEach(r => {
       if (r.bancoTipo !== bt) return;
-      if (esMovimientoFijo(r.detalle)) return;
+      if (r.esFijo) return;
       const m = (r.cuota||'').match(/^(\d+)\s*\/\s*(\d+)$/);
       if (!m) return;
       const c = parseInt(m[1]), t = parseInt(m[2]);
@@ -1794,7 +1901,7 @@ function renderCompromisos() {
   let gastoFijoMensual = 0;
   Object.entries(ultimoMesPorTarjeta).forEach(([bt, mesBase]) => {
     tarjetasPorMes[mesBase].movimientos.forEach(r => {
-      if (r.bancoTipo === bt && esMovimientoFijo(r.detalle)) gastoFijoMensual += r.montoARS;
+      if (r.bancoTipo === bt && r.esFijo) gastoFijoMensual += r.montoARS;
     });
   });
 
