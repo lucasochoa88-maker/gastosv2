@@ -77,14 +77,6 @@ body {
 /* HEADER MÓVIL */
 .mobile-header {
   display: none;
-  background: var(--sidebar-bg);
-  border-bottom: 1px solid var(--border);
-  padding: 1rem 1.25rem;
-  align-items: center;
-  justify-content: space-between;
-  position: sticky;
-  top: 0;
-  z-index: 60;
 }
 
 .mobile-brand {
@@ -114,6 +106,10 @@ body {
   background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(4px);
   z-index: 90;
+}
+
+.sidebar-overlay.open {
+  display: block;
 }
 
 /* SIDEBAR */
@@ -461,24 +457,51 @@ body {
 .loading { text-align: center; padding: 4rem 0; color: var(--t-aaa); font-size: 15px; font-weight: 500; }
 .error-msg { background: rgba(239, 68, 68, 0.1); color: #FCA5A5; border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 12px; padding: 14px 18px; font-size: 13px; margin-bottom: 1rem; }
 
-/* ─── MEDIA QUERIES RESPONSIVE ─── */
+/* ─── MEDIA QUERIES RESPONSIVE (MÓVIL Y TABLET) ─── */
 @media (max-width: 1024px) {
   .dashboard-grid { grid-template-columns: 1fr; }
   .cv-kpi-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (max-width: 900px) {
-  .mobile-header { display: flex; }
-  .sidebar-overlay { display: block; }
-  .sidebar-overlay.open { display: block; }
+  .app-container {
+    flex-direction: column;
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  .mobile-header {
+    display: flex;
+    width: 100%;
+    background: var(--sidebar-bg);
+    border-bottom: 1px solid var(--border);
+    padding: 0.85rem 1.25rem;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 60;
+  }
+
   .sidebar {
     position: fixed;
-    top: 0; left: 0; bottom: 0;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 280px;
+    height: 100vh;
     transform: translateX(-100%);
     box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
   }
-  .sidebar.open { transform: translateX(0); }
-  .main-wrapper { padding: 1.25rem 1rem; }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .main-wrapper {
+    padding: 1.25rem 1rem;
+    width: 100%;
+  }
 }
 
 @media (max-width: 600px) {
@@ -492,7 +515,7 @@ body {
 
 <div class="app-container">
 
-  <!-- HEADER MÓVIL -->
+  <!-- HEADER MÓVIL (SÓLO VISIBLE EN DISPOSITIVOS MÓVILES) -->
   <header class="mobile-header">
     <div class="mobile-brand">
       <div class="brand-icon" style="width:34px; height:34px; font-size:18px;">🏡</div>
@@ -1060,7 +1083,7 @@ function parsearCiclo(rows) {
   const cCat   = findCol('categoria') || cols[2];
   const cMonto = findCol('monto') || cols[3];
   const cQuien = findCol('quien') || cols[4];
-  const cTipo  = findCol('tipo'); // 💡 NUEVA COLUMNA "Tipo"
+  const cTipo  = findCol('tipo');
 
   let ingresosLucas = 0, ingresosMari = 0;
   const datos = [];
@@ -1097,7 +1120,6 @@ function parsearCiclo(rows) {
     }
     if (!fecha || !cat || monto <= 0) return;
 
-    // Detectar si es Gasto Fijo por columna "Tipo" O por palabras clave de categoría
     const esFijo = tipoVal.toLowerCase().includes('fijo') || CATEGORIAS_FIJAS_KEYWORDS.some(k => cL.includes(k));
 
     datos.push({
@@ -1284,7 +1306,6 @@ function renderFijosVsVariables(datos, totalGastos, totalIngresos) {
   const block = document.getElementById('fijosBlock');
   if (!totalGastos) { block.style.display='none'; return; }
   
-  // 💡 Usa la propiedad esFijo que contempla la columna "Tipo"
   const gastosFijos = datos.filter(r => r.esFijo);
   const totFijo = gastosFijos.reduce((s,r)=>s+r.monto,0);
   const totVar  = totalGastos - totFijo;
@@ -1493,7 +1514,7 @@ function parseTarjetasRows(rows) {
   const cVenc      = findCol('venc') || cols[8];
   const cTotalARS  = findCol('total ars') || cols[9];
   const cTotalUSD  = findCol('total usd') || cols[10];
-  const cTipo      = findCol('tipo'); // 💡 NUEVA COLUMNA "Tipo" en Tarjetas
+  const cTipo      = findCol('tipo');
 
   const porMes = {};
   const meta = {};
