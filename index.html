@@ -47,13 +47,6 @@ body.light {
   --divider: #E2E8F0;
   --border: #E2E8F0;
   
-  --t-fff: #0F172A;
-  --t-e8: #1E293B;
-  --t-ccc: #334155;
-  --t-aaa: #475569;
-  --t-888: #64748B;
-  --t-555: #94A3B8;
-  
   --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
 }
 
@@ -764,7 +757,6 @@ body {
       <div id="tarjetasTotalBlock" style="display:none; margin-bottom:1.5rem;">
         <div id="tarjetasTotalInner"></div>
       </div>
-      <div class="chart-card-full" id="tarjetasFijosBlock" style="display:none; margin-bottom:1.5rem;"></div>
       
       <div class="chart-card-full" id="cuotasBlock" style="display:none; margin-bottom:1.5rem;">
         <div style="display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:4px;">
@@ -1793,81 +1785,7 @@ function renderTarjetas() {
   document.getElementById('tarjetasMovLabel').textContent = `· ${mes}`;
   document.getElementById('tarjetasSearch').value = '';
   renderTarjetasLog(tarjetasMovimientosActuales);
-  renderTarjetasFijos(dataMes, mes);
   renderCompromisos();
-}
-
-function renderTarjetasFijos(dataMes, mes) {
-  const block = document.getElementById('tarjetasFijosBlock');
-  if (!dataMes || !TARJETAS_FIJOS.length) { block.style.display='none'; return; }
-  
-  const detectados = [];
-  const ausentes = [];
-
-  TARJETAS_FIJOS.forEach(f => {
-    const matches = dataMes.movimientos.filter(r => {
-      const d = r.detalle.toLowerCase();
-      return r.esFijo || f.match.some(k => d.includes(k));
-    });
-    if (!matches.length) { ausentes.push(f); return; }
-    const totARS = matches.reduce((s,r)=>s+r.montoARS,0);
-    const totUSD = matches.reduce((s,r)=>s+r.montoUSD,0);
-    const tarjetas = [...new Set(matches.map(r=>r.bancoTipo))];
-    detectados.push({ ...f, totARS, totUSD, tarjetas, cant: matches.length });
-  });
-
-  const totalARS = detectados.reduce((s,d)=>s+d.totARS,0);
-  const totalUSD = detectados.reduce((s,d)=>s+d.totUSD,0);
-  detectados.sort((a,b)=>b.totARS-a.totARS);
-
-  const filas = detectados.map(d => {
-    const montoStr = [
-      d.totARS>0 ? fmt(d.totARS) : '',
-      d.totUSD>0 ? `<span style="color:var(--accent-green);">U$S ${d.totUSD.toFixed(2)}</span>` : ''
-    ].filter(Boolean).join(' · ') || '—';
-    return `<tr>
-      <td style="font-weight:600;font-size:12px;">${d.nombre}${d.cant>1?` <span class="pct-label">×${d.cant}</span>`:''}</td>
-      <td><span style="font-size:11px;color:var(--t-aaa);">${d.tarjetas.join(' · ')}</span></td>
-      <td style="text-align:right;font-weight:700;">${montoStr}</td>
-    </tr>`;
-  }).join('');
-
-  const ausentesHtml = ausentes.length
-    ? `<div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--divider);">
-        <span style="font-size:11px;color:var(--t-aaa);text-transform:uppercase;letter-spacing:0.05em;">Sin aparecer este mes:</span>
-        <span style="display:inline-flex;gap:6px;flex-wrap:wrap;margin-left:8px;">
-          ${ausentes.map(f=>`<span class="cat-tag" style="opacity:0.6;">${f.nombre}</span>`).join('')}
-        </span>
-      </div>`
-    : '';
-
-  const totalStr = [
-    totalARS>0 ? `<strong style="color:var(--t-fff);">${fmt(totalARS)}</strong>` : '',
-    totalUSD>0 ? `<strong style="color:var(--accent-green);">U$S ${totalUSD.toFixed(2)}</strong>` : ''
-  ].filter(Boolean).join(' + ');
-
-  block.innerHTML = `
-    <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:4px;">
-      <div>
-        <p class="chart-title" style="margin-bottom:4px;">Débitos fijos del resumen · ${mes}</p>
-        <p style="font-size:12px;color:var(--t-aaa);">Suscripciones y cargos recurrentes detectados</p>
-      </div>
-    </div>
-    ${detectados.length
-      ? `<p style="font-size:13px;color:var(--t-ccc);margin-bottom:12px;line-height:1.6;">
-          ${detectados.length} fijos este mes por${totalStr}.
-        </p>
-        <table class="ranking-table">
-          <thead><tr>
-            <th style="width:38%">Concepto</th>
-            <th style="width:37%">Tarjeta</th>
-            <th style="width:25%;text-align:right">Monto</th>
-          </tr></thead>
-          <tbody>${filas}</tbody>
-        </table>`
-      : `<p style="font-size:12px;color:var(--t-aaa);">Ningún débito fijo detectado en este resumen.</p>`}
-    ${ausentesHtml}`;
-  block.style.display='block';
 }
 
 function renderCompromisos() {
